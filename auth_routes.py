@@ -12,7 +12,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationE
 
 from config import Config
 from extensions import db
-from models import User
+from models import User, normalize_username
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -39,8 +39,8 @@ def _record_failed_login() -> None:
 
 
 def _validate_username(form, field):
-    value = field.data.strip()
-    if not re.fullmatch(r"[A-Za-z0-9_]+", value):
+    value = normalize_username(field.data)
+    if not re.fullmatch(r"[a-z0-9_]+", value):
         raise ValidationError("Имя пользователя: только буквы, цифры и _")
 
 
@@ -114,7 +114,7 @@ def register():
 
     form = RegisterForm()
     if form.validate_on_submit():
-        username = form.username.data.strip()
+        username = normalize_username(form.username.data)
         email = form.email.data.strip().lower()
 
         if User.query.filter_by(username=username).first():
@@ -146,9 +146,9 @@ def login():
             flash(str(exc), "error")
             return render_template("auth/login.html", form=form)
 
-        login_value = form.login.data.strip()
+        login_value = form.login.data.strip().lower()
         user = User.query.filter(
-            (User.email == login_value.lower()) | (User.username == login_value)
+            (User.email == login_value) | (User.username == login_value)
         ).first()
 
         if user is None or not user.check_password(form.password.data):

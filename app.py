@@ -63,9 +63,34 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
         _ensure_solution_xml_column()
+        _normalize_existing_usernames()
 
     register_routes(app)
     return app
+
+
+def _normalize_existing_usernames():
+    """Привести существующие имена пользователей к нижнему регистру."""
+    from sqlalchemy.exc import IntegrityError
+
+    changed = False
+    for user in User.query.all():
+        normalized = user.username.strip().lower()
+        if user.username == normalized:
+            continue
+        conflict = User.query.filter(
+            User.username == normalized, User.id != user.id
+        ).first()
+        if conflict:
+            continue
+        user.username = normalized
+        changed = True
+    if not changed:
+        return
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def _ensure_solution_xml_column():

@@ -174,6 +174,12 @@
 
     <aside class="profile-sidebar" aria-label="Подсказки и активность">
 
+      <article class="sidebar-card sidebar-card--account">
+        <h3 class="sidebar-card__title">Аккаунт</h3>
+        <p class="sidebar-card__email">{{ current_user.email }}</p>
+        <a href="{{ url_for('profile.change_password') }}" class="btn btn--small btn--ghost">Сменить пароль</a>
+      </article>
+
       <article class="sidebar-card skill-unlock{% if skills.time_machine_unlocked %} skill-unlock--active{% endif %}">
         <span class="skill-unlock__icon" aria-hidden="true">⏱️</span>
         <div class="skill-unlock__body">

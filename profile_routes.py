@@ -2,14 +2,47 @@
 
 from datetime import datetime, timezone
 
-from flask import Blueprint, abort, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
+from flask_wtf import FlaskForm
+from wtforms import PasswordField, SubmitField
+from wtforms.validators import DataRequired, EqualTo, Length
 
+from auth_routes import _validate_password_strength
+from config import Config
 from data.registry import get_task_with_tests, get_tasks_public, get_topics
+from extensions import db
 from models import TaskAttempt, TaskProgress
 from skills_service import build_skills_profile
 
 profile_bp = Blueprint("profile", __name__, url_prefix="/profile")
+
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField(
+        "Текущий пароль",
+        validators=[DataRequired(message="Введите текущий пароль")],
+    )
+    new_password = PasswordField(
+        "Новый пароль",
+        validators=[
+            DataRequired(message="Укажите новый пароль"),
+            Length(
+                min=Config.PASSWORD_MIN_LENGTH,
+                message=f"Минимум {Config.PASSWORD_MIN_LENGTH} символов",
+            ),
+            _validate_password_strength,
+        ],
+    )
+    new_password_confirm = PasswordField(
+        "Подтверждение нового пароля",
+        validators=[
+            DataRequired(message="Подтвердите новый пароль"),
+            EqualTo("new_password", message="Пароли не совпадают"),
+        ],
+    )
+    submit = SubmitField("Сохранить пароль")
+
 
 ACHIEVEMENT_CATEGORIES = [
     ("tasks", "Задачи"),
@@ -518,6 +551,24 @@ def _build_dashboard_data(user):
 def dashboard():
     data = _build_dashboard_data(current_user)
     return render_template("profile/dashboard.html", **data)
+
+
+@profile_bp.route("/password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if not current_user.check_password(form.current_password.data):
+            flash("Неверный текущий пароль.", "error")
+        elif current_user.check_password(form.new_password.data):
+            flash("Новый пароль должен отличаться от текущего.", "error")
+        else:
+            current_user.set_password(form.new_password.data)
+            db.session.commit()
+            flash("Пароль успешно изменён.", "success")
+            return redirect(url_for("profile.dashboard"))
+
+    return render_template("profile/change_password.html", form=form)
 
 
 @profile_bp.route("/solution/<topic_id>/<task_id>")

@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 
 from flask_login import UserMixin
+from sqlalchemy.orm import validates
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from extensions import db
@@ -10,6 +11,10 @@ from extensions import db
 
 def _utcnow():
     return datetime.now(timezone.utc)
+
+
+def normalize_username(value: str) -> str:
+    return value.strip().lower()
 
 
 class User(UserMixin, db.Model):
@@ -51,6 +56,10 @@ class User(UserMixin, db.Model):
         cascade="all, delete-orphan",
         lazy="dynamic",
     )
+
+    @validates("username")
+    def _set_username(self, key, value: str) -> str:
+        return normalize_username(value)
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password, method="scrypt")
