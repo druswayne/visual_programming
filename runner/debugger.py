@@ -7,7 +7,12 @@ import tempfile
 from pathlib import Path
 
 from runner.pool import ExecutionPoolBusy, execution_slot
-from runner.sandbox import EXECUTION_TIMEOUT, MAX_OUTPUT_CHARS, validate_code
+from runner.sandbox import (
+    EXECUTION_TIMEOUT,
+    MAX_OUTPUT_CHARS,
+    resolve_python_executable,
+    validate_code,
+)
 
 MAX_STEPS = 500
 
@@ -376,7 +381,7 @@ def debug_python_code(code: str, stdin_text: str = "") -> dict:
     try:
         with execution_slot():
             result = subprocess.run(
-                [sys.executable, tmp_path],
+                [resolve_python_executable(), tmp_path],
                 capture_output=True,
                 text=True,
                 encoding="utf-8",

@@ -1,9 +1,10 @@
 """Безопасный запуск Python-кода для учебных целей."""
 
+import os
+import shutil
 import subprocess
 import sys
 import tempfile
-import os
 from pathlib import Path
 
 from runner.pool import ExecutionPoolBusy, execution_slot
@@ -30,6 +31,33 @@ FORBIDDEN_PATTERNS = [
 
 MAX_OUTPUT_CHARS = 8000
 EXECUTION_TIMEOUT = 5
+
+_NON_PYTHON_EXECUTABLE_MARKERS = ("uwsgi", "gunicorn")
+
+
+def resolve_python_executable() -> str:
+    """Возвращает путь к интерпретатору Python (не uWSGI/gunicorn)."""
+    override = os.environ.get("SANDBOX_PYTHON")
+    if override:
+        return override
+
+    candidates = []
+    base = getattr(sys, "_base_executable", None)
+    if base:
+        candidates.append(base)
+    candidates.append(sys.executable)
+
+    for exe in candidates:
+        name = os.path.basename(exe).lower()
+        if "python" in name and not any(marker in name for marker in _NON_PYTHON_EXECUTABLE_MARKERS):
+            return exe
+
+    for name in ("python3", "python"):
+        found = shutil.which(name)
+        if found:
+            return found
+
+    return sys.executable
 
 
 def validate_code(code: str):
@@ -59,7 +87,7 @@ def run_python_code(code: str, stdin_text: str = "") -> dict:
     try:
         with execution_slot():
             result = subprocess.run(
-                [sys.executable, tmp_path],
+                [resolve_python_executable(), tmp_path],
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
