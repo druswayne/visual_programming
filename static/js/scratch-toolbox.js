@@ -30,6 +30,9 @@ const ScratchToolbox = {
 
     this.buildCategoryRail();
     this.setupPersistentFlyout();
+    this.patchFlyoutFixedWidth();
+    this.patchToolboxRefresh();
+    this.setupVariableChangeGuard();
     this.hideNativeToolbox();
     this.setupFlyoutDragRefresh();
     this.selectCategory(0);
@@ -48,6 +51,75 @@ const ScratchToolbox = {
     if (typeof flyout.setRecycleBlocks === "function") {
       flyout.setRecycleBlocks(true);
     }
+  },
+
+  /**
+   * Blockly по умолчанию подстраивает ширину flyout под содержимое и сдвигает
+   * рабочую область (translate). У нас ширина задаётся CSS (--palette-width).
+   */
+  patchFlyoutFixedWidth() {
+    const flyout = this.toolbox.getFlyout && this.toolbox.getFlyout();
+    if (!flyout || flyout._pyblocksFixedWidthPatched) return;
+
+    const self = this;
+    flyout._pyblocksFixedWidthPatched = true;
+
+    flyout.reflowInternal_ = function () {
+      const fixedWidth = self.getPaletteWidth();
+      this.workspace_.scale = this.getFlyoutScale();
+
+      if (this.getWidth() === fixedWidth) return;
+
+      if (this.RTL) {
+        for (const item of this.getContents()) {
+          const rect = item.getElement().getBoundingRectangle();
+          const targetLeft =
+            fixedWidth / this.workspace_.scale - rect.getWidth() - this.MARGIN - this.tabWidth_;
+          item.getElement().moveBy(targetLeft - rect.left, 0);
+        }
+      }
+
+      this.width_ = fixedWidth;
+      this.position();
+      if (this.targetWorkspace) {
+        this.targetWorkspace.resizeContents();
+        this.targetWorkspace.recordDragTargets();
+      }
+      self.applyFixedFlyoutWidth(fixedWidth);
+    };
+  },
+
+  patchToolboxRefresh() {
+    if (!this.toolbox || this.toolbox._pyblocksRefreshPatched) return;
+
+    const self = this;
+    const originalRefresh = this.toolbox.refreshSelection.bind(this.toolbox);
+    this.toolbox._pyblocksRefreshPatched = true;
+
+    this.toolbox.refreshSelection = function () {
+      originalRefresh();
+      self.applyFixedFlyoutWidth(self.getPaletteWidth());
+    };
+  },
+
+  setupVariableChangeGuard() {
+    const varEvents = new Set([
+      Blockly.Events.VAR_CREATE,
+      Blockly.Events.VAR_DELETE,
+      Blockly.Events.VAR_RENAME,
+      Blockly.Events.VAR_TYPE_CHANGE,
+    ]);
+
+    this.workspace.addChangeListener((event) => {
+      if (!varEvents.has(event.type)) return;
+      if (event.workspaceId !== this.workspace.id) return;
+
+      const width = this.getPaletteWidth();
+      this.applyFixedFlyoutWidth(width);
+      requestAnimationFrame(() => {
+        this.applyFixedFlyoutWidth(width);
+      });
+    });
   },
 
   isInteractionBlocked() {

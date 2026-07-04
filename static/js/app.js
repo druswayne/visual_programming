@@ -115,7 +115,9 @@ function initPanelResize() {
     if (!dragging) return;
     const area = document.getElementById("editorArea");
     const rect = area.getBoundingClientRect();
-    const paletteWidth = Math.min(maxPalette, Math.max(minPalette, e.clientX - rect.left - 56));
+    const catWidth =
+      parseInt(getComputedStyle(shell).getPropertyValue("--cat-width"), 10) || 84;
+    const paletteWidth = Math.min(maxPalette, Math.max(minPalette, e.clientX - rect.left - catWidth));
     shell.style.setProperty("--palette-width", paletteWidth + "px");
     Blockly.svgResize(workspace);
     ScratchToolbox.onResize();
@@ -309,58 +311,88 @@ function copyCode() {
   });
 }
 
-function initMobileBlocksPanel() {
+function getEditorViewportWidth() {
+  if (window.visualViewport && window.visualViewport.width > 0) {
+    return window.visualViewport.width;
+  }
+  return document.documentElement.clientWidth;
+}
+
+function initEditorResponsive() {
   const toggle = document.getElementById("btnBlocksToggle");
   const backdrop = document.getElementById("blocksPanelBackdrop");
-  if (!toggle) return;
+  const layout = document.querySelector(".layout");
+  const shell = document.getElementById("blocklyShell");
+  if (!layout) return;
 
-  const mq = window.matchMedia("(max-width: 640px)");
+  let raf = 0;
 
-  function resizeWorkspace() {
-    if (typeof Blockly !== "undefined" && typeof workspace !== "undefined" && workspace) {
-      Blockly.svgResize(workspace);
-    }
-    if (typeof ScratchToolbox !== "undefined") {
-      ScratchToolbox.onResize();
-    }
-    if (typeof TopicsUI !== "undefined") {
-      TopicsUI.updateWorkspaceLayout();
-    }
+  function refreshWorkspace() {
+    refreshWorkspaceLayout();
   }
 
-  function setOpen(open) {
+  function setBlocksOpen(open) {
     document.body.classList.toggle("blocks-panel-open", open);
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
     if (backdrop) {
       backdrop.hidden = !open;
       backdrop.setAttribute("aria-hidden", open ? "false" : "true");
     }
-    resizeWorkspace();
+    refreshWorkspace();
   }
 
-  function syncMode() {
-    const mobile = mq.matches;
-    toggle.hidden = !mobile;
-    if (!mobile) setOpen(false);
+  function updateLayoutMode() {
+    const viewportWidth = getEditorViewportWidth();
+    const shellWidth = shell ? shell.clientWidth : viewportWidth;
+    const narrow = viewportWidth < 1100;
+    const compact = viewportWidth < 880;
+    const tiny = shellWidth < 620 || viewportWidth < 640;
+
+    document.body.classList.toggle("editor-narrow", narrow);
+    document.body.classList.toggle("editor-compact", compact);
+    document.body.classList.toggle("editor-tiny", tiny);
+
+    if (toggle) {
+      toggle.hidden = !tiny;
+    }
+    if (!tiny && document.body.classList.contains("blocks-panel-open")) {
+      setBlocksOpen(false);
+    } else {
+      refreshWorkspace();
+    }
   }
 
-  toggle.addEventListener("click", function () {
-    setOpen(!document.body.classList.contains("blocks-panel-open"));
-  });
+  function scheduleUpdate() {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(updateLayoutMode);
+  }
 
-  if (backdrop) {
-    backdrop.addEventListener("click", function () {
-      setOpen(false);
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      setBlocksOpen(!document.body.classList.contains("blocks-panel-open"));
     });
   }
 
-  if (typeof mq.addEventListener === "function") {
-    mq.addEventListener("change", syncMode);
-  } else if (typeof mq.addListener === "function") {
-    mq.addListener(syncMode);
+  if (backdrop) {
+    backdrop.addEventListener("click", function () {
+      setBlocksOpen(false);
+    });
   }
 
-  syncMode();
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", scheduleUpdate);
+  }
+  window.addEventListener("resize", scheduleUpdate);
+
+  if (typeof ResizeObserver !== "undefined") {
+    const observer = new ResizeObserver(scheduleUpdate);
+    observer.observe(layout);
+    if (shell) observer.observe(shell);
+  }
+
+  scheduleUpdate();
 }
 
 function centerWorkspaceOnBlocks() {
@@ -373,7 +405,7 @@ function centerWorkspaceOnBlocks() {
 
 document.addEventListener("DOMContentLoaded", function () {
   initBlockly();
-  initMobileBlocksPanel();
+  initEditorResponsive();
   TopicsUI.init();
   CodeEditor.init();
   document.getElementById("btnRun").addEventListener("click", runCode);

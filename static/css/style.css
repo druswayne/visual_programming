@@ -13,12 +13,45 @@
   --radius: 10px;
   --font: "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "Cascadia Code", "Consolas", "Courier New", monospace;
+  --scrollbar-size: 8px;
+  --scrollbar-track: var(--surface-2);
+  --scrollbar-thumb: #3d5068;
+  --scrollbar-thumb-hover: var(--accent);
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-track);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  border: 2px solid var(--scrollbar-track);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
 }
 
 body {
@@ -32,7 +65,7 @@ body {
 }
 
 body:not(.page-body) {
-  --editor-cat-width: 56px;
+  --editor-cat-width: 84px;
   --editor-palette-width: 242px;
   --editor-blocks-offset: calc(var(--editor-cat-width) + var(--editor-palette-width));
 }
@@ -712,7 +745,7 @@ body:not(.page-body) {
 /* --- Blockly shell: Scratch-панель + колонка рабочей области --- */
 .blockly-shell {
   --palette-width: var(--editor-palette-width, 242px);
-  --cat-width: var(--editor-cat-width, 56px);
+  --cat-width: var(--editor-cat-width, 84px);
   --palette-title-height: 38px;
   --workspace-top-offset: 0px;
   --active-cat-color: #4c97ff;
@@ -802,8 +835,8 @@ body:not(.page-body) {
 .scratch-categories {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 6px 3px;
+  gap: 3px;
+  padding: 8px 5px;
   background: #141618;
   border-right: 1px solid var(--border);
   overflow-y: auto;
@@ -812,11 +845,11 @@ body:not(.page-body) {
 
 .scratch-cat {
   --cat-color: #4a6278;
-  width: 48px;
-  height: 44px;
-  min-height: 44px;
-  max-height: 44px;
-  padding: 4px 2px;
+  width: 100%;
+  height: 56px;
+  min-height: 56px;
+  max-height: 56px;
+  padding: 5px 4px;
   border: none;
   border-left: 3px solid transparent;
   border-radius: 3px;
@@ -827,7 +860,7 @@ body:not(.page-body) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
+  gap: 3px;
   transition: background 0.12s, color 0.12s, border-color 0.12s;
   font-family: var(--mono);
   flex-shrink: 0;
@@ -846,20 +879,23 @@ body:not(.page-body) {
 }
 
 .scratch-cat__icon {
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   font-weight: 600;
   line-height: 1;
   font-family: var(--mono);
 }
 
 .scratch-cat__label {
-  font-size: 0.55rem;
-  line-height: 1.1;
+  font-size: 0.68rem;
+  line-height: 1.15;
   text-align: center;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
   opacity: 0.85;
 }
 
@@ -1999,7 +2035,7 @@ dialog.blocklyDialog::backdrop {
   }
 
   body:not(.page-body) {
-    --editor-cat-width: 48px;
+    --editor-cat-width: 56px;
     --editor-palette-width: 198px;
   }
 
@@ -2102,7 +2138,7 @@ dialog.blocklyDialog::backdrop {
   }
 
   body:not(.page-body) {
-    --editor-cat-width: 44px;
+    --editor-cat-width: 48px;
     --editor-palette-width: 176px;
   }
 
@@ -2196,12 +2232,22 @@ dialog.blocklyDialog::backdrop {
   }
 
   body:not(.page-body) {
-    --editor-cat-width: 40px;
+    --editor-cat-width: 48px;
     --editor-palette-width: 152px;
   }
 
   .scratch-cat__label {
     display: none;
+  }
+
+  .scratch-cat__icon {
+    font-size: 1.25rem;
+  }
+
+  .scratch-cat {
+    height: 46px;
+    min-height: 46px;
+    max-height: 46px;
   }
 
   .sidebar {
@@ -2284,7 +2330,7 @@ dialog.blocklyDialog::backdrop {
   body:not(.page-body).blocks-panel-open .blocks-panel {
     transform: translateX(0);
     pointer-events: auto;
-    --editor-cat-width: 44px;
+    --editor-cat-width: 48px;
     --editor-palette-width: min(76vw, 220px);
   }
 

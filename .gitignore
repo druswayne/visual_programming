@@ -1,0 +1,18 @@
+# База данных
+/pyblocks.db
+*.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Окружение
+.venv/
+venv/
+.env
+.env.*
+
+# IDE
+.idea/

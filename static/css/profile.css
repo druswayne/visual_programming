@@ -284,8 +284,6 @@
   overflow-y: auto;
   flex: 1;
   padding-right: 2px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) var(--surface-2);
 }
 
 .sidebar-feed {
