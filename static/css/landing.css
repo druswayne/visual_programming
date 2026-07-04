@@ -113,6 +113,150 @@
   margin-top: 0;
 }
 
+/* Прокрутка вниз — только десктоп */
+.hero__scroll-down {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .page-main:has(.landing) {
+    padding-top: 12px;
+  }
+
+  .landing .hero--landing {
+    position: relative;
+    min-height: calc(100svh - 76px);
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 56px;
+    padding-bottom: 24px;
+  }
+
+  .hero__actions--cta {
+    gap: 14px;
+  }
+
+  .hero__scroll-down {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #fbbf24;
+    cursor: pointer;
+    transition: opacity 0.35s ease, transform 0.25s ease;
+    z-index: 2;
+  }
+
+  .hero__scroll-down:hover {
+    color: #fde68a;
+    transform: translateY(2px);
+  }
+
+  .hero__scroll-down:hover .hero__scroll-down-ring {
+    border-color: rgba(251, 191, 36, 0.75);
+    box-shadow:
+      0 0 0 4px rgba(245, 158, 11, 0.12),
+      0 0 24px rgba(245, 158, 11, 0.35);
+  }
+
+  .hero__scroll-down.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+  }
+
+  .hero__scroll-down-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(245, 158, 11, 0.5);
+    background:
+      radial-gradient(circle at 50% 30%, rgba(251, 191, 36, 0.18) 0%, transparent 65%),
+      rgba(245, 158, 11, 0.08);
+    box-shadow:
+      0 0 0 3px rgba(245, 158, 11, 0.08),
+      0 4px 20px rgba(0, 0, 0, 0.25);
+    animation: heroScrollRingPulse 2.4s ease-in-out infinite;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+
+  .hero__scroll-down-svg {
+    display: block;
+    overflow: visible;
+  }
+
+  .hero__scroll-down-chevron {
+    opacity: 0.35;
+  }
+
+  .hero__scroll-down-chevron--1 {
+    animation: heroScrollChevron 2s ease-in-out infinite;
+  }
+
+  .hero__scroll-down-chevron--2 {
+    animation: heroScrollChevron 2s ease-in-out 0.35s infinite;
+  }
+
+  .hero__scroll-down-hint {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.85;
+    transition: color 0.25s, opacity 0.25s;
+  }
+
+  .hero__scroll-down:hover .hero__scroll-down-hint {
+    color: #fcd34d;
+    opacity: 1;
+  }
+}
+
+@keyframes heroScrollRingPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px rgba(245, 158, 11, 0.06),
+      0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(245, 158, 11, 0.14),
+      0 0 28px rgba(245, 158, 11, 0.22),
+      0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@keyframes heroScrollChevron {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__scroll-down-ring,
+  .hero__scroll-down-chevron--1,
+  .hero__scroll-down-chevron--2 {
+    animation: none;
+  }
+
+  .hero__scroll-down-chevron {
+    opacity: 0.85;
+  }
+}
+
 .landing .hero__badge {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(59, 130, 246, 0.14));
   border-color: rgba(245, 158, 11, 0.35);
@@ -479,6 +623,21 @@
   font-weight: 600;
   opacity: 0;
   transform: scale(0.9);
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.demo-run-btn:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+.demo-run-btn:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
 }
 
 .demo-run-btn__icon {
@@ -680,6 +839,10 @@
   margin-bottom: 72px;
 }
 
+.landing #how-it-works {
+  scroll-margin-top: 40px;
+}
+
 .steps-flow__track {
   display: flex;
   align-items: stretch;
@@ -816,6 +979,18 @@
 
 .landing-sandbox__output--error {
   color: #fca5a5;
+}
+
+.landing-sandbox__output--hint {
+  color: #fcd34d;
+}
+
+.landing-sandbox__output--success {
+  color: #86efac;
+}
+
+.landing-sandbox__output--running {
+  color: var(--text-muted);
 }
 
 .landing-sandbox__output--idle {

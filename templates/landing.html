@@ -27,14 +27,13 @@
       <p class="hero__badge">Визуальный Python · прямо в браузере</p>
 
       <h1 class="hero__title hero__title--landing">
-        Собираешь программу из <em class="hero__highlight hero__highlight--blocks">блоков</em> —
-        и сразу видишь <em class="hero__highlight hero__highlight--python">Python</em>
-        <span class="hero__title-tagline">· настоящий код, строчка за строчкой</span>
+        Освойте программирование через <em class="hero__highlight hero__highlight--blocks">блоки</em> —
+        лёгкий старт с <em class="hero__highlight hero__highlight--python">Python</em>
       </h1>
 
       <p class="hero__text">
-        Соединяйте блоки как в конструкторе — редактор <strong>мгновенно показывает Python</strong>.
-        Запускайте программу и разбирайте каждую строку.
+        Для начинающих блоки — самый простой путь в код: собирайте программу как конструктор,
+        редактор <strong>показывает Python рядом</strong> — и вы учитесь на каждом запуске.
       </p>
 
     </div>
@@ -89,13 +88,13 @@
 
             <pre class="code-panel__pre"><code><span class="code-line code-line--1"><span class="tk-name">name</span> <span class="tk-op">=</span> <span class="tk-str">'Аня'</span></span><span class="code-line code-line--2"><span class="tk-fn">print</span>(<span class="tk-str">'Привет, '</span> <span class="tk-op">+</span> <span class="tk-name">name</span>)</span></code></pre>
 
-            <div class="code-panel__run demo-run-btn">
+            <a href="{{ url_for('learn', demo='greet') }}" class="code-panel__run demo-run-btn">
 
-              <span class="demo-run-btn__icon">▶</span>
+              <span class="demo-run-btn__icon" aria-hidden="true">▶</span>
 
               <span>Запустить</span>
 
-            </div>
+            </a>
 
           </div>
 
@@ -153,13 +152,32 @@
 
       </div>
 
+      <button
+        type="button"
+        class="hero__scroll-down"
+        id="heroScrollDown"
+        aria-label="Прокрутить к разделу «Как это работает»"
+      >
+        <span class="hero__scroll-down-ring" aria-hidden="true">
+          <svg class="hero__scroll-down-svg" viewBox="0 0 32 40" width="32" height="40" fill="none">
+            <g class="hero__scroll-down-chevron hero__scroll-down-chevron--1">
+              <path d="M6 12 L16 20 L26 12" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <g class="hero__scroll-down-chevron hero__scroll-down-chevron--2">
+              <path d="M6 20 L16 28 L26 20" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </svg>
+        </span>
+        <span class="hero__scroll-down-hint">Как это работает</span>
+      </button>
+
     </div>
 
   </section>
 
 
 
-  <section class="steps-flow reveal" aria-label="Как это работает">
+  <section class="steps-flow reveal" id="how-it-works" aria-label="Как это работает">
 
     <h2 class="section-title">Как это работает</h2>
 

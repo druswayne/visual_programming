@@ -2,6 +2,54 @@
  * Демо на главной: настоящие Blockly-блоки + анимация кода и результата.
  */
 (function () {
+  function initHeroScrollDown() {
+    const btn = document.getElementById("heroScrollDown");
+    const target = document.getElementById("how-it-works");
+    if (!btn || !target) return;
+
+    const desktopMq = window.matchMedia("(min-width: 1024px)");
+
+    function scrollToContent() {
+      const heading = target.querySelector(".section-title") || target;
+      const topGap = 40;
+      const scrollTop =
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
+      const y = heading.getBoundingClientRect().top + scrollTop - topGap;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    }
+
+    btn.addEventListener("click", scrollToContent);
+
+    function syncVisibility() {
+      if (!desktopMq.matches) {
+        btn.classList.add("is-hidden");
+        return;
+      }
+      const hero = document.querySelector(".hero--landing");
+      if (!hero) return;
+      const heroBottom = hero.getBoundingClientRect().bottom;
+      const hide = heroBottom < window.innerHeight * 0.55;
+      btn.classList.toggle("is-hidden", hide);
+    }
+
+    window.addEventListener("scroll", syncVisibility, { passive: true });
+    if (typeof desktopMq.addEventListener === "function") {
+      desktopMq.addEventListener("change", syncVisibility);
+    } else if (typeof desktopMq.addListener === "function") {
+      desktopMq.addListener(syncVisibility);
+    }
+    syncVisibility();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initHeroScrollDown);
+  } else {
+    initHeroScrollDown();
+  }
+
   if (typeof Blockly === "undefined") return;
 
   const pyblocksTheme = Blockly.Theme.defineTheme("pyblocks", {
