@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}PyBlocks — визуальное программирование на Python{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="landing">
+
+  <section class="hero hero--landing">
+    <div class="hero__content">
+      <p class="hero__badge">Блоки → Python → результат</p>
+      <h1 class="hero__title">Видишь блоки — понимаешь, как работает код на Python</h1>
+      <p class="hero__text">
+        PyBlocks — это визуальное программирование: вы соединяете блоки как в конструкторе,
+        а редактор <strong>сразу показывает настоящий Python-код</strong>. Запускайте программу,
+        смотрите вывод и шаг за шагом разбирайтесь, что делает каждая строка.
+      </p>
+      <ul class="hero__points">
+        <li><span>🧩</span> Перетаскивайте и щёлкайте блоки — без синтаксических ошибок</li>
+        <li><span>🐍</span> Код Python обновляется в реальном времени</li>
+        <li><span>▶</span> Запуск и пошаговая отладка прямо в браузере</li>
+      </ul>
+      <div class="hero__actions">
+        <a href="{{ url_for('learn') }}" class="btn btn--primary btn--large">Открыть редактор</a>
+        {% if not current_user.is_authenticated %}
+          <a href="{{ url_for('auth.register') }}" class="btn btn--ghost btn--large">Создать аккаунт</a>
+        {% else %}
+          <a href="{{ url_for('profile.dashboard') }}" class="btn btn--ghost btn--large">Мой прогресс</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="landing-demo" id="landingDemo" aria-hidden="true">
+      <div class="landing-demo__stage">
+        <div class="landing-demo__col landing-demo__col--blocks">
+          <div class="demo-panel__label">Блоки</div>
+          <div
+            id="landingBlocksPreview"
+            class="landing-blocks-preview guide-preview"
+            data-guide-mounted="0"
+          ></div>
+        </div>
+
+        <div class="demo-connector demo-connector--1" aria-hidden="true">
+          <svg class="demo-connector__svg" viewBox="0 0 56 32" width="56" height="32">
+            <path class="demo-connector__path" d="M4 16 H40" />
+            <path class="demo-connector__head" d="M34 10 L46 16 L34 22" />
+          </svg>
+          <span class="demo-connector__label">код</span>
+        </div>
+
+        <div class="landing-demo__col landing-demo__col--code">
+          <div class="demo-panel__label">Python-код</div>
+          <div class="code-panel">
+            <pre class="code-panel__pre"><code>
+<span class="code-line code-line--1"><span class="tk-name">name</span> <span class="tk-op">=</span> <span class="tk-str">'Аня'</span></span>
+<span class="code-line code-line--2"><span class="tk-fn">print</span>(<span class="tk-str">'Привет, '</span> <span class="tk-op">+</span> <span class="tk-name">name</span>)</span>
+            </code></pre>
+            <div class="code-panel__run demo-run-btn">
+              <span class="demo-run-btn__icon">▶</span>
+              <span>Запустить</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-connector demo-connector--2" aria-hidden="true">
+          <svg class="demo-connector__svg" viewBox="0 0 56 32" width="56" height="32">
+            <path class="demo-connector__path" d="M4 16 H40" />
+            <path class="demo-connector__head" d="M34 10 L46 16 L34 22" />
+          </svg>
+          <span class="demo-connector__label">запуск</span>
+        </div>
+
+        <div class="landing-demo__col landing-demo__col--output">
+          <div class="demo-panel__label">Результат</div>
+          <div class="output-panel">
+            <div class="output-panel__badge demo-output-badge">Выполняется…</div>
+            <pre class="output-panel__text"><span class="demo-output-line">Привет, Аня</span><span class="demo-cursor">▌</span></pre>
+          </div>
+        </div>
+      </div>
+      <p class="landing-demo__caption">Анимация: блоки соединяются → появляется Python → программа выполняется</p>
+    </div>
+  </section>
+
+  <section class="how-it-works reveal">
+    <h2 class="section-title">Как это работает</h2>
+    <div class="steps">
+      <article class="step-card">
+        <div class="step-card__num">1</div>
+        <div class="step-card__visual step-card__visual--snap">
+          <div
+            id="stepBlocksPreview"
+            class="step-blocks-preview guide-preview"
+            data-guide-mounted="0"
+            data-preview-mode="compact"
+          ></div>
+        </div>
+        <h3>Соединяйте блоки</h3>
+        <p>Блоки щёлкаются друг к другу, как в конструкторе. Условия, циклы, переменные — всё наглядно.</p>
+      </article>
+      <article class="step-card">
+        <div class="step-card__num">2</div>
+        <div class="step-card__visual step-card__visual--code">
+          <pre class="mini-code"><code><span class="tk-fn">print</span>(<span class="tk-str">'Hello'</span>)</code></pre>
+        </div>
+        <h3>Смотрите Python</h3>
+        <p>Справа в редакторе — настоящий код. Видно, какой блок какую строку создаёт.</p>
+      </article>
+      <article class="step-card">
+        <div class="step-card__num">3</div>
+        <div class="step-card__visual step-card__visual--run">
+          <div class="mini-output"><span class="mini-output__line">Hello</span></div>
+        </div>
+        <h3>Запускайте и учитесь</h3>
+        <p>Выполнение, отладка по шагам и проверка задач — вы понимаете логику, а не заучиваете синтаксис.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block-showcase reveal">
+    <h2 class="section-title">Примеры блоков</h2>
+    <p class="section-lead">Каждый тип блока — это конструкция Python. Цвет помогает быстро узнавать категорию.</p>
+    <div class="block-gallery">
+      <div class="block-gallery__item">
+        <div class="pb-block pb-block--start pb-block--mini"><span class="pb-block__icon">▶</span><span class="pb-block__text">НАЧАЛО ПРОГРАММЫ</span></div>
+        <span class="block-gallery__code"># точка входа</span>
+      </div>
+      <div class="block-gallery__item">
+        <div class="pb-block pb-block--var pb-block--mini"><span class="pb-block__kw">задать</span> <span class="pb-block__var">имя</span> <span class="pb-block__op">=</span> <span class="pb-block__slot">…</span></div>
+        <span class="block-gallery__code">name = …</span>
+      </div>
+      <div class="block-gallery__item">
+        <div class="pb-block pb-block--print pb-block--mini"><span class="pb-block__kw">вывести</span> <span class="pb-block__slot">…</span></div>
+        <span class="block-gallery__code">print(…)</span>
+      </div>
+      <div class="block-gallery__item">
+        <div class="pb-block pb-block--if pb-block--mini"><span class="pb-block__kw">если</span> <span class="pb-block__slot">…</span></div>
+        <span class="block-gallery__code">if …:</span>
+      </div>
+      <div class="block-gallery__item">
+        <div class="pb-block pb-block--for pb-block--mini"><span class="pb-block__kw">для</span> <span class="pb-block__var">i</span> <span class="pb-block__kw">в</span> <span class="pb-block__slot">…</span></div>
+        <span class="block-gallery__code">for i in …:</span>
+      </div>
+      <div class="block-gallery__item">
+        <div class="pb-block pb-block--while pb-block--mini"><span class="pb-block__kw">пока</span> <span class="pb-block__slot">…</span></div>
+        <span class="block-gallery__code">while …:</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features reveal">
+    <h2 class="section-title">Возможности платформы</h2>
+    <div class="features__grid">
+      <article class="feature-card">
+        <div class="feature-card__icon">🧩</div>
+        <h3>Визуальный редактор</h3>
+        <p>Визуальные блоки с генерацией Python-кода в реальном времени — идеально для первых шагов в программировании.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-card__icon">📚</div>
+        <h3>7 тем и 200+ задач</h3>
+        <p>Ввод-вывод, числа, условия, циклы, строки и списки с обучающими материалами и автопроверкой.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-card__icon">⏭</div>
+        <h3>Пошаговая отладка</h3>
+        <p>Смотрите, как выполняется каждая строка: подсветка блоков, переменных и вывода.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-card__icon">👤</div>
+        <h3>Личный кабинет</h3>
+        <p>Сохранение прогресса, число попыток и история ваших решений по каждой задаче.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="topics-preview reveal">
+    <h2 class="section-title">Темы курса</h2>
+    <div class="topics-preview__grid">
+      <div class="topic-chip">Ввод и вывод</div>
+      <div class="topic-chip">Числа и операции</div>
+      <div class="topic-chip">Условные конструкции</div>
+      <div class="topic-chip">Цикл while</div>
+      <div class="topic-chip">Цикл for</div>
+      <div class="topic-chip">Строки</div>
+      <div class="topic-chip">Списки</div>
+    </div>
+    <div class="topics-preview__cta">
+      <a href="{{ url_for('learn') }}" class="btn btn--primary">Попробовать в редакторе →</a>
+    </div>
+  </section>
+
+  <section class="cta-block reveal">
+    <h2>Соберите первую программу за минуту</h2>
+    <p>Откройте редактор, перетащите блок «вывести» — и увидите, как он превращается в <code>print()</code>.</p>
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('learn') }}" class="btn btn--primary btn--large">Продолжить обучение</a>
+    {% else %}
+      <a href="{{ url_for('learn') }}" class="btn btn--primary btn--large">Начать в песочнице</a>
+      <a href="{{ url_for('auth.register') }}" class="btn btn--ghost btn--large">Зарегистрироваться для задач</a>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/blockly_compressed.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/blocks_compressed.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/python_compressed.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/msg/ru.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pyblocks-locale.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/compact-renderer.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/method-blocks.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/blocks.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/program-frame.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/guide-preview.js') }}"></script>
+  <script>
+    window.LANDING_DEMO_XML = {{ landing_demo_xml|default('', true)|tojson }};
+    window.STEP_CONNECT_DEMO_XML = {{ step_connect_demo_xml|default('', true)|tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='js/landing-demo.js') }}"></script>
+{% endblock %}

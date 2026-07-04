@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>PyBlocks — визуальное программирование на Python</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/blockly_compressed.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/blocks_compressed.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/python_compressed.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/msg/ru.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pyblocks-locale.js') }}"></script>
+  <script>
+    function getJsonHeaders() {
+      const headers = { "Content-Type": "application/json" };
+      const meta = document.querySelector('meta[name="csrf-token"]');
+      if (meta && meta.content) headers["X-CSRFToken"] = meta.content;
+      return headers;
+    }
+
+    function getApiErrorMessage(data, response) {
+      if (response.status === 429) {
+        return data.error || "Слишком много запросов. Подождите и попробуйте снова.";
+      }
+      if (response.status === 503) {
+        return data.error || data.message || "Сервер занят. Подождите несколько секунд.";
+      }
+      return null;
+    }
+  </script>
+</head>
+<body data-authenticated="{{ '1' if current_user.is_authenticated else '0' }}">
+  <header class="header">
+    <div class="header__row header__row--main">
+      <a href="{{ url_for('landing') }}" class="header__brand">
+        <span class="header__logo">🐍</span>
+        <div>
+          <h1>PyBlocks</h1>
+          <p class="header__subtitle">Визуальное обучение Python</p>
+        </div>
+      </a>
+      <div class="header__nav-panel">
+        <nav class="site-nav" aria-label="Основная навигация">
+          <a href="{{ url_for('landing') }}" class="site-nav__link">Главная</a>
+          <a href="{{ url_for('learn') }}" class="site-nav__link is-active">Редактор</a>
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('profile.dashboard') }}" class="site-nav__link">Личный кабинет</a>
+            <a href="{{ url_for('auth.logout') }}" class="site-nav__link site-nav__link--muted">Выйти</a>
+          {% else %}
+            <a href="{{ url_for('auth.login', next=url_for('learn')) }}" class="site-nav__link">Вход</a>
+            <a href="{{ url_for('auth.register', next=url_for('learn')) }}" class="btn btn--primary btn--nav">Регистрация</a>
+          {% endif %}
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <div class="editor-area" id="editorArea">
+      <div class="editor-main">
+        <div class="workspace-bar" id="workspaceChrome" aria-label="Панель редактора">
+          <div class="workspace-bar__cluster">
+            <button
+              id="btnBlocksToggle"
+              class="blocks-panel-toggle btn btn--small btn--ghost"
+              type="button"
+              hidden
+              aria-expanded="false"
+              aria-controls="blocksPanel"
+            >☰ Блоки</button>
+            {% if current_user.is_authenticated %}
+              <div class="mode-switch" id="modeSwitch" role="group" aria-label="Режим работы">
+                <button type="button" class="mode-switch__btn is-active" data-mode="sandbox">Песочница</button>
+                <button type="button" class="mode-switch__btn" data-mode="topic">Задачи</button>
+              </div>
+              <select id="modeSelect" class="visually-hidden" aria-hidden="true" tabindex="-1">
+                <option value="sandbox">Песочница</option>
+                <option value="topic">Задачи</option>
+              </select>
+            {% else %}
+              <span class="mode-badge__label">Песочница</span>
+              <a href="{{ url_for('auth.login', next=url_for('learn')) }}" class="btn btn--ghost btn--small btn--nav-login">Войти для задач</a>
+            {% endif %}
+
+            <div class="picker-group" id="taskPickersRow" hidden>
+              <label class="picker-group__item picker-group__item--topic" for="topicSelect">
+                <span class="picker-group__label">Тема</span>
+                <select id="topicSelect" aria-label="Выбор темы">
+                  <option value="">Выберите тему</option>
+                </select>
+              </label>
+              <label class="picker-group__item picker-group__item--task" for="taskSelect">
+                <span class="picker-group__label">Задача</span>
+                <select id="taskSelect" aria-label="Выбор задачи" disabled>
+                  <option value="">Выберите задачу</option>
+                </select>
+              </label>
+              <button id="btnTopicMore" class="picker-group__more btn btn--small btn--topic-more" type="button" hidden>Подробнее</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="blockly-shell" id="blocklyShell">
+          <div id="blocksPanelBackdrop" class="blocks-panel-backdrop" hidden aria-hidden="true"></div>
+          <aside class="blocks-panel" id="blocksPanel" aria-label="Панель блоков">
+            <nav class="scratch-categories" id="scratchCategories" aria-label="Категории блоков"></nav>
+            <div class="blocks-palette">
+              <div class="scratch-palette__title" id="scratchPaletteTitle">Основы</div>
+              <div class="blocks-palette__flyout" aria-hidden="true"></div>
+            </div>
+          </aside>
+          <div class="workspace-overlay" id="workspaceOverlay">
+            <section class="task-strip" id="taskPanel" hidden>
+              <div class="task-strip__header">
+                <button
+                  id="btnTaskCollapse"
+                  class="task-strip__collapse btn btn--small"
+                  type="button"
+                  aria-expanded="true"
+                  aria-controls="taskBannerBody"
+                  title="Свернуть условие"
+                >▲</button>
+                <div class="task-strip__titles">
+                  <h2 id="taskTitle" class="task-strip__title">Задача</h2>
+                  <span id="taskMeta" class="task-meta"></span>
+                </div>
+                <div class="task-nav">
+                  <button id="btnTaskPrev" class="btn btn--small" type="button" hidden title="Предыдущая задача">←</button>
+                  <button id="btnTaskNext" class="btn btn--small" type="button" hidden title="Следующая задача">→</button>
+                  <button id="btnCheckTask" class="btn btn--small btn--check" type="button" hidden>✓ Проверить</button>
+                </div>
+              </div>
+              <div class="task-strip__body" id="taskBannerBody">
+                <p id="taskCondition" class="task-condition"></p>
+                <p id="taskHint" class="task-hint" hidden></p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+      <div class="panel-resize-handle" id="panelResizeHandle" title="Изменить ширину"></div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="sidebar-runbar" aria-label="Запуск программы">
+        <button id="btnRun" class="btn btn--primary btn--icon" type="button" title="Запустить программу" aria-label="Запустить программу">▶</button>
+        <button id="btnDebugStart" class="btn btn--ghost btn--icon" type="button" title="Машина времени — пошаговое выполнение" aria-label="Машина времени — пошаговое выполнение">⏭</button>
+        <button id="btnClear" class="btn btn--ghost btn--icon" type="button" title="Очистить рабочую область" aria-label="Очистить рабочую область">🗑</button>
+      </div>
+
+      <section class="panel panel--code" id="codePanel">
+        <div class="panel__header">
+          <h2 id="codePanelTitle">Python-код</h2>
+          <div class="panel__header-actions">
+            <button
+              id="btnCodeHelp"
+              class="btn btn--small btn--ghost"
+              type="button"
+              title="Справка по редактору Python"
+              aria-label="Справка по редактору Python"
+            >?</button>
+            <button id="btnCodeApply" class="btn btn--small btn--primary" type="button" title="Собрать блоки из кода" hidden>Собрать</button>
+            <button id="btnCodeEdit" class="btn btn--small" type="button" title="Редактировать Python-код">Редактор</button>
+            <button id="btnCopy" class="btn btn--small" type="button"><span class="btn-label">Копировать</span></button>
+          </div>
+        </div>
+        <pre id="codePreview" class="code-preview"><code># Соберите программу из блоков</code></pre>
+        <div id="codeEditorWrap" class="code-editor-wrap" hidden>
+          <pre id="codeEditorHighlight" class="code-editor-highlight" aria-hidden="true"><code></code></pre>
+          <textarea
+            id="codeEditor"
+            class="code-editor-input"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            aria-label="Редактор Python-кода"
+          ></textarea>
+        </div>
+      </section>
+
+      <section class="panel panel--output" id="outputPanel">
+        <div class="panel__header">
+          <h2>Результат</h2>
+          <span id="outputStatusSlot">
+            <span id="statusBadge" class="badge badge--idle">Готов</span>
+          </span>
+        </div>
+        <pre id="outputConsole" class="output-console">Нажмите «Запустить», чтобы выполнить программу.</pre>
+      </section>
+
+      <section class="panel panel--debug" id="debugPanel" hidden>
+        <div class="panel__header">
+          <h2>Машина времени</h2>
+          <div class="panel__header-badges">
+            <span id="debugStepCounter" class="badge badge--idle">—</span>
+            <span id="debugStatusSlot"></span>
+          </div>
+        </div>
+
+        <div class="time-machine__scroll">
+        <div class="time-machine__controls debug-controls">
+          <button id="btnDebugPrev" class="btn btn--small" type="button" disabled title="Шаг назад">← Назад</button>
+          <button id="btnDebugStep" class="btn btn--small btn--primary" type="button" disabled title="Шаг вперёд (F5)">Шаг →</button>
+          <button id="btnDebugPlay" class="btn btn--small" type="button" disabled title="Автозапуск">▶ Авто</button>
+          <label class="time-machine__speed" title="Скорость автозапуска">
+            <span class="time-machine__speed-label">Скорость</span>
+            <select id="debugPlaySpeed" class="time-machine__speed-select" disabled>
+              <option value="1200">Медленно</option>
+              <option value="700" selected>Нормально</option>
+              <option value="350">Быстро</option>
+            </select>
+          </label>
+          <button id="btnDebugStop" class="btn btn--small btn--ghost" type="button" disabled title="Сброс">Сброс</button>
+        </div>
+
+        <div class="time-machine__timeline">
+          <input
+            id="debugTimeline"
+            class="time-machine__timeline-input"
+            type="range"
+            min="0"
+            max="0"
+            value="0"
+            disabled
+            aria-label="Перемотка по шагам"
+          />
+        </div>
+
+        <div class="debug-output" id="debugOutputWrap">
+          <h3 class="debug-output__title">Вывод программы</h3>
+          <pre id="debugOutputConsole" class="output-console debug-output-console"></pre>
+        </div>
+
+        <div class="time-machine__body">
+          <div class="time-machine__memory">
+            <h3 class="memory-viz__title">Переменные</h3>
+            <div id="debugMemoryVars" class="memory-viz__vars">
+              <p class="memory-viz__empty">Коробочки переменных появятся на каждом шаге</p>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <div id="debugVars" class="debug-vars debug-vars--legacy" hidden aria-hidden="true"></div>
+      </section>
+
+    </aside>
+  </main>
+
+  <div id="topicGuideModal" class="topic-guide-modal" hidden>
+    <div
+      class="topic-guide-modal__dialog"
+      role="dialog"
+      aria-labelledby="topicGuideTitle"
+      aria-modal="true"
+    >
+      <header class="topic-guide-modal__header">
+        <h3 id="topicGuideTitle">Тема</h3>
+        <button id="topicGuideClose" class="topic-guide-modal__close" type="button" aria-label="Закрыть">
+          ×
+        </button>
+      </header>
+      <div id="topicGuideBody" class="topic-guide-modal__body"></div>
+      <footer class="topic-guide-modal__footer">
+        <button id="topicGuideOk" class="btn btn--primary" type="button">Понятно</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="codeEditorHelpModal" class="code-editor-help-modal" hidden>
+    <div
+      class="code-editor-help-modal__dialog"
+      role="dialog"
+      aria-labelledby="codeEditorHelpTitle"
+      aria-modal="true"
+    >
+      <header class="code-editor-help-modal__header">
+        <h3 id="codeEditorHelpTitle">Редактор Python-кода</h3>
+        <button id="codeEditorHelpClose" class="code-editor-help-modal__close" type="button" aria-label="Закрыть">
+          ×
+        </button>
+      </header>
+      <div class="code-editor-help-modal__body">
+        <section class="code-editor-help-modal__section">
+          <h4>Как работать</h4>
+          <ul>
+            <li><strong>Редактор</strong> — открыть текстовый режим и править код вручную.</li>
+            <li><strong>Собрать</strong> — превратить код в блоки на рабочей области.</li>
+            <li><strong>Закрыть</strong> — выйти из редактора без сборки блоков.</li>
+            <li>Код из блоков и из редактора — один и тот же: после сборки блоки заменяются новой программой.</li>
+          </ul>
+        </section>
+        <section class="code-editor-help-modal__section">
+          <h4>Удобства редактора</h4>
+          <ul>
+            <li>Подсветка ключевых слов, строк, чисел и комментариев.</li>
+            <li><kbd>Tab</kbd> — отступ (4 пробела); <kbd>Shift</kbd>+<kbd>Tab</kbd> — убрать отступ.</li>
+            <li><kbd>Enter</kbd> после строки с <code>:</code> — автоматический отступ внутри блока.</li>
+            <li><kbd>Backspace</kbd> в начале строки — снять отступ целиком.</li>
+          </ul>
+        </section>
+        <section class="code-editor-help-modal__section">
+          <h4>Что можно писать</h4>
+          <ul>
+            <li>Переменные, <code>print</code>, <code>input</code>, арифметика и сравнения.</li>
+            <li><code>if</code> / <code>elif</code> / <code>else</code>, циклы <code>for</code> и <code>while</code>.</li>
+            <li><code>break</code>, <code>continue</code>, списки, строки и их методы.</li>
+            <li><code>import math</code>, <code>import random</code>, функции из этих модулей.</li>
+          </ul>
+        </section>
+        <section class="code-editor-help-modal__section">
+          <h4>Ограничения</h4>
+          <ul>
+            <li>Поддерживается только то, для чего есть блоки в конструкторе.</li>
+            <li>Нельзя: свои функции (<code>def</code>), классы, <code>from … import</code>, сложные выражения в одной строке.</li>
+            <li>Если «Собрать» выдаёт ошибку — упростите код или соберите программу из блоков.</li>
+          </ul>
+        </section>
+      </div>
+      <footer class="code-editor-help-modal__footer">
+        <button id="codeEditorHelpOk" class="btn btn--primary btn--small" type="button">Понятно</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="inputModal" class="input-modal" hidden>
+    <div class="input-modal__dialog" role="dialog" aria-labelledby="inputModalTitle" aria-modal="true">
+      <h3 id="inputModalTitle">Ввод данных</h3>
+      <p id="inputModalHint" class="input-modal__hint" hidden></p>
+      <form id="inputModalForm" class="input-modal__form"></form>
+      <div class="input-modal__actions">
+        <button id="inputModalCancel" class="btn btn--ghost" type="button">Отмена</button>
+        <button id="inputModalOk" class="btn btn--primary" type="submit" form="inputModalForm">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/compact-renderer.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/method-blocks.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/toolbox.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/scratch-toolbox.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/blocks.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/program-frame.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/guide-preview.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/generator.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/block-code-sync.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/blocks-builder.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/python-highlighter.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/code-editor.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/workspace-storage.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/input-helper.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/memory-viz.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/debugger.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/custom-select.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/topics-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pyblocks-theme.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

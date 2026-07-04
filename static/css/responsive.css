@@ -1,0 +1,519 @@
+/* Адаптивная вёрстка — планшеты, телефоны, узкие экраны */
+
+:root {
+  --site-header-height: 58px;
+  --editor-header-height: 62px;
+}
+
+/* ── Общие правила ── */
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+.page-main,
+.landing,
+.profile-page,
+.solution-page,
+.auth-section {
+  min-width: 0;
+}
+
+/* ── ≤1200px — ноутбуки и планшеты landscape ── */
+
+@media (max-width: 1200px) {
+  .page-main:has(.landing) {
+    max-width: 100%;
+  }
+
+  .layout {
+    grid-template-columns: 1fr minmax(280px, 340px);
+  }
+
+  .landing-demo__stage {
+    grid-template-columns: minmax(180px, 1fr) 44px minmax(160px, 1fr) 44px minmax(140px, 1fr);
+  }
+
+  .page-main {
+    max-width: 100%;
+  }
+}
+
+/* ── ≤960px — планшеты ── */
+
+@media (max-width: 960px) {
+  .site-header {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .site-nav {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .page-main {
+    padding: 28px 20px 40px;
+  }
+
+  .flash-list {
+    padding: 0 20px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .topic-progress__header {
+    align-items: flex-start;
+  }
+
+  .block-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .landing .hero--landing {
+    margin-bottom: 56px;
+  }
+
+  .how-it-works,
+  .block-showcase,
+  .features,
+  .topics-preview {
+    margin-bottom: 56px;
+  }
+
+  .solution-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .solution-blocks-preview {
+    min-height: 160px;
+  }
+}
+
+/* ── ≤768px — планшеты portrait и большие телефоны ── */
+
+@media (max-width: 768px) {
+  .site-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .site-nav {
+    gap: 4px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-nav__link,
+  .btn--nav {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .site-nav__user {
+    width: 100%;
+    padding: 4px 10px 0;
+    font-size: 0.8rem;
+  }
+
+  .page-main {
+    padding: 24px 16px 32px;
+  }
+
+  .flash-list {
+    margin-top: 12px;
+    padding: 0 16px;
+  }
+
+  .hero {
+    gap: 28px;
+    margin-bottom: 48px;
+  }
+
+  .hero__title {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+
+  .hero__text {
+    font-size: 0.98rem;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero__actions .btn {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+
+  .section-lead {
+    margin-bottom: 20px;
+    font-size: 0.92rem;
+  }
+
+  .features__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+
+  .cta-block {
+    padding: 36px 20px;
+    border-radius: 14px;
+  }
+
+  .cta-block h2 {
+    font-size: 1.3rem;
+  }
+
+  .cta-block .btn--large {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .auth-section {
+    min-height: auto;
+    padding-top: 8px;
+  }
+
+  .auth-card {
+    padding: 28px 20px;
+    border-radius: 14px;
+  }
+
+  .auth-card__title {
+    font-size: 1.35rem;
+  }
+
+  .profile-header__title {
+    font-size: 1.45rem;
+  }
+
+  .profile-page {
+    gap: 24px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-card__value {
+    font-size: 1.65rem;
+  }
+
+  .topic-progress {
+    padding: 16px;
+  }
+
+  .topic-progress__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .progress-bar {
+    width: 100%;
+  }
+
+  .task-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .task-row__info {
+    width: 100%;
+  }
+
+  .task-row__attempts {
+    padding-left: 28px;
+  }
+
+  .solution-page {
+    padding-top: 4px;
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    line-height: 1.45;
+  }
+
+  .solution-header__meta {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .solution-actions {
+    flex-direction: column;
+  }
+
+  .solution-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .attempt-item summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .step-card {
+    padding: 20px 16px;
+  }
+
+  .step-blocks-preview {
+    max-width: 100%;
+  }
+
+  .topics-preview__grid {
+    gap: 8px;
+  }
+
+  .topic-chip {
+    font-size: 0.85rem;
+    padding: 7px 12px;
+  }
+
+  .code-editor-help-modal__dialog {
+    width: min(460px, calc(100% - 24px));
+    max-height: calc(100vh - 32px);
+  }
+
+  .header__nav-panel .site-nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .header__nav-panel .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header__nav-panel .site-nav__link,
+  .header__nav-panel .btn--nav {
+    flex-shrink: 0;
+  }
+}
+
+/* ── ≤480px — телефоны ── */
+
+@media (max-width: 480px) {
+  .site-header {
+    padding: 10px 12px;
+  }
+
+  .site-header__logo {
+    font-size: 1.5rem;
+  }
+
+  .site-header__name {
+    font-size: 1rem;
+  }
+
+  .site-nav__user {
+    display: none;
+  }
+
+  .page-main {
+    padding: 20px 12px 28px;
+  }
+
+  .flash-list {
+    padding: 0 12px;
+  }
+
+  .site-footer {
+    padding: 16px 12px;
+    font-size: 0.8rem;
+  }
+
+  .hero__badge {
+    font-size: 0.78rem;
+    margin-bottom: 12px;
+  }
+
+  .hero__points li {
+    font-size: 0.88rem;
+  }
+
+  .hero__actions .btn--large {
+    padding: 11px 18px;
+    font-size: 0.95rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .block-gallery {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .block-gallery__item {
+    padding: 14px 10px;
+  }
+
+  .block-gallery__code {
+    font-size: 0.72rem;
+  }
+
+  .landing-demo {
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .landing-demo__caption {
+    font-size: 0.75rem;
+  }
+
+  .step-card__visual {
+    min-height: 140px;
+  }
+
+  .pb-block {
+    font-size: 0.7rem;
+  }
+
+  .pb-block--mini {
+    font-size: 0.62rem;
+    padding: 4px 8px;
+  }
+
+  .auth-card {
+    padding: 24px 16px;
+  }
+
+  .form-input {
+    font-size: 16px;
+  }
+
+  .empty-state {
+    padding: 32px 16px;
+  }
+
+  .profile-hero {
+    padding: 18px 14px;
+  }
+
+  .profile-hero__meta {
+    font-size: 0.82rem;
+  }
+
+  .topic-card {
+    padding: 14px;
+  }
+
+  .topic-card__title {
+    font-size: 1rem;
+  }
+
+  .solution-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .solution-code {
+    padding: 12px;
+    font-size: 0.78rem;
+  }
+
+  .topic-guide-modal__dialog {
+    width: calc(100% - 16px);
+    max-height: calc(100vh - 24px);
+    margin: 8px;
+  }
+
+  .topic-guide-modal__header {
+    padding: 14px 16px;
+  }
+
+  .topic-guide-modal__body {
+    padding: 16px;
+  }
+
+  .input-modal {
+    padding: 12px;
+  }
+
+  .input-modal__dialog {
+    padding: 16px;
+  }
+
+  .code-editor-help-modal {
+    padding: 10px;
+  }
+
+  .code-editor-help-modal__dialog {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+  }
+
+  .code-editor-help-modal__body {
+    padding: 12px 14px;
+  }
+
+  .code-editor-help-modal__section ul {
+    font-size: 0.82rem;
+  }
+}
+
+/* ── Безопасные зоны (вырезы экрана) ── */
+
+@supports (padding: max(0px)) {
+  .site-header,
+  .header {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+
+  .page-main {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  .site-footer {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  body:not(.page-body) .sidebar-runbar,
+  body:not(.page-body) .panel__header {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+}

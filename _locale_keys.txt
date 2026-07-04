@@ -1,0 +1,2 @@
+text_print: message0=$.C.TEXT_PRINT_TITLE
+lists_sort: message0="%{BKY_LISTS_SORT_TITLE}"

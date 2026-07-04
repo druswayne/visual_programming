@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Личный кабинет — PyBlocks{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+
+  {# ── Шапка: профиль + сводка ── #}
+  <header class="profile-hero">
+    <div class="profile-hero__identity">
+      <div class="profile-avatar" aria-hidden="true">{{ current_user.username[0]|upper }}</div>
+      <div class="profile-hero__info">
+        <p class="profile-hero__greeting">Привет, {{ current_user.username }}!</p>
+        <h1 class="profile-hero__title">Личный кабинет</h1>
+        <p class="profile-hero__meta">
+          {% if member_since %}С нами с {{ member_since.strftime('%d.%m.%Y') }}{% endif %}
+          {% if last_activity_at %} · активность {{ last_activity_at.strftime('%d.%m.%Y') }}{% endif %}
+        </p>
+      </div>
+    </div>
+
+    <div class="profile-hero__summary">
+      <div class="progress-ring" style="--progress: {{ overall_percent }}" role="group" aria-label="Общий прогресс курса">
+        <svg viewBox="0 0 120 120" class="progress-ring__svg" aria-hidden="true">
+          <circle class="progress-ring__track" cx="60" cy="60" r="52" />
+          <circle class="progress-ring__fill" cx="60" cy="60" r="52" />
+        </svg>
+        <div class="progress-ring__label">
+          <span class="progress-ring__value">{{ overall_percent }}%</span>
+          <span class="progress-ring__caption">
+            <span class="stat-pair stat-pair--compact">
+              <span class="stat-pair__main">{{ total_completed }}</span>
+              <span class="stat-pair__sep">/</span>
+              <span class="stat-pair__sub">{{ total_tasks }}</span>
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <ul class="hero-metrics" aria-label="Ключевые показатели">
+        <li class="hero-metric hero-metric--accent">
+          <span class="hero-metric__value">{{ skills.total_xp }}</span>
+          <span class="hero-metric__label">XP</span>
+        </li>
+        <li class="hero-metric">
+          <span class="hero-metric__value">{{ skills.crystals }}</span>
+          <span class="hero-metric__label">Кристаллы</span>
+        </li>
+        <li class="hero-metric">
+          <span class="hero-metric__value">{{ topics_mastered }}/{{ topics_total }}</span>
+          <span class="hero-metric__label">Тем</span>
+        </li>
+        <li class="hero-metric">
+          <span class="hero-metric__value">{{ achievements_unlocked }}/{{ achievements_total }}</span>
+          <span class="hero-metric__label">Достижений</span>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  {# ── Следующий шаг ── #}
+  {% if next_task %}
+    <section class="profile-continue">
+      <div class="profile-continue__text">
+        <span class="profile-continue__badge">{% if next_task.in_progress %}Продолжить{% else %}Следующая задача{% endif %}</span>
+        <h2 class="profile-continue__title">{{ next_task.task_title }}</h2>
+        <p class="profile-continue__topic">{{ next_task.topic_title }}</p>
+      </div>
+      <a href="{{ next_task.learn_url }}" class="btn btn--primary btn--large">Открыть в редакторе →</a>
+    </section>
+  {% elif total_attempts == 0 %}
+    <section class="profile-continue profile-continue--empty">
+      <div class="profile-continue__text">
+        <span class="profile-continue__badge">Начало пути</span>
+        <h2 class="profile-continue__title">Решите первую задачу</h2>
+        <p class="profile-continue__topic">Прогресс, XP и достижения появятся здесь после проверки решения.</p>
+      </div>
+      <a href="{{ url_for('learn') }}" class="btn btn--primary btn--large">Открыть редактор →</a>
+    </section>
+  {% endif %}
+
+  {# ── Основной блок: путь курса + боковая панель ── #}
+  <div class="profile-layout">
+
+    <section class="profile-main skill-tree-section" aria-labelledby="course-path-title">
+      <div class="profile-section__head">
+        <div>
+          <h2 class="section-title" id="course-path-title">Путь курса</h2>
+          <p class="section-subtitle">Семь тем редактора — новая тема открывается после 50% задач предыдущей</p>
+        </div>
+      </div>
+
+      <div class="skill-path">
+        {% for branch in skills.branches %}
+          {% set ns = namespace(topic=none) %}
+          {% for topic in topics %}
+            {% if topic.id == branch.id %}{% set ns.topic = topic %}{% endif %}
+          {% endfor %}
+
+          {% if not loop.first %}
+            <div class="skill-path__connector{% if branch.locked %} skill-path__connector--locked{% endif %}" aria-hidden="true"></div>
+          {% endif %}
+
+          <article class="skill-node skill-node--compact{% if branch.locked %} skill-node--locked{% endif %}{% if branch.level >= 5 %} skill-node--mastered{% endif %}{% if ns.topic and ns.topic.status == 'in_progress' %} skill-node--active{% endif %}"
+                   style="--skill-color: {{ branch.color }}">
+            <div class="skill-node__order">{{ branch.order }}</div>
+
+            <div class="skill-node__row">
+              <span class="skill-node__icon" aria-hidden="true">{{ branch.icon }}</span>
+              <div class="skill-node__core">
+                <div class="skill-node__topline">
+                  <h3 class="skill-node__title">{{ branch.title }}</h3>
+                  {% if not branch.locked %}
+                    <span class="skill-node__percent">{{ branch.topic_percent }}%</span>
+                  {% endif %}
+                </div>
+                <div class="skill-node__meta">
+                  {% if branch.locked %}
+                    <span class="skill-node__lock-hint">{{ branch.unlock_hint }}</span>
+                  {% else %}
+                    <span class="skill-node__stars" aria-label="{{ branch.stars_filled }} из 5 звёзд">
+                      {% for i in range(1, 6) %}
+                        <span class="skill-star{% if i <= branch.stars_filled %} skill-star--filled{% endif %}">★</span>
+                      {% endfor %}
+                    </span>
+                    <span class="skill-node__counts">
+                      {{ branch.completed_count }}/{{ branch.total_tasks }} задач
+                      · {{ branch.fix_completed }}/{{ branch.fix_total }} исправлений
+                    </span>
+                  {% endif %}
+                </div>
+                {% if not branch.locked %}
+                  <div class="skill-node__bar" role="progressbar"
+                       aria-valuenow="{{ branch.topic_percent }}"
+                       aria-valuemin="0" aria-valuemax="100">
+                    <div class="skill-node__bar-fill" style="width: {{ branch.topic_percent }}%"></div>
+                  </div>
+                {% endif %}
+              </div>
+              {% if not branch.locked %}
+                <a href="{{ url_for('learn') }}?topic={{ branch.id }}" class="skill-node__link btn btn--small btn--ghost">
+                  {% if ns.topic and ns.topic.status == 'completed' %}Повторить{% elif ns.topic and ns.topic.status == 'in_progress' %}Продолжить{% else %}Начать{% endif %}
+                </a>
+              {% endif %}
+            </div>
+
+            {% if ns.topic and ns.topic.completed_tasks %}
+              <details class="skill-node__solved">
+                <summary>Решённые задачи ({{ ns.topic.completed_count }})</summary>
+                <ul class="skill-solved-list">
+                  {% for task in ns.topic.completed_tasks %}
+                    <li class="skill-solved-item">
+                      <span class="skill-solved-item__title">{{ task.title }}</span>
+                      <span class="skill-solved-item__attempts">{{ task.attempts_count }}
+                        {% if task.attempts_count == 1 %}попытка{% elif task.attempts_count < 5 %}попытки{% else %}попыток{% endif %}
+                      </span>
+                      <span class="skill-solved-item__actions">
+                        <a href="{{ task.learn_url }}" class="btn btn--small btn--ghost">Редактор</a>
+                        <a href="{{ url_for('profile.solution', topic_id=branch.id, task_id=task.id) }}" class="btn btn--small">Решение</a>
+                      </span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </details>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <aside class="profile-sidebar" aria-label="Подсказки и активность">
+
+      <article class="sidebar-card skill-unlock{% if skills.time_machine_unlocked %} skill-unlock--active{% endif %}">
+        <span class="skill-unlock__icon" aria-hidden="true">⏱️</span>
+        <div class="skill-unlock__body">
+          <h3 class="skill-unlock__title">Машина времени</h3>
+          <p class="skill-unlock__desc">
+            {% if skills.time_machine_unlocked %}
+              Пошаговая трассировка доступна в редакторе.
+            {% else %}
+              ★★ в «{{ skills.time_machine_topic }}»
+              {% if skills.time_machine_level > 0 %}({{ '★' * skills.time_machine_level }}){% endif %}
+            {% endif %}
+          </p>
+        </div>
+        <span class="skill-unlock__badge">{% if skills.time_machine_unlocked %}Открыто{% else %}Закрыто{% endif %}</span>
+      </article>
+
+      {% if skills.recommendation %}
+        <aside class="sidebar-card skill-recommendation">
+          <span class="skill-recommendation__icon" aria-hidden="true">💡</span>
+          <p class="skill-recommendation__text">{{ skills.recommendation.text }}</p>
+        </aside>
+      {% endif %}
+
+      <div class="sidebar-card sidebar-card--medals">
+        <h3 class="sidebar-card__title">Медали</h3>
+        <ul class="skill-medals skill-medals--compact">
+          {% for medal in skills.medals %}
+            <li class="skill-medal{% if medal.points > 0 %} skill-medal--earned{% endif %}" title="{{ medal.description }}">
+              <span class="skill-medal__icon">{{ medal.icon }}</span>
+              <span class="skill-medal__value">{{ medal.points }}</span>
+              <span class="skill-medal__label">{{ medal.title }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      {% if skills.recent_gains or recent_activity %}
+        <div class="sidebar-card sidebar-card--activity">
+          <h3 class="sidebar-card__title">Недавнее</h3>
+          <ul class="sidebar-feed">
+            {% for gain in skills.recent_gains %}
+              <li class="sidebar-feed__item sidebar-feed__item--xp">
+                <span class="sidebar-feed__badge sidebar-feed__badge--xp">+{{ gain.xp_total }} XP</span>
+                <span class="sidebar-feed__title">{{ gain.task_title }}</span>
+                <span class="sidebar-feed__meta">{{ gain.topic_title }}</span>
+              </li>
+            {% endfor %}
+            {% for item in recent_activity[:6] %}
+              <li class="sidebar-feed__item sidebar-feed__item--{% if item.success %}ok{% else %}fail{% endif %}">
+                <span class="sidebar-feed__badge">{% if item.success %}✓{% else %}✗{% endif %}</span>
+                <span class="sidebar-feed__title">{{ item.task_title }}</span>
+                <span class="sidebar-feed__meta">{{ item.topic_title }} · {{ item.created_at.strftime('%d.%m %H:%M') }}</span>
+                <a href="{{ item.learn_url }}" class="sidebar-feed__link">Открыть</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+    </aside>
+  </div>
+
+  {# ── Достижения ── #}
+  <section class="profile-section achievements-section" data-achievements-panel>
+    <div class="profile-section__head achievements-section__head">
+      <div>
+        <h2 class="section-title">Достижения</h2>
+        <p class="section-subtitle">
+          {{ achievements_unlocked }} из {{ achievements_total }} получено
+          {% if achievements_in_progress %} · {{ achievements_in_progress }} в процессе{% endif %}
+        </p>
+      </div>
+      <div class="achievements-summary" aria-hidden="true">
+        <div class="achievements-summary__ring" style="--ach-progress: {{ (achievements_unlocked / achievements_total * 100) | round if achievements_total else 0 }}">
+          <span>{{ achievements_unlocked }}/{{ achievements_total }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="achievements-filters" role="tablist" aria-label="Фильтр достижений">
+      <button type="button" class="achievements-filter is-active" data-ach-filter="all" role="tab" aria-selected="true">Все</button>
+      <button type="button" class="achievements-filter" data-ach-filter="unlocked" role="tab" aria-selected="false">Получено</button>
+      <button type="button" class="achievements-filter" data-ach-filter="progress" role="tab" aria-selected="false">В процессе</button>
+      <button type="button" class="achievements-filter" data-ach-filter="locked" role="tab" aria-selected="false">Закрыто</button>
+    </div>
+
+    {% for group in achievement_groups %}
+      <div class="achievements-group" data-ach-group="{{ group.id }}">
+        <header class="achievements-group__head">
+          <h3 class="achievements-group__title">{{ group.label }}</h3>
+          <span class="achievements-group__count">{{ group.unlocked }}/{{ group.total }}</span>
+        </header>
+        <div class="achievements-grid">
+          {% for ach in group.achievements %}
+            <article class="achievement-card achievement-card--tier-{{ ach.tier }}{% if ach.unlocked %} achievement-card--unlocked{% elif ach.in_progress %} achievement-card--progress{% else %} achievement-card--locked{% endif %}"
+                     data-ach-filter-state="{% if ach.unlocked %}unlocked{% elif ach.in_progress %}progress{% else %}locked{% endif %}">
+              <div class="achievement-card__badge">
+                <span class="achievement-card__icon" aria-hidden="true">{{ ach.icon }}</span>
+                {% if ach.unlocked %}
+                  <span class="achievement-card__check" aria-hidden="true">✓</span>
+                {% endif %}
+              </div>
+              <div class="achievement-card__body">
+                <div class="achievement-card__top">
+                  <h4 class="achievement-card__title">{{ ach.title }}</h4>
+                  <span class="achievement-card__tier" title="Редкость">{{ ach.tier_label }}</span>
+                </div>
+                <p class="achievement-card__desc">{{ ach.description }}</p>
+                {% if ach.unlocked %}
+                  <span class="achievement-card__status achievement-card__status--done">Получено</span>
+                {% else %}
+                  <div class="achievement-card__progress">
+                    <div class="achievement-card__bar" role="progressbar"
+                         aria-valuenow="{{ ach.progress.percent }}"
+                         aria-valuemin="0" aria-valuemax="100">
+                      <div class="achievement-card__bar-fill" style="width: {{ ach.progress.percent }}%"></div>
+                    </div>
+                    <span class="achievement-card__progress-label">{{ ach.progress.label }}</span>
+                  </div>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <p class="achievements-empty" data-achievements-empty hidden>Нет достижений в этой категории</p>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{{ url_for('static', filename='js/profile-dashboard.js') }}"></script>
+{% endblock %}
