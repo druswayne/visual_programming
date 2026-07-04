@@ -7,6 +7,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from i18n import _
+
 from runner.pool import ExecutionPoolBusy, execution_slot
 
 FORBIDDEN_PATTERNS = [
@@ -65,7 +67,7 @@ def validate_code(code: str):
     lowered = code.lower()
     for pattern in FORBIDDEN_PATTERNS:
         if pattern.lower() in lowered:
-            return f"Запрещённая конструкция: {pattern}"
+            return _("runner.forbidden_pattern", pattern=pattern)
     return None
 
 
@@ -107,15 +109,12 @@ def run_python_code(code: str, stdin_text: str = "") -> dict:
             output += ("\n" if output else "") + result.stderr
 
         if len(output) > MAX_OUTPUT_CHARS:
-            output = output[:MAX_OUTPUT_CHARS] + "\n… (вывод обрезан)"
+            output = output[:MAX_OUTPUT_CHARS] + "\n" + _("runner.output_truncated")
 
         if result.returncode != 0:
-            error = "Ошибка выполнения программы"
+            error = _("runner.exec_error")
             if "EOFError" in output or "EOF when reading a line" in output:
-                error = (
-                    "Не хватило введённых данных для всех блоков input(). "
-                    "Если ввод в цикле — укажите значение для каждого шага."
-                )
+                error = _("runner.eof_input")
             return {
                 "success": False,
                 "output": output.strip(),
@@ -130,7 +129,7 @@ def run_python_code(code: str, stdin_text: str = "") -> dict:
         return {
             "success": False,
             "output": "",
-            "error": f"Превышено время выполнения ({EXECUTION_TIMEOUT} сек.)",
+            "error": _("runner.timeout", seconds=EXECUTION_TIMEOUT),
         }
     except Exception as exc:
         return {"success": False, "output": "", "error": str(exc)}

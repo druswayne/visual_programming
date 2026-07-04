@@ -188,7 +188,7 @@ const StepDebugger = {
   updatePlayButton() {
     const btnPlay = document.getElementById("btnDebugPlay");
     if (!btnPlay) return;
-    btnPlay.textContent = this.playing ? "⏸ Пауза" : "▶ Авто";
+    btnPlay.textContent = this.playing ? t("debugger.pause") : t("debugger.autoplay");
     btnPlay.classList.toggle("btn--active", this.playing);
   },
 
@@ -213,8 +213,8 @@ const StepDebugger = {
     if (!this.workspace || this.loading) return;
 
     if (typeof CodeEditor !== "undefined" && CodeEditor.isEditMode()) {
-      setStatus("error", "Ошибка");
-      setOutput("Для пошаговой отладки нажмите «Собрать» или закройте редактор.", true);
+      setStatus("error", t("status.error"));
+      setOutput(t("debugger.edit_mode_hint"), true);
       return;
     }
 
@@ -224,8 +224,8 @@ const StepDebugger = {
 
     const data = generatePythonDebugData(this.workspace);
     if (!data.code.trim()) {
-      setStatus("error", "Ошибка");
-      setOutput("Добавьте блоки для пошагового выполнения.", true);
+      setStatus("error", t("status.error"));
+      setOutput(t("debugger.no_code"), true);
       return;
     }
 
@@ -236,16 +236,16 @@ const StepDebugger = {
     this.showPanel();
     this.setControls();
     this.showCleanPreview();
-    setStatus("running", "Отладка");
-    setOutput("Сбор шагов выполнения…", false);
+    setStatus("running", t("debugger.status"));
+    setOutput(t("debugger.collecting_steps"), false);
 
     const stdinText = await InputHelper.collectStdin(data.code);
     if (stdinText === null) {
       this.loading = false;
       this.hidePanel();
       this.setControls();
-      setStatus("idle", "Готов");
-      setOutput("Ввод отменён.", false);
+      setStatus("idle", t("status.ready"));
+      setOutput(t("run.input_cancelled"), false);
       return;
     }
 
@@ -258,7 +258,7 @@ const StepDebugger = {
       const result = await response.json();
       const limitMsg = getApiErrorMessage(result, response);
       if (limitMsg) {
-        setStatus("error", "Подождите");
+        setStatus("error", t("status.wait"));
         setOutput(limitMsg, true);
         this.loading = false;
         this.hidePanel();
@@ -267,7 +267,7 @@ const StepDebugger = {
       }
 
       if (!result.success && (!result.steps || !result.steps.length)) {
-        setStatus("error", "Ошибка");
+        setStatus("error", t("status.error"));
         setOutput([result.error, result.output].filter(Boolean).join("\n\n"), true);
         this.loading = false;
         this.hidePanel();
@@ -283,14 +283,17 @@ const StepDebugger = {
       this.setControls();
 
       if (result.error) {
-        setOutput("Ошибка: " + result.error, true);
+        setOutput(t("debugger.error_prefix", "Ошибка: {message}", { message: result.error }), true);
       }
 
       this.renderStep();
-      setStatus("running", "Шаг 1/" + this.steps.length);
+      setStatus(
+        "running",
+        t("debugger.step_of", "Шаг {current} из {total}", { current: 1, total: this.steps.length })
+      );
     } catch (err) {
-      setStatus("error", "Ошибка");
-      setOutput("Ошибка отладки: " + err.message, true);
+      setStatus("error", t("status.error"));
+      setOutput(t("debugger.debug_error", "Ошибка отладки: {message}", { message: err.message }), true);
       this.loading = false;
       this.sessionActive = false;
       this.hidePanel();
@@ -315,7 +318,7 @@ const StepDebugger = {
     this.hidePanel();
     this.setControls();
     updateCodePreview();
-    setStatus("idle", "Готов");
+    setStatus("idle", t("status.ready"));
   },
 
   setControls() {
@@ -370,7 +373,10 @@ const StepDebugger = {
 
     const counter = document.getElementById("debugStepCounter");
     if (counter) {
-      counter.textContent = "Шаг " + (this.stepIndex + 1) + " / " + this.steps.length;
+      counter.textContent = t("debugger.step_of", "Шаг {current} из {total}", {
+        current: this.stepIndex + 1,
+        total: this.steps.length,
+      });
     }
 
     this.highlightLine(step.line);
@@ -381,14 +387,17 @@ const StepDebugger = {
     } else {
       this.renderVariables(step.vars || {});
     }
-    setOutput(step.output || "(нет вывода)", false);
-    setStatus("running", "Шаг " + (this.stepIndex + 1));
+    setOutput(step.output || t("debugger.no_output"), false);
+    setStatus(
+      "running",
+      t("debugger.step_short", "Шаг {current}", { current: this.stepIndex + 1 })
+    );
     this.updateTimeline();
   },
 
   showCleanPreview() {
     const text = this.displayLines.join("\n").trim();
-    setCodePreviewPlain(text || "# Соберите программу из блоков");
+    setCodePreviewPlain(text || t("code.placeholder"));
   },
 
   highlightLine(lineNo) {
@@ -460,7 +469,7 @@ const StepDebugger = {
 
     const names = Object.keys(vars || {}).sort();
     if (!names.length) {
-      panel.innerHTML = '<p class="debug-vars__empty">Нет переменных</p>';
+      panel.innerHTML = '<p class="debug-vars__empty">' + t("debugger.no_vars") + "</p>";
       return;
     }
 

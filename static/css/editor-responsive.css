@@ -1,0 +1,229 @@
+/* Адаптивность редактора при узком окне и увеличении масштаба браузера */
+
+body:not(.page-body) {
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body:not(.page-body) .layout {
+  min-height: calc(100dvh - var(--editor-header-height, 62px));
+}
+
+.layout {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, min(380px, 36vw));
+}
+
+.sidebar {
+  min-width: 0;
+  min-height: 0;
+}
+
+body:not(.page-body) .sidebar .panel {
+  min-height: 0;
+}
+
+body:not(.page-body) .code-preview,
+body:not(.page-body) .code-editor-wrap,
+body:not(.page-body) .output-console {
+  overflow: auto;
+  min-height: 0;
+}
+
+.panel--code,
+.panel--output {
+  min-height: min(180px, 28dvh);
+}
+
+.panel--output {
+  min-height: min(140px, 22dvh);
+}
+
+/* ── Узкий layout: боковая колонка под редактором ── */
+
+body.editor-narrow:not(.page-body) .layout {
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(min(380px, 52dvh), 1fr) auto;
+  height: auto;
+}
+
+body.editor-narrow:not(.page-body) .editor-area {
+  flex-direction: column;
+  min-height: min(380px, 52dvh);
+}
+
+body.editor-narrow .panel-resize-handle {
+  display: none;
+}
+
+body.editor-narrow .workspace-bar {
+  padding-left: calc(var(--editor-blocks-offset) + 8px);
+  padding-right: 10px;
+}
+
+body.editor-narrow .workspace-bar__cluster {
+  flex-wrap: wrap;
+  overflow: visible;
+  gap: 6px;
+}
+
+body.editor-narrow .picker-group {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+body.editor-narrow .mode-switch {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+body.editor-narrow .sidebar {
+  max-height: none;
+  min-height: min(280px, 40dvh);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+body.editor-narrow .panel--code,
+body.editor-narrow .panel--output {
+  min-height: min(140px, 24dvh);
+  flex: 1 1 auto;
+}
+
+body.editor-narrow .panel__header {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+body.editor-narrow .panel__header-actions {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+/* ── Компактный режим: уже палитра блоков ── */
+
+body.editor-compact:not(.page-body) {
+  --editor-cat-width: 56px;
+  --editor-palette-width: min(200px, 32vw);
+}
+
+body.editor-compact .header {
+  padding: 10px 14px;
+  gap: 8px;
+}
+
+body.editor-compact .header__subtitle {
+  display: none;
+}
+
+body.editor-compact .header__nav-panel {
+  width: 100%;
+}
+
+body.editor-compact .header__nav-panel .site-nav {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+body.editor-compact .header__nav-panel .site-nav__link,
+body.editor-compact .header__nav-panel .btn--nav {
+  flex-shrink: 0;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+}
+
+body.editor-compact .scratch-cat__label {
+  display: none;
+}
+
+body.editor-compact .scratch-cat {
+  height: 46px;
+  min-height: 46px;
+  max-height: 46px;
+}
+
+body.editor-compact .picker-group__item--topic {
+  max-width: none;
+}
+
+body.editor-compact .sidebar-runbar .btn--icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+}
+
+/* ── Очень узко: панель блоков — выезжающая ── */
+
+body.editor-tiny:not(.page-body):not(.blocks-panel-open) {
+  --editor-cat-width: 0px;
+  --editor-palette-width: 0px;
+}
+
+body.editor-tiny:not(.page-body):not(.blocks-panel-open) .workspace-bar {
+  padding-left: 8px;
+}
+
+body.editor-tiny .blocks-panel-toggle {
+  display: inline-flex !important;
+  flex-shrink: 0;
+}
+
+body.editor-tiny:not(.page-body) .blocks-panel {
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+  pointer-events: none;
+  z-index: 35;
+}
+
+body.editor-tiny:not(.page-body).blocks-panel-open .blocks-panel {
+  transform: translateX(0);
+  pointer-events: auto;
+  --editor-cat-width: 48px;
+  --editor-palette-width: min(76vw, 220px);
+}
+
+body.editor-tiny .mode-switch {
+  width: 100%;
+}
+
+body.editor-tiny .mode-switch__btn {
+  flex: 1;
+  text-align: center;
+}
+
+body.editor-tiny .panel__header-actions .btn--small {
+  padding: 6px 8px;
+  min-height: 32px;
+}
+
+body.editor-tiny .code-preview,
+body.editor-tiny .code-editor-highlight,
+body.editor-tiny .code-editor-input,
+body.editor-tiny .output-console {
+  padding: 10px 12px;
+  font-size: 0.78rem;
+}
+
+/* Совместимость с viewport-медиазапросами: те же правила по классам */
+
+@media (max-width: 960px) {
+  body:not(.page-body):not(.editor-narrow) .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(420px, 55vh) auto;
+    height: auto;
+    min-height: calc(100vh - var(--editor-header-height, 62px));
+  }
+}
+
+@media (max-width: 640px) {
+  body:not(.page-body):not(.editor-tiny):not(.blocks-panel-open) {
+    --editor-cat-width: 0px;
+    --editor-palette-width: 0px;
+  }
+
+  body:not(.page-body):not(.editor-tiny) .blocks-panel-toggle {
+    display: inline-flex;
+  }
+}

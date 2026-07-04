@@ -190,7 +190,7 @@ function setCodePreviewHighlight(lines, activeLineNo) {
     })
     .join("\n");
 
-  nodes.codeEl.innerHTML = html || "# Соберите программу из блоков";
+  nodes.codeEl.innerHTML = html || t("code.placeholder");
 
   const active = nodes.codeEl.querySelector(".code-line--active");
   if (active) active.scrollIntoView({ block: "nearest" });
@@ -217,7 +217,7 @@ function updateCodePreview() {
   }
 
   const code = generatePythonCode(workspace);
-  setCodePreviewPlain(code.trim() || "# Соберите программу из блоков");
+  setCodePreviewPlain(code.trim() || t("code.placeholder"));
 }
 
 function setStatus(state, text) {
@@ -244,20 +244,20 @@ async function runCode() {
   StepDebugger.stop();
   const code = getActivePythonCode();
   if (!code.trim()) {
-    setStatus("error", "Ошибка");
-    setOutput("Добавьте хотя бы один блок в рабочую область.", true);
+    setStatus("error", t("status.error"));
+    setOutput(t("run.no_blocks"), true);
     return;
   }
 
   const stdinText = await InputHelper.collectStdin(code);
   if (stdinText === null) {
-    setStatus("idle", "Готов");
-    setOutput("Ввод отменён.", false);
+    setStatus("idle", t("status.ready"));
+    setOutput(t("run.input_cancelled"), false);
     return;
   }
 
-  setStatus("running", "Выполняется…");
-  setOutput("Выполнение программы…", false);
+  setStatus("running", t("status.running"));
+  setOutput(t("run.executing"), false);
 
   try {
     const response = await fetch("/api/run", {
@@ -268,21 +268,21 @@ async function runCode() {
     const data = await response.json();
     const limitMsg = getApiErrorMessage(data, response);
     if (limitMsg) {
-      setStatus("error", "Подождите");
+      setStatus("error", t("status.wait"));
       setOutput(limitMsg, true);
       return;
     }
 
     if (data.success) {
-      setStatus("success", "Готово");
-      setOutput(data.output || "(программа выполнена без вывода)", false);
+      setStatus("success", t("status.success"));
+      setOutput(data.output || t("run.no_output"), false);
     } else {
-      setStatus("error", "Ошибка");
+      setStatus("error", t("status.error"));
       setOutput([data.error, data.output].filter(Boolean).join("\n\n"), true);
     }
   } catch (err) {
-    setStatus("error", "Ошибка");
-    setOutput("Не удалось связаться с сервером: " + err.message, true);
+    setStatus("error", t("status.error"));
+    setOutput(t("run.network_error", "Network error: {message}", { message: err.message }), true);
   }
 }
 
@@ -292,18 +292,18 @@ function clearWorkspace() {
   workspace.clear();
   ProgramFrame.setup(workspace);
   updateCodePreview();
-  setStatus("idle", "Готов");
-  setOutput("Рабочая область очищена.", false);
+  setStatus("idle", t("status.ready"));
+  setOutput(t("run.workspace_cleared"), false);
 }
 
 function copyCode() {
   const code = getActivePythonCode();
   const btn = document.getElementById("btnCopy");
   const label = btn ? btn.querySelector(".btn-label") : null;
-  const original = label ? label.textContent : btn ? btn.textContent : "Копировать";
+  const original = label ? label.textContent : btn ? btn.textContent : t("copy.label");
   navigator.clipboard.writeText(code).then(function () {
-    if (label) label.textContent = "Скопировано!";
-    else if (btn) btn.textContent = "Скопировано!";
+    if (label) label.textContent = t("copy.done");
+    else if (btn) btn.textContent = t("copy.done");
     setTimeout(function () {
       if (label) label.textContent = original;
       else if (btn) btn.textContent = original;

@@ -8,32 +8,8 @@
   flex-direction: column;
 }
 
-.site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.site-header__brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: var(--text);
-}
-
-.site-header__logo {
-  font-size: 1.75rem;
-}
-
-.site-header__name {
-  font-size: 1.15rem;
-  font-weight: 700;
+.page-body .header {
+  flex-shrink: 0;
 }
 
 .site-nav {
@@ -466,6 +442,8 @@
 }
 
 .form-input {
+  width: 100%;
+  box-sizing: border-box;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);

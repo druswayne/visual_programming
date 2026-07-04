@@ -2,6 +2,8 @@
 
 import re
 
+from i18n import _
+
 from runner.sandbox import run_python_code
 
 _INPUT_PROMPT_RE = re.compile(
@@ -50,7 +52,7 @@ def normalize_output(text: str) -> str:
 def check_solution(code: str, tests: list) -> dict:
     """Запускает код на каждом тесте и сравнивает stdout с ожидаемым результатом."""
     if not tests:
-        return {"success": False, "passed": 0, "total": 0, "message": "Нет тестов для задачи"}
+        return {"success": False, "passed": 0, "total": 0, "message": _("check.no_tests")}
 
     details = []
     passed = 0
@@ -65,7 +67,7 @@ def check_solution(code: str, tests: list) -> dict:
                 "success": False,
                 "passed": passed,
                 "total": len(tests),
-                "message": result.get("error", "Сервер перегружен"),
+                "message": result.get("error", _("api.server_busy")),
                 "overloaded": True,
                 "details": details,
             }
@@ -73,9 +75,9 @@ def check_solution(code: str, tests: list) -> dict:
         item = {"index": index + 1, "passed": False}
 
         if not result["success"]:
-            item["message"] = result.get("error") or "Ошибка выполнения"
+            item["message"] = result.get("error") or _("check.exec_error")
             if test.get("stdin"):
-                item["hint"] = "Проверьте работу с вводом данных"
+                item["hint"] = _("check.input_hint")
             details.append(item)
             continue
 
@@ -84,9 +86,9 @@ def check_solution(code: str, tests: list) -> dict:
             item["passed"] = True
             passed += 1
         else:
-            item["message"] = "Неверный результат"
+            item["message"] = _("check.wrong_result")
             if test.get("stdin"):
-                item["hint"] = f"При вводе «{test['stdin'].strip()}»"
+                item["hint"] = _("check.stdin_hint", stdin=test["stdin"].strip())
             item["expected"] = expected
             item["actual"] = actual
         details.append(item)
@@ -94,11 +96,11 @@ def check_solution(code: str, tests: list) -> dict:
     total = len(tests)
     success = passed == total
     if success:
-        message = f"Отлично! Пройдено тестов: {passed} из {total}"
+        message = _("check.success", passed=passed, total=total)
     elif passed == 0:
-        message = "Пока не получилось. Перечитайте условие и попробуйте снова."
+        message = _("check.fail_all")
     else:
-        message = f"Частично верно: {passed} из {total} тестов"
+        message = _("check.partial", passed=passed, total=total)
 
     return {
         "success": success,

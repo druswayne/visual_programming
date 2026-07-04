@@ -31,6 +31,12 @@ class Config:
     USERNAME_MIN_LENGTH = 3
     USERNAME_MAX_LENGTH = 32
 
+    LANGUAGES = {
+        "ru": "Русский",
+        "en": "English",
+    }
+    DEFAULT_LOCALE = "ru"
+
     # Лимиты выполнения кода
     MAX_CONCURRENT_EXECUTIONS = int(os.environ.get("MAX_CONCURRENT_EXECUTIONS", "8"))
     EXECUTION_QUEUE_TIMEOUT = float(os.environ.get("EXECUTION_QUEUE_TIMEOUT", "10"))

@@ -8,10 +8,11 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Length
 
-from auth_routes import _validate_password_strength
+from auth_routes import _localize_form_errors, _validate_password_strength
 from config import Config
 from data.registry import get_task_with_tests, get_tasks_public, get_topics
 from extensions import db
+from i18n import _
 from models import TaskAttempt, TaskProgress
 from skills_service import build_skills_profile
 
@@ -19,43 +20,47 @@ profile_bp = Blueprint("profile", __name__, url_prefix="/profile")
 
 
 class ChangePasswordForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.current_password.label.text = _("auth.current_password")
+        self.new_password.label.text = _("auth.new_password")
+        self.new_password_confirm.label.text = _("auth.new_password_confirm")
+        self.submit.label.text = _("auth.change_password_submit")
+
     current_password = PasswordField(
-        "Текущий пароль",
-        validators=[DataRequired(message="Введите текущий пароль")],
+        validators=[DataRequired(message="val.current_password_required")],
     )
     new_password = PasswordField(
-        "Новый пароль",
         validators=[
-            DataRequired(message="Укажите новый пароль"),
+            DataRequired(message="val.new_password_required"),
             Length(
                 min=Config.PASSWORD_MIN_LENGTH,
-                message=f"Минимум {Config.PASSWORD_MIN_LENGTH} символов",
+                message="val.password_min",
             ),
             _validate_password_strength,
         ],
     )
     new_password_confirm = PasswordField(
-        "Подтверждение нового пароля",
         validators=[
-            DataRequired(message="Подтвердите новый пароль"),
-            EqualTo("new_password", message="Пароли не совпадают"),
+            DataRequired(message="val.new_password_confirm_required"),
+            EqualTo("new_password", message="val.password_mismatch"),
         ],
     )
-    submit = SubmitField("Сохранить пароль")
+    submit = SubmitField()
 
 
 ACHIEVEMENT_CATEGORIES = [
-    ("tasks", "Задачи"),
-    ("topics", "Темы"),
-    ("practice", "Практика"),
-    ("skills", "Навыки"),
+    ("tasks", "ach.cat.tasks"),
+    ("topics", "ach.cat.topics"),
+    ("practice", "ach.cat.practice"),
+    ("skills", "ach.cat.skills"),
 ]
 
 TIER_LABELS = {
-    "bronze": "Бронза",
-    "silver": "Серебро",
-    "gold": "Золото",
-    "special": "Особое",
+    "bronze": "ach.tier.bronze",
+    "silver": "ach.tier.silver",
+    "gold": "ach.tier.gold",
+    "special": "ach.tier.special",
 }
 
 
@@ -81,152 +86,152 @@ def _prog_sharpshooter(stats: dict) -> dict:
     attempts = stats["total_attempts"]
     rate = stats["success_rate"]
     if attempts >= 10 and rate >= 80:
-        return {"current": 80, "target": 80, "percent": 100, "label": f"{rate}% успеха"}
+        return {"current": 80, "target": 80, "percent": 100, "label": _("ach.prog.success_rate", rate=rate)}
     if attempts < 10:
-        return _prog_value(attempts, 10, "попыток")
-    return _prog_value(rate, 80, "% успеха")
+        return _prog_value(attempts, 10, _("ach.unit.attempts"))
+    return _prog_value(rate, 80, _("ach.prog.success_pct"))
 
 
 def _prog_perfectionist(stats: dict) -> dict:
     attempts = stats["total_attempts"]
     rate = stats["success_rate"]
     if attempts >= 20 and rate >= 95:
-        return {"current": 95, "target": 95, "percent": 100, "label": f"{rate}% успеха"}
+        return {"current": 95, "target": 95, "percent": 100, "label": _("ach.prog.success_rate", rate=rate)}
     if attempts < 20:
-        return _prog_value(attempts, 20, "попыток")
-    return _prog_value(rate, 95, "% успеха")
+        return _prog_value(attempts, 20, _("ach.unit.attempts"))
+    return _prog_value(rate, 95, _("ach.prog.success_pct"))
 
 
 ACHIEVEMENT_DEFS = [
     {
         "id": "first_task",
-        "title": "Первый шаг",
+        "title_key": "ach.first_task.title",
+        "description_key": "ach.first_task.desc",
         "icon": "🎯",
-        "description": "Решить первую задачу",
         "category": "tasks",
         "tier": "bronze",
         "check": lambda s: s["total_completed"] >= 1,
-        "progress": lambda s: _prog_value(s["total_completed"], 1, "задача"),
+        "progress": lambda s: _prog_value(s["total_completed"], 1, _("ach.unit.task")),
     },
     {
         "id": "tasks_10",
-        "title": "Десятка",
+        "title_key": "ach.tasks_10.title",
+        "description_key": "ach.tasks_10.desc",
         "icon": "🔟",
-        "description": "Решить 10 задач",
         "category": "tasks",
         "tier": "bronze",
         "check": lambda s: s["total_completed"] >= 10,
-        "progress": lambda s: _prog_value(s["total_completed"], 10, "задач"),
+        "progress": lambda s: _prog_value(s["total_completed"], 10, _("ach.unit.tasks")),
     },
     {
         "id": "tasks_25",
-        "title": "Четверть сотни",
+        "title_key": "ach.tasks_25.title",
+        "description_key": "ach.tasks_25.desc",
         "icon": "📈",
-        "description": "Решить 25 задач",
         "category": "tasks",
         "tier": "silver",
         "check": lambda s: s["total_completed"] >= 25,
-        "progress": lambda s: _prog_value(s["total_completed"], 25, "задач"),
+        "progress": lambda s: _prog_value(s["total_completed"], 25, _("ach.unit.tasks")),
     },
     {
         "id": "tasks_50",
-        "title": "Полсотни",
+        "title_key": "ach.tasks_50.title",
+        "description_key": "ach.tasks_50.desc",
         "icon": "🏅",
-        "description": "Решить 50 задач",
         "category": "tasks",
         "tier": "silver",
         "check": lambda s: s["total_completed"] >= 50,
-        "progress": lambda s: _prog_value(s["total_completed"], 50, "задач"),
+        "progress": lambda s: _prog_value(s["total_completed"], 50, _("ach.unit.tasks")),
     },
     {
         "id": "tasks_100",
-        "title": "Сотня",
+        "title_key": "ach.tasks_100.title",
+        "description_key": "ach.tasks_100.desc",
         "icon": "💯",
-        "description": "Решить 100 задач",
         "category": "tasks",
         "tier": "gold",
         "check": lambda s: s["total_completed"] >= 100,
-        "progress": lambda s: _prog_value(s["total_completed"], 100, "задач"),
+        "progress": lambda s: _prog_value(s["total_completed"], 100, _("ach.unit.tasks")),
     },
     {
         "id": "half_way",
-        "title": "На полпути",
+        "title_key": "ach.half_way.title",
+        "description_key": "ach.half_way.desc",
         "icon": "🛤️",
-        "description": "Решить половину всех задач курса",
         "category": "tasks",
         "tier": "gold",
         "check": lambda s: s["total_tasks"] > 0 and s["total_completed"] >= s["total_tasks"] // 2,
         "progress": lambda s: _prog_value(
             s["total_completed"],
             max(1, s["total_tasks"] // 2),
-            "задач",
+            _("ach.unit.tasks"),
         ),
     },
     {
         "id": "topic_master",
-        "title": "Мастер темы",
+        "title_key": "ach.topic_master.title",
+        "description_key": "ach.topic_master.desc",
         "icon": "📚",
-        "description": "Полностью пройти любую тему",
         "category": "topics",
         "tier": "silver",
         "check": lambda s: s["topics_mastered"] >= 1,
-        "progress": lambda s: _prog_value(s["topics_mastered"], 1, "тема"),
+        "progress": lambda s: _prog_value(s["topics_mastered"], 1, _("ach.unit.topic")),
     },
     {
         "id": "all_topics",
-        "title": "Покоритель курса",
+        "title_key": "ach.all_topics.title",
+        "description_key": "ach.all_topics.desc",
         "icon": "👑",
-        "description": "Пройти все темы курса",
         "category": "topics",
         "tier": "gold",
         "check": lambda s: s["topics_total"] > 0 and s["topics_mastered"] >= s["topics_total"],
-        "progress": lambda s: _prog_value(s["topics_mastered"], max(1, s["topics_total"]), "тем"),
+        "progress": lambda s: _prog_value(s["topics_mastered"], max(1, s["topics_total"]), _("ach.unit.topics")),
     },
     {
         "id": "explorer",
-        "title": "Исследователь",
+        "title_key": "ach.explorer.title",
+        "description_key": "ach.explorer.desc",
         "icon": "🧭",
-        "description": "Начать 3 разные темы",
         "category": "topics",
         "tier": "bronze",
         "check": lambda s: s["topics_started"] >= 3,
-        "progress": lambda s: _prog_value(s["topics_started"], 3, "тем"),
+        "progress": lambda s: _prog_value(s["topics_started"], 3, _("ach.unit.topics")),
     },
     {
         "id": "explorer_all",
-        "title": "Картограф",
+        "title_key": "ach.explorer_all.title",
+        "description_key": "ach.explorer_all.desc",
         "icon": "🗺️",
-        "description": "Открыть все темы курса",
         "category": "topics",
         "tier": "gold",
         "check": lambda s: s["topics_total"] > 0 and s["topics_started"] >= s["topics_total"],
-        "progress": lambda s: _prog_value(s["topics_started"], max(1, s["topics_total"]), "тем"),
+        "progress": lambda s: _prog_value(s["topics_started"], max(1, s["topics_total"]), _("ach.unit.topics")),
     },
     {
         "id": "persistent",
-        "title": "Упорство",
+        "title_key": "ach.persistent.title",
+        "description_key": "ach.persistent.desc",
         "icon": "💪",
-        "description": "Сделать 25 попыток",
         "category": "practice",
         "tier": "bronze",
         "check": lambda s: s["total_attempts"] >= 25,
-        "progress": lambda s: _prog_value(s["total_attempts"], 25, "попыток"),
+        "progress": lambda s: _prog_value(s["total_attempts"], 25, _("ach.unit.attempts")),
     },
     {
         "id": "marathon",
-        "title": "Марафон",
+        "title_key": "ach.marathon.title",
+        "description_key": "ach.marathon.desc",
         "icon": "🏃",
-        "description": "Сделать 100 попыток",
         "category": "practice",
         "tier": "gold",
         "check": lambda s: s["total_attempts"] >= 100,
-        "progress": lambda s: _prog_value(s["total_attempts"], 100, "попыток"),
+        "progress": lambda s: _prog_value(s["total_attempts"], 100, _("ach.unit.attempts")),
     },
     {
         "id": "sharpshooter",
-        "title": "Меткий стрелок",
+        "title_key": "ach.sharpshooter.title",
+        "description_key": "ach.sharpshooter.desc",
         "icon": "🎪",
-        "description": "80% успешных попыток (от 10)",
         "category": "practice",
         "tier": "silver",
         "check": lambda s: s["total_attempts"] >= 10 and s["success_rate"] >= 80,
@@ -234,9 +239,9 @@ ACHIEVEMENT_DEFS = [
     },
     {
         "id": "perfectionist",
-        "title": "Без ошибок",
+        "title_key": "ach.perfectionist.title",
+        "description_key": "ach.perfectionist.desc",
         "icon": "✨",
-        "description": "95% успешных попыток (от 20)",
         "category": "practice",
         "tier": "gold",
         "check": lambda s: s["total_attempts"] >= 20 and s["success_rate"] >= 95,
@@ -244,9 +249,9 @@ ACHIEVEMENT_DEFS = [
     },
     {
         "id": "skill_starter",
-        "title": "На пути инженера",
+        "title_key": "ach.skill_starter.title",
+        "description_key": "ach.skill_starter.desc",
         "icon": "⚙️",
-        "description": "Набрать 50 XP в дереве навыков",
         "category": "skills",
         "tier": "bronze",
         "check": lambda s: s.get("skills_total_xp", 0) >= 50,
@@ -254,29 +259,29 @@ ACHIEVEMENT_DEFS = [
     },
     {
         "id": "debugger_medal",
-        "title": "Охотник за багами",
+        "title_key": "ach.debugger_medal.title",
+        "description_key": "ach.debugger_medal.desc",
         "icon": "🔧",
-        "description": "10+ задач «Исправь код»",
         "category": "skills",
         "tier": "silver",
         "check": lambda s: s.get("medal_fix_master", 0) >= 10,
-        "progress": lambda s: _prog_value(s.get("medal_fix_master", 0), 10, "исправлений"),
+        "progress": lambda s: _prog_value(s.get("medal_fix_master", 0), 10, _("ach.unit.fixes")),
     },
     {
         "id": "skill_crystal",
-        "title": "Кристальный ум",
+        "title_key": "ach.skill_crystal.title",
+        "description_key": "ach.skill_crystal.desc",
         "icon": "💎",
-        "description": "Полностью освоить любую тему курса",
         "category": "skills",
         "tier": "gold",
         "check": lambda s: s.get("skills_crystals", 0) >= 1,
-        "progress": lambda s: _prog_value(s.get("skills_crystals", 0), 1, "кристалл"),
+        "progress": lambda s: _prog_value(s.get("skills_crystals", 0), 1, _("ach.unit.crystal")),
     },
     {
         "id": "time_traveler",
-        "title": "Путешественник во времени",
+        "title_key": "ach.time_traveler.title",
+        "description_key": "ach.time_traveler.desc",
         "icon": "⏱️",
-        "description": "Открыть Машину времени (★★ в «Условиях»)",
         "category": "skills",
         "tier": "special",
         "check": lambda s: s.get("time_machine_unlocked", False),
@@ -331,12 +336,12 @@ def _build_achievements(stats: dict) -> list:
         items.append(
             {
                 "id": ach["id"],
-                "title": ach["title"],
+                "title": _(ach["title_key"]),
                 "icon": ach["icon"],
-                "description": ach["description"],
+                "description": _(ach["description_key"]),
                 "category": ach["category"],
                 "tier": ach["tier"],
-                "tier_label": TIER_LABELS[ach["tier"]],
+                "tier_label": _(TIER_LABELS[ach["tier"]]),
                 "unlocked": unlocked,
                 "progress": progress,
                 "in_progress": not unlocked and progress["percent"] > 0,
@@ -348,7 +353,7 @@ def _build_achievements(stats: dict) -> list:
 
 def _group_achievements(achievements: list) -> list[dict]:
     groups = []
-    for cat_id, cat_label in ACHIEVEMENT_CATEGORIES:
+    for cat_id, cat_label_key in ACHIEVEMENT_CATEGORIES:
         cat_items = [a for a in achievements if a["category"] == cat_id]
         if not cat_items:
             continue
@@ -356,7 +361,7 @@ def _group_achievements(achievements: list) -> list[dict]:
         groups.append(
             {
                 "id": cat_id,
-                "label": cat_label,
+                "label": _(cat_label_key),
                 "achievements": cat_items,
                 "unlocked": unlocked,
                 "total": len(cat_items),
@@ -559,15 +564,16 @@ def change_password():
     form = ChangePasswordForm()
     if form.validate_on_submit():
         if not current_user.check_password(form.current_password.data):
-            flash("Неверный текущий пароль.", "error")
+            flash(_("flash.wrong_password"), "error")
         elif current_user.check_password(form.new_password.data):
-            flash("Новый пароль должен отличаться от текущего.", "error")
+            flash(_("flash.password_same"), "error")
         else:
             current_user.set_password(form.new_password.data)
             db.session.commit()
-            flash("Пароль успешно изменён.", "success")
+            flash(_("flash.password_changed"), "success")
             return redirect(url_for("profile.dashboard"))
 
+    _localize_form_errors(form)
     return render_template("profile/change_password.html", form=form)
 
 

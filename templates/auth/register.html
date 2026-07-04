@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% from "auth/_macros.html" import password_field %}
+{% from "auth/_macros.html" import password_field with context %}
 
-{% block title %}Регистрация — PyBlocks{% endblock %}
+{% block title %}{{ _('auth.register_title') }}{% endblock %}
 
 {% block content %}
 <section class="auth-section">
   <div class="auth-card">
-    <h1 class="auth-card__title">Регистрация</h1>
-    <p class="auth-card__subtitle">Создайте аккаунт для сохранения прогресса по задачам</p>
+    <h1 class="auth-card__title">{{ _('auth.register_heading') }}</h1>
+    <p class="auth-card__subtitle">{{ _('auth.register_subtitle') }}</p>
 
     <form method="post" class="auth-form" novalidate>
       {{ form.hidden_tag() }}
@@ -30,16 +30,16 @@
 
       <div class="form-group{% if form.password.errors %} form-group--error{% endif %}">
         {{ form.password.label(class="form-label") }}
-        {{ password_field(form.password, placeholder="минимум 8 символов", autocomplete="new-password") }}
+        {{ password_field(form.password, placeholder="••••••••", autocomplete="new-password") }}
         {% for error in form.password.errors %}
           <span class="form-error">{{ error }}</span>
         {% endfor %}
-        <span class="form-hint">Буквы и цифры, не менее 8 символов</span>
+        <span class="form-hint">{{ _('auth.password_hint') }}</span>
       </div>
 
       <div class="form-group{% if form.password_confirm.errors %} form-group--error{% endif %}">
         {{ form.password_confirm.label(class="form-label") }}
-        {{ password_field(form.password_confirm, placeholder="повторите пароль", autocomplete="new-password") }}
+        {{ password_field(form.password_confirm, placeholder="••••••••", autocomplete="new-password") }}
         {% for error in form.password_confirm.errors %}
           <span class="form-error">{{ error }}</span>
         {% endfor %}
@@ -49,7 +49,7 @@
     </form>
 
     <p class="auth-card__footer">
-      Уже есть аккаунт? <a href="{{ url_for('auth.login') }}">Войти</a>
+      {{ _('auth.have_account') }} <a href="{{ url_for('auth.login') }}">{{ _('auth.login_link') }}</a>
     </p>
   </div>
 </section>

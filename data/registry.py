@@ -70,7 +70,9 @@ TASKS_BY_TOPIC = {
 
 
 def get_topics():
-    return TOPICS
+    from data.localized import get_localized_topics
+
+    return get_localized_topics()
 
 
 def plain_text(value: str) -> str:
@@ -83,21 +85,12 @@ def plain_text(value: str) -> str:
 
 def get_tasks_public(topic_id: str):
     """Список задач без тестов (для клиента)."""
-    tasks = TASKS_BY_TOPIC.get(topic_id, [])
-    return [
-        {
-            "id": task["id"],
-            "title": task["title"],
-            "condition": plain_text(task["condition"]),
-            "hint": plain_text(task.get("hint") or "") or None,
-            "starter_xml": task.get("starter_xml"),
-        }
-        for task in tasks
-    ]
+    from data.localized import get_localized_tasks_public
+
+    return get_localized_tasks_public(topic_id)
 
 
 def get_task_with_tests(topic_id: str, task_id: str):
-    for task in TASKS_BY_TOPIC.get(topic_id, []):
-        if task["id"] == task_id:
-            return task
-    return None
+    from data.localized import get_localized_task_with_tests
+
+    return get_localized_task_with_tests(topic_id, task_id)

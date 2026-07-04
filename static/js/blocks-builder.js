@@ -18,7 +18,7 @@ const BlocksBuilder = {
   applyProgram(workspace, program, xml) {
     if (!workspace) return false;
     if (!xml || typeof xml !== "string" || !xml.trim()) {
-      throw new Error("Нет XML для загрузки блоков");
+      throw new Error(t("builder.no_xml"));
     }
 
     if (typeof setCodePreviewSuppressed === "function") {
@@ -31,7 +31,7 @@ const BlocksBuilder = {
     try {
       const loaded = WorkspaceStorage.load(workspace, xml, { skipIntegrateOrphans: true });
       if (!loaded) {
-        throw new Error("Blockly не смог загрузить блоки");
+        throw new Error(t("builder.load_failed"));
       }
       if (typeof ProgramFrame !== "undefined") {
         ProgramFrame.consolidateEndBlocks(workspace);

@@ -3,6 +3,8 @@
 import threading
 from contextlib import contextmanager
 
+from i18n import _
+
 _pool: threading.BoundedSemaphore | None = None
 _queue_timeout = 10.0
 
@@ -25,10 +27,7 @@ def execution_slot():
 
     acquired = _pool.acquire(blocking=True, timeout=_queue_timeout)
     if not acquired:
-        raise ExecutionPoolBusy(
-            "Сервер занят: слишком много программ выполняется одновременно. "
-            "Подождите несколько секунд и попробуйте снова."
-        )
+        raise ExecutionPoolBusy(_("runner.pool_busy"))
     try:
         yield
     finally:

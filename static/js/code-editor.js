@@ -78,8 +78,8 @@ const CodeEditor = {
     if (this.codePanel) this.codePanel.classList.toggle("panel--code-editing", isEdit);
     if (this.btnApply) this.btnApply.hidden = !isEdit;
     if (this.btnEdit) {
-      this.btnEdit.textContent = isEdit ? "Закрыть" : "Редактор";
-      this.btnEdit.title = isEdit ? "Закрыть редактор без сборки" : "Редактировать Python-код";
+      this.btnEdit.textContent = isEdit ? t("editor.close") : t("editor.open");
+      this.btnEdit.title = isEdit ? t("editor.close_title") : t("editor.open_title");
     }
   },
 
@@ -279,14 +279,14 @@ const CodeEditor = {
 
     const code = this.editor.value.trim();
     if (!code) {
-      setOutput("Введите код перед сборкой блоков.", true);
+      setOutput(t("editor.enter_code"), true);
       return;
     }
 
     this.applying = true;
     if (this.btnApply) {
       this.btnApply.disabled = true;
-      this.btnApply.textContent = "Сборка…";
+      this.btnApply.textContent = t("editor.building");
     }
 
     try {
@@ -303,24 +303,24 @@ const CodeEditor = {
       }
 
       if (!data.success || !data.xml) {
-        const line = data.line ? " (строка " + data.line + ")" : "";
-        setOutput((data.error || "Не удалось разобрать код") + line, true);
+        const line = data.line ? t("editor.line_suffix", " (строка {line})", { line: data.line }) : "";
+        setOutput((data.error || t("editor.parse_error")) + line, true);
         return;
       }
 
       StepDebugger.stop();
       BlocksBuilder.applyProgram(workspace, data.program, data.xml);
       this.toggleEditMode(false);
-      setStatus("idle", "Готов");
-      setOutput("Блоки собраны из кода.", false);
+      setStatus("idle", t("status.ready"));
+      setOutput(t("editor.blocks_built"), false);
       centerWorkspaceOnBlocks();
     } catch (err) {
-      setOutput("Ошибка сборки блоков: " + err.message, true);
+      setOutput(t("editor.build_error", "Ошибка сборки блоков: {message}", { message: err.message }), true);
     } finally {
       this.applying = false;
       if (this.btnApply) {
         this.btnApply.disabled = false;
-        this.btnApply.textContent = "Собрать";
+        this.btnApply.textContent = t("editor.build");
       }
     }
   },

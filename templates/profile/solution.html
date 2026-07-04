@@ -5,7 +5,7 @@
 {% block content %}
 <section class="solution-page">
   <nav class="breadcrumb">
-    <a href="{{ url_for('profile.dashboard') }}">Личный кабинет</a>
+    <a href="{{ url_for('profile.dashboard') }}">{{ _('profile.heading') }}</a>
     <span>/</span>
     <span>{{ topic.title }}</span>
     <span>/</span>
@@ -15,17 +15,17 @@
   <header class="solution-header">
     <h1>{{ task.title }}</h1>
     <p class="solution-header__meta">
-      Тема: {{ topic.title }} ·
-      Попыток: {{ progress.attempts_count }} ·
+      {{ _('profile.topic_label') }} {{ topic.title }} ·
+      {{ _('profile.attempts_count_label') }} {{ progress.attempts_count }} ·
       {% if progress.completed_at %}
-        Решено: {{ progress.completed_at.strftime('%d.%m.%Y %H:%M') }}
+        {{ _('profile.solved_at', date=progress.completed_at.strftime('%d.%m.%Y %H:%M')) }}
       {% endif %}
     </p>
   </header>
 
   {% if progress.solution_xml %}
     <section class="solution-block">
-      <h2 class="solution-block__title">Ваше решение (блоки)</h2>
+      <h2 class="solution-block__title">{{ _('profile.solution_blocks') }}</h2>
       <div
         id="solutionBlocksPreview"
         class="solution-blocks-preview guide-preview"
@@ -36,19 +36,19 @@
 
   {% if solution_code %}
     <section class="solution-block">
-      <h2 class="solution-block__title">{% if progress.solution_xml %}Сгенерированный Python{% else %}Ваше решение{% endif %}</h2>
+      <h2 class="solution-block__title">{% if progress.solution_xml %}{{ _('profile.solution_generated') }}{% else %}{{ _('profile.solution_code') }}{% endif %}</h2>
       <pre class="solution-code"><code>{{ solution_code }}</code></pre>
     </section>
   {% endif %}
 
   <section class="solution-block">
-    <h2 class="solution-block__title">История попыток ({{ attempts|length }})</h2>
+    <h2 class="solution-block__title">{{ _('profile.attempts_with_count', count=attempts|length) }}</h2>
     {% if attempts %}
       <div class="attempts-list">
         {% for attempt in attempts %}
           <details class="attempt-item{% if attempt.success %} attempt-item--success{% endif %}">
             <summary>
-              <span class="attempt-item__status">{% if attempt.success %}✓ Успех{% else %}✗ Неверно{% endif %}</span>
+              <span class="attempt-item__status">{% if attempt.success %}✓ {{ _('profile.success') }}{% else %}✗ {{ _('profile.wrong') }}{% endif %}</span>
               <span class="attempt-item__date">{{ attempt.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
             </summary>
             <pre class="solution-code solution-code--small"><code>{{ attempt.code.strip() }}</code></pre>
@@ -56,13 +56,13 @@
         {% endfor %}
       </div>
     {% else %}
-      <p class="text-muted">Попыток пока нет.</p>
+      <p class="text-muted">{{ _('profile.no_attempts_yet') }}</p>
     {% endif %}
   </section>
 
   <div class="solution-actions">
-    <a href="{{ url_for('profile.dashboard') }}" class="btn btn--ghost">← Назад в кабинет</a>
-    <a href="{{ learn_url }}" class="btn btn--primary">Открыть в редакторе</a>
+    <a href="{{ url_for('profile.dashboard') }}" class="btn btn--ghost">{{ _('profile.back_to_dashboard') }}</a>
+    <a href="{{ learn_url }}" class="btn btn--primary">{{ _('profile.open_editor') }}</a>
   </div>
 </section>
 {% endblock %}
@@ -72,8 +72,8 @@
     <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/blockly_compressed.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/blocks_compressed.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/python_compressed.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/msg/ru.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/pyblocks-locale.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/msg/' ~ blockly_msg_file) }}"></script>
+    <script src="{{ url_for('static', filename='js/' ~ pyblocks_locale_file) }}"></script>
     <script src="{{ url_for('static', filename='js/pyblocks-theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/compact-renderer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/method-blocks.js') }}"></script>

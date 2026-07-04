@@ -6,6 +6,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from i18n import _
+
 from runner.pool import ExecutionPoolBusy, execution_slot
 from runner.sandbox import (
     EXECUTION_TIMEOUT,
@@ -398,7 +400,7 @@ def debug_python_code(code: str, stdin_text: str = "") -> dict:
 
         raw = result.stdout.strip()
         if not raw:
-            err = result.stderr.strip() or "Пустой ответ трассировщика"
+            err = result.stderr.strip() or _("runner.trace_empty")
             return {"success": False, "steps": [], "error": err}
 
         if len(raw) > MAX_OUTPUT_CHARS:
@@ -410,7 +412,7 @@ def debug_python_code(code: str, stdin_text: str = "") -> dict:
             return {
                 "success": False,
                 "steps": [],
-                "error": "Ошибка разбора трассировки",
+                "error": _("runner.trace_parse_error"),
                 "output": raw,
             }
 
@@ -426,7 +428,7 @@ def debug_python_code(code: str, stdin_text: str = "") -> dict:
             return {
                 "success": False,
                 "steps": [],
-                "error": result.stderr.strip() or "Ошибка трассировки",
+                "error": result.stderr.strip() or _("runner.trace_error"),
             }
 
         return {
@@ -442,7 +444,7 @@ def debug_python_code(code: str, stdin_text: str = "") -> dict:
         return {
             "success": False,
             "steps": [],
-            "error": f"Превышено время выполнения ({EXECUTION_TIMEOUT} сек.)",
+            "error": _("runner.timeout", seconds=EXECUTION_TIMEOUT),
         }
     except Exception as exc:
         return {"success": False, "steps": [], "error": str(exc)}

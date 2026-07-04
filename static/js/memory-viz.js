@@ -12,7 +12,7 @@ const MemoryViz = {
 
   clear() {
     if (this.varsEl) {
-      this.varsEl.innerHTML = '<p class="memory-viz__empty">Коробочки переменных появятся на каждом шаге</p>';
+      this.varsEl.innerHTML = '<p class="memory-viz__empty">' + t("memory.empty_hint") + "</p>";
     }
     if (this.outputWrap) {
       this.outputWrap.classList.remove("debug-output--active");
@@ -48,7 +48,7 @@ const MemoryViz = {
     Object.keys(vars).forEach(function (name) {
       cells[name] = MemoryViz._legacyToCell(vars[name]);
     });
-    return [{ name: "программа", line: step.line || 1, vars: cells }];
+    return [{ name: t("memory.program_frame", "программа"), line: step.line || 1, vars: cells }];
   },
 
   _legacyToCell(value) {
@@ -102,12 +102,12 @@ const MemoryViz = {
 
   _typeLabel(cell) {
     if (!cell) return "?";
-    if (cell.kind === "ref") return cell.type || "объект";
+    if (cell.kind === "ref") return cell.type || t("memory.object", "объект");
     if (cell.kind === "list") return "list";
     if (cell.kind === "dict") return "dict";
     if (cell.kind === "tuple") return "tuple";
     if (cell.kind === "set") return "set";
-    return cell.type || "значение";
+    return cell.type || t("memory.value", "значение");
   },
 
   renderVariableBoxes(stack, heap, changed, prevStack) {
@@ -115,7 +115,7 @@ const MemoryViz = {
 
     const top = this._topFrame(stack);
     if (!top || !Object.keys(top.vars || {}).length) {
-      this.varsEl.innerHTML = '<p class="memory-viz__empty">Нет переменных</p>';
+      this.varsEl.innerHTML = '<p class="memory-viz__empty">' + t("memory.no_vars") + "</p>";
       return;
     }
 
@@ -140,7 +140,9 @@ const MemoryViz = {
         let sharedHint = "";
         if (cell.kind === "ref" && shared[cell.id] && shared[cell.id].length > 1) {
           sharedHint =
-            '<span class="memory-var__shared" title="Общая ссылка">⇄ ' +
+            '<span class="memory-var__shared" title="' +
+            t("memory.shared_ref") +
+            '">⇄ ' +
             MemoryViz.escape(shared[cell.id].join(", ")) +
             "</span>";
         }
@@ -163,15 +165,19 @@ const MemoryViz = {
           display +
           "</div>" +
           (prevText && isChanged
-            ? '<span class="memory-var__delta">было ' +
+            ? '<span class="memory-var__delta">' +
+              t("memory.was") +
+              " " +
               MemoryViz.escape(prevText) +
-              " → стало " +
+              " → " +
+              t("memory.became") +
+              " " +
               MemoryViz.escape(MemoryViz.formatPlain(cell, heap)) +
               "</span>"
             : "") +
           sharedHint +
-          (isChanged ? '<span class="memory-var__badge">изменено</span>' : "") +
-          (isNew ? '<span class="memory-var__badge memory-var__badge--new">новая</span>' : "") +
+          (isChanged ? '<span class="memory-var__badge">' + t("memory.changed") + "</span>" : "") +
+          (isNew ? '<span class="memory-var__badge memory-var__badge--new">' + t("memory.new") + "</span>" : "") +
           "</div>"
         );
       })
@@ -292,7 +298,7 @@ const MemoryViz = {
       return bracket[0] + items + suffix + bracket[1];
     }
     if (entry.kind === "dict") {
-      return "{… " + entry.length + " пар}";
+      return t("memory.dict_preview", "{… {count} пар}", { count: entry.length });
     }
     return MemoryViz.primitiveText(entry);
   },

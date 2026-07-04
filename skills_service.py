@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 
+from data.localized import get_localized_topics
 from data.registry import get_task_with_tests, get_tasks_public, get_topics
 from data.skills_config import (
     LEGACY_BRANCH_IDS,
@@ -17,13 +18,52 @@ from data.skills_config import (
     TOPIC_ORDER,
     build_skill_branches,
 )
+from i18n import _, get_locale
 from topic_unlock_service import get_unlock_info, is_topic_unlocked
 from extensions import db
 from models import SkillBranchXp, SkillMedalPoints, SkillXpAward, TaskProgress
 
-SKILL_BRANCHES = build_skill_branches()
 BRANCH_IDS = tuple(TOPIC_ORDER)
 MEDAL_IDS = tuple(m["id"] for m in MEDAL_DEFS)
+
+
+def _localized_level_names() -> list[str]:
+    if get_locale() == "en":
+        from data.translations.en_skills import LEVEL_NAMES as EN_LEVEL_NAMES
+
+        return EN_LEVEL_NAMES
+    return LEVEL_NAMES
+
+
+def _localized_medal_defs() -> list[dict]:
+    if get_locale() == "en":
+        from data.translations.en_skills import MEDAL_DEFS_EN
+
+        return [{**medal, **MEDAL_DEFS_EN.get(medal["id"], {})} for medal in MEDAL_DEFS]
+    return MEDAL_DEFS
+
+
+def _localized_skill_branches() -> list[dict]:
+    branches = build_skill_branches()
+    if get_locale() != "en":
+        return branches
+
+    from data.translations.en_skills import TOPIC_META_EN
+    from data.translations.en_topics import TOPICS_EN
+
+    localized = []
+    for branch in branches:
+        tid = branch["id"]
+        overlay = TOPICS_EN.get(tid, {})
+        meta = TOPIC_META_EN.get(tid, {})
+        localized.append(
+            {
+                **branch,
+                **{key: overlay[key] for key in ("title", "description") if key in overlay},
+                "skill_label": meta.get("skill_label", branch["skill_label"]),
+            }
+        )
+    return localized
 
 
 @dataclass
@@ -103,11 +143,17 @@ def _next_level_hint(
     if locked:
         return ""
     if level >= 5:
-        return f"Тема освоена · {fix_completed}/{fix_total} исправлений"
-    _, span, _ = _progress_to_next_star(completed, total, level)
-    next_name = LEVEL_NAMES[level + 1]
-    remaining = max(0, span - _progress_to_next_star(completed, total, level)[0])
-    return f"До «{next_name}»: ещё ~{remaining} задач · исправления {fix_completed}/{fix_total}"
+        return _("skills.hint.mastered", fix_completed=fix_completed, fix_total=fix_total)
+    progress, span, _percent = _progress_to_next_star(completed, total, level)
+    next_name = _localized_level_names()[level + 1]
+    remaining = max(0, span - progress)
+    return _(
+        "skills.hint.next_level",
+        next_name=next_name,
+        remaining=remaining,
+        fix_completed=fix_completed,
+        fix_total=fix_total,
+    )
 
 
 def _collect_topic_stats(user_id: int) -> dict[str, dict]:
@@ -141,14 +187,17 @@ def _collect_topic_stats(user_id: int) -> dict[str, dict]:
 
 
 def _build_recommendation(user_id: int, topic_stats: dict[str, dict]) -> dict | None:
-    titles = {t["id"]: t["title"] for t in get_topics()}
+    titles = {t["id"]: t["title"] for t in get_localized_topics()}
 
     for tid in TOPIC_ORDER:
         if not is_topic_unlocked(user_id, tid):
             info = get_unlock_info(user_id, tid)
             return {
                 "topic_id": info["requires_topic_id"],
-                "text": info["unlock_hint"] or f"Продолжайте тему «{titles.get(tid, tid)}».",
+                "text": info["unlock_hint"] or _(
+                    "skills.rec.continue_topic",
+                    topic=titles.get(tid, tid),
+                ),
             }
 
     candidates = [
@@ -162,14 +211,18 @@ def _build_recommendation(user_id: int, topic_stats: dict[str, dict]) -> dict | 
     tid = min(candidates, key=lambda x: topic_stats[x]["percent"])
     stats = topic_stats[tid]
     if stats["fix_completed"] < stats["fix_total"]:
-        text = (
-            f"В теме «{titles[tid]}» остались задачи «Исправь код» "
-            f"({stats['fix_completed']}/{stats['fix_total']}). Они идут сразу после обычных заданий."
+        text = _(
+            "skills.rec.fix_tasks",
+            topic=titles[tid],
+            fix_completed=stats["fix_completed"],
+            fix_total=stats["fix_total"],
         )
     else:
-        text = (
-            f"Продолжайте тему «{titles[tid]}»: решено {stats['completed_count']}"
-            f"/{stats['total_tasks']} задач."
+        text = _(
+            "skills.rec.continue_progress",
+            topic=titles[tid],
+            completed=stats["completed_count"],
+            total=stats["total_tasks"],
         )
     return {"topic_id": tid, "text": text}
 
@@ -321,9 +374,10 @@ def build_skills_profile(user_id: int) -> dict:
     total_xp = sum(branch_xp.values())
     crystals = sum(1 for tid in BRANCH_IDS if topic_stats[tid]["level"] >= 5)
 
-    titles = {t["id"]: t["title"] for t in get_topics()}
+    titles = {t["id"]: t["title"] for t in get_localized_topics()}
+    level_names = _localized_level_names()
     branches = []
-    for index, meta in enumerate(SKILL_BRANCHES):
+    for index, meta in enumerate(_localized_skill_branches()):
         tid = meta["id"]
         stats = topic_stats[tid]
         level = stats["level"]
@@ -341,12 +395,12 @@ def build_skills_profile(user_id: int) -> dict:
                 "locked": locked,
                 "stars_filled": stars,
                 "level_name": (
-                    LEVEL_NAMES[level]
+                    level_names[level]
                     if not locked and level > 0
-                    else ("Открыта" if not locked else "Закрыта")
+                    else (_("skills.level.open") if not locked else _("skills.level.closed"))
                 ),
                 "next_level_name": (
-                    LEVEL_NAMES[level + 1] if level < 5 and not locked else None
+                    level_names[level + 1] if level < 5 and not locked else None
                 ),
                 "completed_count": stats["completed_count"],
                 "total_tasks": stats["total_tasks"],
@@ -397,12 +451,12 @@ def build_skills_profile(user_id: int) -> dict:
         "topic_order": TOPIC_ORDER,
         "total_xp": total_xp,
         "crystals": crystals,
-        "medals": [{**m, "points": medals.get(m["id"], 0)} for m in MEDAL_DEFS],
+        "medals": [{**m, "points": medals.get(m["id"], 0)} for m in _localized_medal_defs()],
         "time_machine_unlocked": time_machine_unlocked,
         "time_machine_topic": titles[TIME_MACHINE_TOPIC],
         "time_machine_level": conditions_level,
         "time_machine_required_level": TIME_MACHINE_MIN_LEVEL,
         "recommendation": _build_recommendation(user_id, topic_stats),
         "recent_gains": recent_gains,
-        "level_names": LEVEL_NAMES,
+        "level_names": level_names,
     }

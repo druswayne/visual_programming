@@ -1,162 +1,86 @@
 {% extends "base.html" %}
 
-
-
-{% block title %}PyBlocks — визуальное программирование на Python{% endblock %}
-
-
+{% block title %}{{ _('landing.title') }}{% endblock %}
 
 {% block extra_head %}
-
   <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
-
 {% endblock %}
 
-
-
 {% block content %}
-
 <div class="landing">
 
-
-
   <section class="hero hero--landing">
-
     <div class="hero__intro">
-
-      <p class="hero__badge">Визуальный Python · прямо в браузере</p>
-
+      <p class="hero__badge">{{ _('landing.badge') }}</p>
       <h1 class="hero__title hero__title--landing">
-        Освойте программирование через <em class="hero__highlight hero__highlight--blocks">блоки</em> —
-        лёгкий старт с <em class="hero__highlight hero__highlight--python">Python</em>
+        {{ _('landing.hero_title_html') | safe }}
       </h1>
-
       <p class="hero__text">
-        Для начинающих блоки — самый простой путь в код: собирайте программу как конструктор,
-        редактор <strong>показывает Python рядом</strong> — и вы учитесь на каждом запуске.
+        {{ _('landing.hero_text') }}
       </p>
-
     </div>
-
-
 
     <div class="landing-demo" id="landingDemo" aria-hidden="true">
-
       <div class="landing-demo__stage">
-
         <div class="landing-demo__col landing-demo__col--blocks">
-
-          <div class="demo-panel__label">Блоки</div>
-
+          <div class="demo-panel__label">{{ _('landing.demo_blocks') }}</div>
           <div
-
             id="landingBlocksPreview"
-
             class="landing-blocks-preview guide-preview"
-
             data-guide-mounted="0"
-
             data-preview-mode="compact"
-
           ></div>
-
         </div>
-
-
 
         <div class="demo-connector demo-connector--1" aria-hidden="true">
-
           <svg class="demo-connector__svg" viewBox="0 0 56 32" width="56" height="32">
-
             <path class="demo-connector__path" d="M4 16 H40" />
-
             <path class="demo-connector__head" d="M34 10 L46 16 L34 22" />
-
           </svg>
-
-          <span class="demo-connector__label">код</span>
-
+          <span class="demo-connector__label">{{ _('landing.demo_code_label') }}</span>
         </div>
-
-
 
         <div class="landing-demo__col landing-demo__col--code">
-
-          <div class="demo-panel__label">Python-код</div>
-
+          <div class="demo-panel__label">{{ _('landing.demo_code') }}</div>
           <div class="code-panel">
-
-            <pre class="code-panel__pre"><code><span class="code-line code-line--1"><span class="tk-name">name</span> <span class="tk-op">=</span> <span class="tk-str">'Аня'</span></span><span class="code-line code-line--2"><span class="tk-fn">print</span>(<span class="tk-str">'Привет, '</span> <span class="tk-op">+</span> <span class="tk-name">name</span>)</span></code></pre>
-
+            <pre class="code-panel__pre"><code><span class="code-line code-line--1"><span class="tk-name">name</span> <span class="tk-op">=</span> <span class="tk-str">'{{ _('landing.demo_name') }}'</span></span><span class="code-line code-line--2"><span class="tk-fn">print</span>(<span class="tk-str">'{{ _('landing.demo_greet') }}'</span> <span class="tk-op">+</span> <span class="tk-name">name</span>)</span></code></pre>
             <a href="{{ url_for('learn', demo='greet') }}" class="code-panel__run demo-run-btn">
-
               <span class="demo-run-btn__icon" aria-hidden="true">▶</span>
-
-              <span>Запустить</span>
-
+              <span>{{ _('landing.demo_run') }}</span>
             </a>
-
           </div>
-
         </div>
-
-
 
         <div class="demo-connector demo-connector--2" aria-hidden="true">
-
           <svg class="demo-connector__svg" viewBox="0 0 56 32" width="56" height="32">
-
             <path class="demo-connector__path" d="M4 16 H40" />
-
             <path class="demo-connector__head" d="M34 10 L46 16 L34 22" />
-
           </svg>
-
-          <span class="demo-connector__label">запуск</span>
-
+          <span class="demo-connector__label">{{ _('landing.demo_run_label') }}</span>
         </div>
-
-
 
         <div class="landing-demo__col landing-demo__col--output">
-
-          <div class="demo-panel__label">Результат</div>
-
+          <div class="demo-panel__label">{{ _('landing.demo_output') }}</div>
           <div class="output-panel">
-
-            <div class="output-panel__badge demo-output-badge">Выполняется…</div>
-
-            <pre class="output-panel__text"><span class="demo-output-line">Привет, Аня</span><span class="demo-cursor">▌</span></pre>
-
+            <div class="output-panel__badge demo-output-badge">{{ _('landing.demo_running') }}</div>
+            <pre class="output-panel__text"><span class="demo-output-line">{{ _('landing.demo_output_text') }}</span><span class="demo-cursor">▌</span></pre>
           </div>
-
         </div>
-
       </div>
-
     </div>
 
-
-
     <div class="hero__actions hero__actions--cta">
-
       <div class="hero__cta-row">
-
-        <a href="{{ url_for('learn', demo='hello') }}" class="btn btn--cta hero__cta-btn">Попробовать прямо сейчас</a>
-
+        <a href="{{ url_for('learn', demo='hello') }}" class="btn btn--cta hero__cta-btn">{{ _('landing.try_now') }}</a>
         {% if not current_user.is_authenticated %}
-
-          <a href="{{ url_for('auth.register') }}" class="btn btn--register hero__cta-btn">Создать аккаунт</a>
-
+          <a href="{{ url_for('auth.register') }}" class="btn btn--register hero__cta-btn">{{ _('landing.create_account') }}</a>
         {% endif %}
-
       </div>
-
       <button
         type="button"
         class="hero__scroll-down"
         id="heroScrollDown"
-        aria-label="Прокрутить к разделу «Как это работает»"
+        aria-label="{{ _('landing.scroll_aria') }}"
       >
         <span class="hero__scroll-down-ring" aria-hidden="true">
           <svg class="hero__scroll-down-svg" viewBox="0 0 32 40" width="32" height="40" fill="none">
@@ -168,386 +92,195 @@
             </g>
           </svg>
         </span>
-        <span class="hero__scroll-down-hint">Как это работает</span>
+        <span class="hero__scroll-down-hint">{{ _('landing.scroll_hint') }}</span>
       </button>
-
     </div>
-
   </section>
 
-
-
-  <section class="steps-flow reveal" id="how-it-works" aria-label="Как это работает">
-
-    <h2 class="section-title">Как это работает</h2>
-
+  <section class="steps-flow reveal" id="how-it-works" aria-label="{{ _('landing.how_it_works') }}">
+    <h2 class="section-title">{{ _('landing.how_it_works') }}</h2>
     <div class="steps-flow__track">
-
       <a href="{{ url_for('learn', demo='hello') }}" class="steps-flow__step">
-
         <span class="steps-flow__icon" aria-hidden="true">🧩</span>
-
-        <strong class="steps-flow__title">Блоки</strong>
-
-        <span class="steps-flow__desc">Собираешь как конструктор</span>
-
+        <strong class="steps-flow__title">{{ _('landing.step_blocks') }}</strong>
+        <span class="steps-flow__desc">{{ _('landing.step_blocks_desc') }}</span>
       </a>
-
       <span class="steps-flow__arrow" aria-hidden="true">➤</span>
-
       <a href="{{ url_for('learn', demo='greet') }}" class="steps-flow__step">
-
         <span class="steps-flow__icon" aria-hidden="true">🐍</span>
-
-        <strong class="steps-flow__title">Код Python</strong>
-
-        <span class="steps-flow__desc">Видишь настоящий код</span>
-
+        <strong class="steps-flow__title">{{ _('landing.step_code') }}</strong>
+        <span class="steps-flow__desc">{{ _('landing.step_code_desc') }}</span>
       </a>
-
       <span class="steps-flow__arrow" aria-hidden="true">➤</span>
-
       <a href="{{ url_for('learn', demo='hello') }}" class="steps-flow__step">
-
         <span class="steps-flow__icon" aria-hidden="true">▶</span>
-
-        <strong class="steps-flow__title">Результат</strong>
-
-        <span class="steps-flow__desc">Запускаешь и отлаживаешь</span>
-
+        <strong class="steps-flow__title">{{ _('landing.step_result') }}</strong>
+        <span class="steps-flow__desc">{{ _('landing.step_result_desc') }}</span>
       </a>
-
     </div>
-
   </section>
-
-
 
   <section class="block-showcase reveal">
-
-    <h2 class="section-title">Попробуйте сами</h2>
-
+    <h2 class="section-title">{{ _('landing.try_yourself') }}</h2>
     <p class="section-lead">
-
-      Задача: выведите <strong>Hello, world!</strong> — перетащите блок «вывести» и нажмите «Запустить».
-
+      {{ _('landing.sandbox_lead') }}
     </p>
-
     <div class="landing-sandbox" id="landingSandbox">
-
       <div class="landing-sandbox__task">
-
-        <strong>Задача:</strong> выведите на экран текст <code>Hello, world!</code>
-
+        <strong>{{ _('landing.sandbox_task') }}</strong> {{ _('landing.sandbox_task_text') }} <code>Hello, world!</code>
       </div>
-
       <div class="landing-sandbox__workspace-wrap">
-
-        <div class="demo-panel__label">Блоки</div>
-
+        <div class="demo-panel__label">{{ _('landing.demo_blocks') }}</div>
         <div id="landingSandboxWorkspace" class="landing-sandbox__workspace"></div>
-
       </div>
-
       <div class="landing-sandbox__code-wrap">
-
-        <div class="demo-panel__label">Python-код</div>
-
-        <pre class="landing-sandbox__code"><code id="landingSandboxCode"># соберите программу из блоков</code></pre>
-
+        <div class="demo-panel__label">{{ _('landing.demo_code') }}</div>
+        <pre class="landing-sandbox__code"><code id="landingSandboxCode">{{ _('landing.sandbox_code_placeholder') }}</code></pre>
         <div class="landing-sandbox__actions">
-
-          <button type="button" class="btn btn--cta landing-sandbox__run" id="landingSandboxRun">▶ Запустить</button>
-
+          <button type="button" class="btn btn--cta landing-sandbox__run" id="landingSandboxRun">{{ _('landing.sandbox_run') }}</button>
           <a href="{{ url_for('learn', demo='hello') }}" class="btn btn--ghost landing-sandbox__open">
-
-            Открыть в редакторе →
-
+            {{ _('landing.sandbox_open') }}
           </a>
-
         </div>
-
-        <div class="demo-panel__label">Результат</div>
-
-        <pre class="landing-sandbox__output landing-sandbox__output--idle" id="landingSandboxOutput">Нажмите «Запустить», чтобы увидеть вывод</pre>
-
+        <div class="demo-panel__label">{{ _('landing.demo_output') }}</div>
+        <pre class="landing-sandbox__output landing-sandbox__output--idle" id="landingSandboxOutput">{{ _('landing.sandbox_output_idle') }}</pre>
       </div>
-
     </div>
 
-
-
-    <h3 class="block-showcase__subtitle">Примеры блоков</h3>
-
+    <h3 class="block-showcase__subtitle">{{ _('landing.block_examples') }}</h3>
     <div class="block-gallery">
-
       <div class="block-gallery__item">
-
-        <div class="pb-block pb-block--start pb-block--mini"><span class="pb-block__icon">▶</span><span class="pb-block__text">НАЧАЛО ПРОГРАММЫ</span></div>
-
-        <span class="block-gallery__code"># точка входа</span>
-
+        <div class="pb-block pb-block--start pb-block--mini"><span class="pb-block__icon">▶</span><span class="pb-block__text">{{ _('landing.block_start') }}</span></div>
+        <span class="block-gallery__code">{{ _('landing.block_entry') }}</span>
       </div>
-
       <div class="block-gallery__item">
-
-        <div class="pb-block pb-block--var pb-block--mini"><span class="pb-block__kw">задать</span> <span class="pb-block__var">имя</span> <span class="pb-block__op">=</span> <span class="pb-block__slot">…</span></div>
-
+        <div class="pb-block pb-block--var pb-block--mini"><span class="pb-block__kw">{{ _('landing.block_set') }}</span> <span class="pb-block__var">{{ _('landing.block_var_name') }}</span> <span class="pb-block__op">=</span> <span class="pb-block__slot">…</span></div>
         <span class="block-gallery__code">name = …</span>
-
       </div>
-
       <div class="block-gallery__item">
-
-        <div class="pb-block pb-block--print pb-block--mini"><span class="pb-block__kw">вывести</span> <span class="pb-block__slot">…</span></div>
-
+        <div class="pb-block pb-block--print pb-block--mini"><span class="pb-block__kw">{{ _('landing.block_print') }}</span> <span class="pb-block__slot">…</span></div>
         <span class="block-gallery__code">print(…)</span>
-
       </div>
-
       <div class="block-gallery__item">
-
-        <div class="pb-block pb-block--if pb-block--mini"><span class="pb-block__kw">если</span> <span class="pb-block__slot">…</span></div>
-
+        <div class="pb-block pb-block--if pb-block--mini"><span class="pb-block__kw">{{ _('landing.block_if') }}</span> <span class="pb-block__slot">…</span></div>
         <span class="block-gallery__code">if …:</span>
-
       </div>
-
       <div class="block-gallery__item">
-
-        <div class="pb-block pb-block--for pb-block--mini"><span class="pb-block__kw">для</span> <span class="pb-block__var">i</span> <span class="pb-block__kw">в</span> <span class="pb-block__slot">…</span></div>
-
+        <div class="pb-block pb-block--for pb-block--mini"><span class="pb-block__kw">{{ _('landing.block_for') }}</span> <span class="pb-block__var">i</span> <span class="pb-block__kw">{{ _('landing.block_in') }}</span> <span class="pb-block__slot">…</span></div>
         <span class="block-gallery__code">for i in …:</span>
-
       </div>
-
       <div class="block-gallery__item">
-
-        <div class="pb-block pb-block--while pb-block--mini"><span class="pb-block__kw">пока</span> <span class="pb-block__slot">…</span></div>
-
+        <div class="pb-block pb-block--while pb-block--mini"><span class="pb-block__kw">{{ _('landing.block_while') }}</span> <span class="pb-block__slot">…</span></div>
         <span class="block-gallery__code">while …:</span>
-
       </div>
-
     </div>
-
   </section>
-
-
 
   <section class="outcomes reveal">
-
-    <h2 class="section-title">Что вы научитесь делать</h2>
-
-    <p class="section-lead">Навыки, которые вы освоите по темам курса — от первого вывода до работы со списками.</p>
-
+    <h2 class="section-title">{{ _('landing.outcomes_title') }}</h2>
+    <p class="section-lead">{{ _('landing.outcomes_lead') }}</p>
     <ul class="outcomes__list">
-
       <li class="outcomes__item">
-
         <span class="outcomes__check" aria-hidden="true">⌨️</span>
-
-        <span><strong>Ввод и вывод</strong> — выводить текст, считывать ввод и сохранять значения в переменных</span>
-
+        <span>{{ _('landing.outcome_io') | safe }}</span>
       </li>
-
       <li class="outcomes__item">
-
         <span class="outcomes__check" aria-hidden="true">🔢</span>
-
-        <span><strong>Числа</strong> — выполнять вычисления: сложение, деление, остаток, степень</span>
-
+        <span>{{ _('landing.outcome_numbers') | safe }}</span>
       </li>
-
       <li class="outcomes__item">
-
         <span class="outcomes__check" aria-hidden="true">🔀</span>
-
-        <span><strong>Условия</strong> — строить ветвления с <code>if</code>, <code>elif</code> и <code>else</code></span>
-
+        <span>{{ _('landing.outcome_conditions') | safe }}</span>
       </li>
-
       <li class="outcomes__item">
-
         <span class="outcomes__check" aria-hidden="true">🔁</span>
-
-        <span><strong>Циклы</strong> — повторять действия через <code>while</code> и <code>for</code> с <code>range()</code></span>
-
+        <span>{{ _('landing.outcome_loops') | safe }}</span>
       </li>
-
       <li class="outcomes__item">
-
         <span class="outcomes__check" aria-hidden="true">📝</span>
-
-        <span><strong>Строки</strong> — обрабатывать текст: длина, срезы, поиск и методы строк</span>
-
+        <span>{{ _('landing.outcome_strings') | safe }}</span>
       </li>
-
       <li class="outcomes__item">
-
         <span class="outcomes__check" aria-hidden="true">📋</span>
-
-        <span><strong>Списки</strong> — хранить данные, добавлять элементы и перебирать коллекции</span>
-
+        <span>{{ _('landing.outcome_lists') | safe }}</span>
       </li>
-
     </ul>
-
   </section>
-
-
 
   <section class="features reveal">
-
-    <h2 class="section-title">Возможности платформы</h2>
-
+    <h2 class="section-title">{{ _('landing.features_title') }}</h2>
     <div class="features__grid">
-
       <article class="feature-card">
-
         <div class="feature-card__icon">🧩</div>
-
-        <h3>Визуальный редактор</h3>
-
-        <p>Визуальные блоки с генерацией Python-кода в реальном времени — идеально для первых шагов в программировании.</p>
-
+        <h3>{{ _('landing.feature_visual_title') }}</h3>
+        <p>{{ _('landing.feature_visual_desc') }}</p>
       </article>
-
       <article class="feature-card">
-
         <div class="feature-card__icon">📚</div>
-
-        <h3>7 тем и 200+ задач</h3>
-
-        <p>Ввод-вывод, числа, условия, циклы, строки и списки с обучающими материалами и автопроверкой.</p>
-
+        <h3>{{ _('landing.feature_tasks_title') }}</h3>
+        <p>{{ _('landing.feature_tasks_desc') }}</p>
       </article>
-
       <article class="feature-card">
-
         <div class="feature-card__icon">⏭</div>
-
-        <h3>Пошаговая отладка</h3>
-
-        <p>Смотрите, как выполняется каждая строка: подсветка блоков, переменных и вывода.</p>
-
+        <h3>{{ _('landing.feature_debug_title') }}</h3>
+        <p>{{ _('landing.feature_debug_desc') }}</p>
       </article>
-
       <article class="feature-card">
-
         <div class="feature-card__icon">👤</div>
-
-        <h3>Личный кабинет</h3>
-
-        <p>Сохранение прогресса, число попыток и история ваших решений по каждой задаче.</p>
-
+        <h3>{{ _('landing.feature_profile_title') }}</h3>
+        <p>{{ _('landing.feature_profile_desc') }}</p>
       </article>
-
     </div>
-
   </section>
-
-
 
   <section class="topics-preview reveal">
-
-    <h2 class="section-title">Темы курса</h2>
-
+    <h2 class="section-title">{{ _('landing.topics_title') }}</h2>
     <div class="topics-grid">
-
       {% for topic in landing_topics %}
-
         <article class="topic-card{% if topic.highlight %} topic-card--highlight{% endif %}">
-
           <span class="topic-card__icon" aria-hidden="true">{{ topic.icon }}</span>
-
           <h3 class="topic-card__title">{{ topic.title }}</h3>
-
-          <p class="topic-card__meta">{{ topic.task_count }} задач · {{ topic.level }}</p>
-
+          <p class="topic-card__meta">{{ _('landing.topic_meta', count=topic.task_count, level=topic.level) }}</p>
           <p class="topic-card__desc">{{ topic.description }}</p>
-
         </article>
-
       {% endfor %}
-
     </div>
-
     <div class="topics-preview__cta">
-
-      <a href="{{ url_for('learn') }}" class="btn btn--cta">Попробовать в редакторе →</a>
-
+      <a href="{{ url_for('learn') }}" class="btn btn--cta">{{ _('landing.topics_try') }}</a>
     </div>
-
   </section>
-
-
 
   <section class="cta-block reveal">
-
-    <h2>Соберите первую программу за минуту</h2>
-
-    <p>Откройте редактор, перетащите блок «вывести» — и увидите, как он превращается в <code>print()</code>.</p>
-
+    <h2>{{ _('landing.cta_title') }}</h2>
+    <p>{{ _('landing.cta_text') }}</p>
     {% if current_user.is_authenticated %}
-
-      <a href="{{ url_for('learn') }}" class="btn btn--cta btn--huge">Продолжить обучение</a>
-
+      <a href="{{ url_for('learn') }}" class="btn btn--cta btn--huge">{{ _('landing.continue') }}</a>
     {% else %}
-
-      <a href="{{ url_for('learn', demo='hello') }}" class="btn btn--cta btn--huge">Начать в песочнице</a>
-
-      <a href="{{ url_for('auth.register') }}" class="btn btn--register btn--large">Зарегистрироваться для задач</a>
-
+      <a href="{{ url_for('learn', demo='hello') }}" class="btn btn--cta btn--huge">{{ _('landing.start_sandbox') }}</a>
+      <a href="{{ url_for('auth.register') }}" class="btn btn--register btn--large">{{ _('landing.register_for_tasks') }}</a>
     {% endif %}
-
   </section>
 
-
-
 </div>
-
 {% endblock %}
-
-
 
 {% block extra_scripts %}
-
   <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/blockly_compressed.js') }}"></script>
-
   <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/blocks_compressed.js') }}"></script>
-
   <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/python_compressed.js') }}"></script>
-
-  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/msg/ru.js') }}"></script>
-
-  <script src="{{ url_for('static', filename='js/pyblocks-locale.js') }}"></script>
-
+  <script src="{{ url_for('static', filename='vendor/blockly/13.0.0/msg/' ~ blockly_msg_file) }}"></script>
+  <script src="{{ url_for('static', filename='js/' ~ pyblocks_locale_file) }}"></script>
   <script src="{{ url_for('static', filename='js/compact-renderer.js') }}"></script>
-
   <script src="{{ url_for('static', filename='js/method-blocks.js') }}"></script>
-
   <script src="{{ url_for('static', filename='js/blocks.js') }}"></script>
-
   <script src="{{ url_for('static', filename='js/generator.js') }}"></script>
-
   <script src="{{ url_for('static', filename='js/program-frame.js') }}"></script>
-
   <script src="{{ url_for('static', filename='js/workspace-storage.js') }}"></script>
-
   <script src="{{ url_for('static', filename='js/guide-preview.js') }}"></script>
-
   <script>
-
     window.LANDING_DEMO_XML = {{ landing_demo_xml|default('', true)|tojson }};
-
     window.STEP_CONNECT_DEMO_XML = {{ step_connect_demo_xml|default('', true)|tojson }};
-
   </script>
-
   <script src="{{ url_for('static', filename='js/landing-demo.js') }}"></script>
-
   <script src="{{ url_for('static', filename='js/landing-sandbox.js') }}"></script>
-
 {% endblock %}
-

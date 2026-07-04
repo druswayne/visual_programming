@@ -125,11 +125,11 @@
 
     function runCycle() {
       el.classList.remove("is-animating");
-      if (badge) badge.textContent = "Выполняется…";
+      if (badge) badge.textContent = t("status.running");
       void el.offsetWidth;
       el.classList.add("is-animating");
       window.setTimeout(function () {
-        if (badge) badge.textContent = "Готово";
+        if (badge) badge.textContent = t("status.success");
       }, 7600);
     }
 

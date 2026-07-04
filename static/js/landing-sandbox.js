@@ -82,31 +82,28 @@
     if (!allPrints.length) {
       return {
         ok: false,
-        hint:
-          "Перетащите блок «вывести» из панели слева между «Начало программы» и «Конец программы».",
+        hint: t("landing.sandbox.hint_drag_print"),
       };
     }
 
     if (!chainPrints.length) {
       return {
         ok: false,
-        hint:
-          "Блок «вывести» есть, но не подключён к программе. Вставьте его между «Начало» и «Конец программы».",
+        hint: t("landing.sandbox.hint_print_not_connected"),
       };
     }
 
     if (chainPrints.length > 1) {
       return {
         ok: false,
-        hint: "Достаточно одного блока «вывести». Оставьте только один в цепочке.",
+        hint: t("landing.sandbox.hint_one_print"),
       };
     }
 
     if (allPrints.length > chainPrints.length) {
       return {
         ok: false,
-        hint:
-          "Есть лишний блок «вывести» вне программы. Удалите его или подключите только один к цепочке.",
+        hint: t("landing.sandbox.hint_extra_print"),
       };
     }
 
@@ -116,25 +113,23 @@
     if (text === null) {
       return {
         ok: false,
-        hint:
-          "В блок «вывести» нужно вставить текст. Перетащите блок «» внутрь «вывести» и напишите Hello, world!",
+        hint: t("landing.sandbox.hint_insert_text"),
       };
     }
 
     if (!text.trim()) {
       return {
         ok: false,
-        hint: "Текст пустой. В блоке с кавычками напишите: Hello, world!",
+        hint: t("landing.sandbox.hint_empty_text"),
       };
     }
 
     if (text.trim() !== EXPECTED_TEXT) {
       return {
         ok: false,
-        hint:
-          "Сейчас выводится «" +
-          text.trim() +
-          "». Нужно вывести именно: Hello, world!",
+        hint: t("landing.sandbox.hint_wrong_text", "Сейчас выводится «{text}». Нужно вывести именно: Hello, world!", {
+          text: text.trim(),
+        }),
       };
     }
 
@@ -148,10 +143,10 @@
         typeof generatePythonCode === "function"
           ? generatePythonCode(workspace)
           : Blockly.Python.workspaceToCode(workspace);
-      codeEl.textContent = code.trim() || "# соберите программу из блоков";
+      codeEl.textContent = code.trim() || t("landing.sandbox.code_placeholder");
     } catch (err) {
       console.error("landing-sandbox updateCode:", err);
-      codeEl.textContent = "# ошибка генерации кода";
+      codeEl.textContent = t("landing.sandbox.code_error");
     }
   }
 
@@ -171,9 +166,9 @@
 
     if (runBtn) {
       runBtn.disabled = true;
-      runBtn.textContent = "Выполняется…";
+      runBtn.textContent = t("status.running");
     }
-    setOutput("Выполнение программы…", "running");
+    setOutput(t("run.executing"), "running");
 
     try {
       const response = await fetch("/api/run", {
@@ -186,27 +181,21 @@
       if (data.success) {
         const out = (data.output || "").trim();
         if (out === EXPECTED_TEXT) {
-          setOutput(out + "\n\n✓ Отлично! Задача решена.", "success");
+          setOutput(out + "\n\n" + t("landing.sandbox.task_solved"), "success");
         } else if (!out) {
-          setOutput(
-            "Программа выполнилась, но ничего не вывела. Проверьте, что в блок «вывести» вставлен текст Hello, world!",
-            "hint"
-          );
+          setOutput(t("landing.sandbox.no_output"), "hint");
         } else {
-          setOutput(
-            "Программа вывела: " + out + "\n\nНужно вывести: Hello, world!",
-            "hint"
-          );
+          setOutput(t("landing.sandbox.output_mismatch", "Программа вывела: {output}\n\nНужно вывести: Hello, world!", { output: out }), "hint");
         }
       } else {
         setOutput([data.error, data.output].filter(Boolean).join("\n\n"), "error");
       }
     } catch (err) {
-      setOutput("Не удалось связаться с сервером: " + err.message, "error");
+      setOutput(t("run.network_error", "Не удалось связаться с сервером: {message}", { message: err.message }), "error");
     } finally {
       if (runBtn) {
         runBtn.disabled = false;
-        runBtn.textContent = "▶ Запустить";
+        runBtn.textContent = t("landing.sandbox.run");
       }
     }
   }

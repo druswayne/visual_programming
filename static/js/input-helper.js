@@ -350,7 +350,7 @@ const InputHelper = {
     const bareMatches = masked.match(/input\s*\(\s*\)/g);
     if (bareMatches) {
       for (let i = 0; i < bareMatches.length; i++) {
-        prompts.push("Введите значение:");
+        prompts.push(t("input.default_prompt", "Введите значение:"));
       }
     }
 
@@ -430,14 +430,17 @@ const InputHelper = {
     if (!modal || !form) {
       return Promise.resolve(
         prompts.map(function () {
-          return window.prompt("Ввод:", "") || "";
+          return window.prompt(t("input.prompt_fallback", "Ввод:"), "") || "";
         })
       );
     }
 
     if (hint) {
       if (opts.total > 1 && opts.index) {
-        hint.textContent = "Шаг " + opts.index + " из " + opts.total;
+        hint.textContent = t("input.step_of", "Шаг {index} из {total}", {
+          index: opts.index,
+          total: opts.total,
+        });
         hint.hidden = false;
       } else {
         hint.hidden = true;
@@ -447,7 +450,7 @@ const InputHelper = {
 
     if (btnOk) {
       btnOk.textContent =
-        opts.total > 1 && opts.index < opts.total ? "Далее" : "OK";
+        opts.total > 1 && opts.index < opts.total ? t("input.next") : t("input.submit");
     }
 
     form.innerHTML = "";
@@ -474,7 +477,7 @@ const InputHelper = {
         modal.hidden = true;
         form.removeEventListener("submit", onSubmit);
         if (btnCancel) btnCancel.removeEventListener("click", onCancel);
-        if (btnOk) btnOk.textContent = "OK";
+        if (btnOk) btnOk.textContent = t("input.submit");
         if (hint) hint.hidden = true;
       }
 

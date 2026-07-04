@@ -8,13 +8,13 @@ from functools import wraps
 from flask import jsonify, request
 from flask_login import current_user
 
+from i18n import _
+
 
 class RateLimitExceeded(Exception):
     def __init__(self, retry_after: int):
         self.retry_after = retry_after
-        super().__init__(
-            f"Слишком много запросов. Подождите {retry_after} сек. и попробуйте снова."
-        )
+        super().__init__(_("api.rate_limit", seconds=retry_after))
 
 
 class ExecutionRateLimiter:

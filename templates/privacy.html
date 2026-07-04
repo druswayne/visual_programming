@@ -1,35 +1,34 @@
 {% extends "base.html" %}
 
-{% block title %}Политика конфиденциальности — PyBlocks{% endblock %}
+{% block title %}{{ _('privacy.title') }}{% endblock %}
 
 {% block content %}
 <section class="privacy-page">
-  <h1>Политика конфиденциальности</h1>
+  <h1>{{ _('privacy.heading') }}</h1>
   <p class="privacy-page__lead">
-  PyBlocks хранит только данные, необходимые для работы аккаунта и сохранения прогресса обучения.
+    {{ _('privacy.lead') }}
   </p>
 
-  <h2>Какие данные мы собираем</h2>
+  <h2>{{ _('privacy.collect_heading') }}</h2>
   <ul>
-    <li>Имя пользователя и адрес электронной почты при регистрации</li>
-    <li>Прогресс по задачам и сохранённые решения</li>
-    <li>Технические данные сессии для авторизации</li>
+    <li>{{ _('privacy.collect_username') }}</li>
+    <li>{{ _('privacy.collect_progress') }}</li>
+    <li>{{ _('privacy.collect_session') }}</li>
   </ul>
 
-  <h2>Как мы используем данные</h2>
+  <h2>{{ _('privacy.use_heading') }}</h2>
   <ul>
-    <li>Для входа в аккаунт и отображения вашего прогресса</li>
-    <li>Для улучшения учебных материалов и стабильности платформы</li>
+    <li>{{ _('privacy.use_login') }}</li>
+    <li>{{ _('privacy.use_improve') }}</li>
   </ul>
 
-  <h2>Контакты</h2>
+  <h2>{{ _('privacy.contact_heading') }}</h2>
   <p>
-    По вопросам конфиденциальности напишите на
-    <a href="mailto:hello@pyblocks.ru">hello@pyblocks.ru</a>.
+    {{ _('privacy.contact_text') | safe }}
   </p>
 
   <p class="privacy-page__back">
-    <a href="{{ url_for('landing') }}">← На главную</a>
+    <a href="{{ url_for('landing') }}">{{ _('privacy.back_home') }}</a>
   </p>
 </section>
 {% endblock %}

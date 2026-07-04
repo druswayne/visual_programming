@@ -2,19 +2,35 @@
 
 import os
 
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, jsonify, redirect, render_template, request, url_for, make_response
 from flask_login import current_user, login_required
 
 from auth_routes import auth_bp
 from config import Config
-from data.guide_xml import LANDING_DEMO, STEP_CONNECT_DEMO
+from data.guide_xml import (
+    LANDING_DEMO,
+    LANDING_DEMO_EN,
+    STEP_CONNECT_DEMO,
+    STEP_CONNECT_DEMO_EN,
+)
 from data.registry import TASKS_BY_TOPIC, get_task_with_tests, get_tasks_public, get_topics
+from data.localized import get_localized_sandbox_demo, get_localized_topic_guide, get_localized_topics
 from data.sandbox_demos import (
     LANDING_TOPIC_META,
     get_sandbox_demo,
 )
-from data.topic_guides import get_topic_guide
 from extensions import csrf, db, login_manager
+from i18n import (
+    SUPPORTED_LOCALES,
+    _,
+    get_block_messages,
+    get_blockly_msg_file,
+    get_js_messages,
+    get_locale,
+    get_pyblocks_locale_file,
+    ngettext,
+    set_request_locale,
+)
 from models import TaskProgress, User
 from limits import init_rate_limiter, rate_limit_execution
 from profile_routes import profile_bp
@@ -51,18 +67,35 @@ def create_app(config_class=Config):
     @login_manager.unauthorized_handler
     def handle_unauthorized():
         if request.path.startswith("/api/"):
-            return jsonify({"error": "Требуется авторизация", "authenticated": False}), 401
+            return jsonify({"error": _("api.auth_required"), "authenticated": False}), 401
         return redirect(url_for("auth.login", next=request.url))
+
+    @app.before_request
+    def before_request():
+        set_request_locale()
+        login_manager.login_message = _("flash.login_required")
+
+    @app.context_processor
+    def inject_i18n():
+        locale = get_locale()
+        landing_xml = LANDING_DEMO_EN if locale == "en" else LANDING_DEMO
+        step_xml = STEP_CONNECT_DEMO_EN if locale == "en" else STEP_CONNECT_DEMO
+        return {
+            "landing_demo_xml": landing_xml,
+            "step_connect_demo_xml": step_xml,
+            "_": _,
+            "ngettext": ngettext,
+            "get_locale": get_locale,
+            "supported_locales": SUPPORTED_LOCALES,
+            "locale_names": Config.LANGUAGES,
+            "js_messages": get_js_messages(locale),
+            "block_messages": get_block_messages(locale),
+            "blockly_msg_file": get_blockly_msg_file(locale),
+            "pyblocks_locale_file": get_pyblocks_locale_file(locale),
+        }
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
-
-    @app.context_processor
-    def inject_landing_demo():
-        return {
-            "landing_demo_xml": LANDING_DEMO,
-            "step_connect_demo_xml": STEP_CONNECT_DEMO,
-        }
 
     with app.app_context():
         db.create_all()
@@ -120,27 +153,41 @@ def _execution_http_response(result: dict, *, ok_status: int = 200) -> tuple:
 
 def _landing_topics():
     topics = []
-    for topic in get_topics():
-        meta = LANDING_TOPIC_META.get(topic["id"], {})
+    for topic in get_localized_topics():
         topics.append(
             {
                 **topic,
                 "task_count": len(TASKS_BY_TOPIC.get(topic["id"], [])),
-                "icon": meta.get("icon", "📘"),
-                "level": meta.get("level", ""),
-                "highlight": meta.get("highlight", False),
+                "icon": topic.get("icon", "📘"),
+                "level": topic.get("level", ""),
+                "highlight": topic.get("highlight", False),
             }
         )
     return topics
 
 
 def register_routes(app):
+    @app.route("/set-language/<lang>")
+    def set_language(lang):
+        from i18n import LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE, normalize_locale
+
+        locale = normalize_locale(lang)
+        next_url = request.args.get("next") or request.referrer or url_for("landing")
+        if not next_url.startswith("/"):
+            next_url = url_for("landing")
+        response = make_response(redirect(next_url))
+        response.set_cookie(LOCALE_COOKIE, locale, max_age=LOCALE_COOKIE_MAX_AGE, samesite="Lax")
+        return response
+
     @app.route("/")
     def landing():
+        locale = get_locale()
+        landing_xml = LANDING_DEMO_EN if locale == "en" else LANDING_DEMO
+        step_xml = STEP_CONNECT_DEMO_EN if locale == "en" else STEP_CONNECT_DEMO
         return render_template(
             "landing.html",
-            landing_demo_xml=LANDING_DEMO,
-            step_connect_demo_xml=STEP_CONNECT_DEMO,
+            landing_demo_xml=landing_xml,
+            step_connect_demo_xml=step_xml,
             landing_topics=_landing_topics(),
         )
 
@@ -154,9 +201,9 @@ def register_routes(app):
 
     @app.route("/api/sandbox-demo/<demo_id>", methods=["GET"])
     def sandbox_demo(demo_id):
-        demo = get_sandbox_demo(demo_id)
+        demo = get_localized_sandbox_demo(demo_id)
         if not demo:
-            return jsonify({"success": False, "error": "Пример не найден"}), 404
+            return jsonify({"success": False, "error": _("api.demo_not_found")}), 404
         return jsonify(
             {
                 "success": True,
@@ -175,7 +222,7 @@ def register_routes(app):
         stdin_text = data.get("stdin", "")
 
         if not code.strip():
-            return jsonify({"success": False, "output": "", "error": "Код пуст"}), 400
+            return jsonify({"success": False, "output": "", "error": _("api.code_empty")}), 400
 
         result = run_python_code(code, stdin_text=stdin_text)
         return _execution_http_response(result)
@@ -198,7 +245,7 @@ def register_routes(app):
         data = request.get_json(silent=True) or {}
         code = data.get("code", "")
         if not isinstance(code, str):
-            return jsonify({"success": False, "error": "Некорректный запрос"}), 400
+            return jsonify({"success": False, "error": _("api.bad_request")}), 400
         result = python_to_blocks_safe(code)
         status = 200 if result.get("success") else 400
         return jsonify(result), status
@@ -212,7 +259,7 @@ def register_routes(app):
     @login_required
     def list_tasks(topic_id):
         if topic_id not in {t["id"] for t in get_topics()}:
-            return jsonify({"error": "Тема не найдена"}), 404
+            return jsonify({"error": _("api.topic_not_found")}), 404
         locked = assert_topic_unlocked(current_user.id, topic_id)
         if locked:
             return jsonify({"error": locked["unlock_hint"], "locked": True, **locked}), 403
@@ -224,9 +271,9 @@ def register_routes(app):
         locked = assert_topic_unlocked(current_user.id, topic_id)
         if locked:
             return jsonify({"error": locked["unlock_hint"], "locked": True, **locked}), 403
-        guide = get_topic_guide(topic_id)
+        guide = get_localized_topic_guide(topic_id)
         if not guide:
-            return jsonify({"error": "Материалы по теме не найдены"}), 404
+            return jsonify({"error": _("api.guide_not_found")}), 404
         return jsonify({"guide": guide})
 
     @app.route("/api/check", methods=["POST"])
@@ -240,11 +287,11 @@ def register_routes(app):
         blocks_xml = data.get("blocks_xml", "")
 
         if not code.strip():
-            return jsonify({"success": False, "message": "Сначала соберите программу из блоков"}), 400
+            return jsonify({"success": False, "message": _("api.build_program_first")}), 400
 
         task = get_task_with_tests(topic_id, task_id)
         if not task:
-            return jsonify({"success": False, "message": "Задача не найдена"}), 404
+            return jsonify({"success": False, "message": _("api.task_not_found")}), 404
 
         locked = assert_topic_unlocked(current_user.id, topic_id)
         if locked:
@@ -257,7 +304,7 @@ def register_routes(app):
             return jsonify(
                 {
                     "success": False,
-                    "message": result.get("message", "Сервер перегружен"),
+                    "message": result.get("message", _("api.server_busy")),
                     "overloaded": True,
                 }
             ), 503

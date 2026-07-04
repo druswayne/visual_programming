@@ -305,7 +305,7 @@ const BlockCodeSync = {
     if (!nodes) return;
 
     const codeSource = this.isDragging ? this.frozenCode : this.plainCode;
-    const displayCode = codeSource.trim() || "# Соберите программу из блоков";
+    const displayCode = codeSource.trim() || t("code.placeholder");
     const ranges = this.getAllHighlightRanges();
 
     if (typeof PythonHighlighter !== "undefined" && ranges.length) {

@@ -12,6 +12,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationE
 
 from config import Config
 from extensions import db
+from i18n import _
 from models import User, normalize_username
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -31,7 +32,7 @@ def _check_rate_limit() -> None:
     recent = [t for t in _login_attempts[key] if now - t < _LOGIN_WINDOW_SEC]
     _login_attempts[key] = recent
     if len(recent) >= _MAX_LOGIN_ATTEMPTS:
-        raise ValidationError("Слишком много попыток входа. Подождите 5 минут.")
+        raise ValidationError(_("flash.login_rate_limit"))
 
 
 def _record_failed_login() -> None:
@@ -41,70 +42,84 @@ def _record_failed_login() -> None:
 def _validate_username(form, field):
     value = normalize_username(field.data)
     if not re.fullmatch(r"[a-z0-9_]+", value):
-        raise ValidationError("Имя пользователя: только буквы, цифры и _")
+        raise ValidationError(_("val.username_format"))
 
 
 def _validate_password_strength(form, field):
     password = field.data
     if not re.search(r"[A-Za-z]", password):
-        raise ValidationError("Пароль должен содержать хотя бы одну букву")
+        raise ValidationError(_("val.password_letter"))
     if not re.search(r"\d", password):
-        raise ValidationError("Пароль должен содержать хотя бы одну цифру")
+        raise ValidationError(_("val.password_digit"))
 
 
 class RegisterForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.username.label.text = _("auth.username_label")
+        self.email.label.text = _("auth.email_label")
+        self.password.label.text = _("auth.password_label")
+        self.password_confirm.label.text = _("auth.password_confirm_label")
+        self.submit.label.text = _("auth.submit_register")
+
     username = StringField(
-        "Имя пользователя",
         validators=[
-            DataRequired(message="Укажите имя пользователя"),
+            DataRequired(message="val.username_required"),
             Length(
                 min=Config.USERNAME_MIN_LENGTH,
                 max=Config.USERNAME_MAX_LENGTH,
-                message=f"От {Config.USERNAME_MIN_LENGTH} до {Config.USERNAME_MAX_LENGTH} символов",
+                message="val.username_length",
             ),
             _validate_username,
         ],
     )
     email = StringField(
-        "Email",
         validators=[
-            DataRequired(message="Укажите email"),
-            Email(message="Некорректный email"),
+            DataRequired(message="val.email_required"),
+            Email(message="val.email_invalid"),
             Length(max=255),
         ],
     )
     password = PasswordField(
-        "Пароль",
         validators=[
-            DataRequired(message="Укажите пароль"),
-            Length(
-                min=Config.PASSWORD_MIN_LENGTH,
-                message=f"Минимум {Config.PASSWORD_MIN_LENGTH} символов",
-            ),
+            DataRequired(message="val.password_required"),
+            Length(min=Config.PASSWORD_MIN_LENGTH, message="val.password_min"),
             _validate_password_strength,
         ],
     )
     password_confirm = PasswordField(
-        "Подтверждение пароля",
         validators=[
-            DataRequired(message="Подтвердите пароль"),
-            EqualTo("password", message="Пароли не совпадают"),
+            DataRequired(message="val.password_confirm_required"),
+            EqualTo("password", message="val.password_mismatch"),
         ],
     )
-    submit = SubmitField("Зарегистрироваться")
+    submit = SubmitField()
 
 
 class LoginForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.login.label.text = _("auth.login_field_label")
+        self.password.label.text = _("auth.password_label")
+        self.remember.label.text = _("auth.remember_label")
+        self.submit.label.text = _("auth.submit_login")
+
     login = StringField(
-        "Email или имя пользователя",
-        validators=[DataRequired(message="Введите email или имя пользователя")],
+        validators=[DataRequired(message="val.login_required")],
     )
     password = PasswordField(
-        "Пароль",
-        validators=[DataRequired(message="Введите пароль")],
+        validators=[DataRequired(message="val.login_password_required")],
     )
-    remember = BooleanField("Запомнить меня")
-    submit = SubmitField("Войти")
+    remember = BooleanField()
+    submit = SubmitField()
+
+
+def _localize_form_errors(form):
+    for field in form:
+        field.errors = [
+            _(msg, min=Config.PASSWORD_MIN_LENGTH, max=Config.USERNAME_MAX_LENGTH)
+            for msg in field.errors
+        ]
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -118,18 +133,19 @@ def register():
         email = form.email.data.strip().lower()
 
         if User.query.filter_by(username=username).first():
-            flash("Это имя пользователя уже занято.", "error")
+            flash(_("flash.username_taken"), "error")
         elif User.query.filter_by(email=email).first():
-            flash("Этот email уже зарегистрирован.", "error")
+            flash(_("flash.email_taken"), "error")
         else:
             user = User(username=username, email=email)
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
             login_user(user, remember=True)
-            flash("Добро пожаловать в PyBlocks!", "success")
+            flash(_("flash.welcome"), "success")
             return redirect(url_for("learn"))
 
+    _localize_form_errors(form)
     return render_template("auth/register.html", form=form)
 
 
@@ -153,15 +169,16 @@ def login():
 
         if user is None or not user.check_password(form.password.data):
             _record_failed_login()
-            flash("Неверный email/имя пользователя или пароль.", "error")
+            flash(_("flash.bad_credentials"), "error")
         else:
             login_user(user, remember=form.remember.data)
             next_page = request.args.get("next")
             if next_page and next_page.startswith("/"):
                 return redirect(next_page)
-            flash(f"С возвращением, {user.username}!", "success")
+            flash(_("flash.welcome_back", username=user.username), "success")
             return redirect(url_for("learn"))
 
+    _localize_form_errors(form)
     return render_template("auth/login.html", form=form)
 
 
@@ -169,5 +186,5 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("Вы вышли из аккаунта.", "info")
+    flash(_("flash.logged_out"), "info")
     return redirect(url_for("landing"))

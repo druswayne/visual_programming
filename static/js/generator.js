@@ -565,7 +565,7 @@ function generateFromProgramFrame(gen, workspace) {
 
 function generatePythonCode(workspace, withDebugMarkers) {
   const gen = getPythonGenerator();
-  if (!gen) return "# Ошибка: генератор Python не загружен";
+  if (!gen) return "# " + t("generator.not_loaded");
 
   const prev = debugMarkersEnabled;
   debugMarkersEnabled = !!withDebugMarkers;
@@ -578,7 +578,7 @@ function generatePythonCode(workspace, withDebugMarkers) {
     return cleanGeneratedCode(code);
   } catch (err) {
     console.error("generatePythonCode:", err);
-    return "# Ошибка генерации: " + err.message;
+    return "# " + t("generator.error", "Ошибка генерации: {message}", { message: err.message });
   } finally {
     debugMarkersEnabled = prev;
   }
@@ -875,7 +875,7 @@ function walkStatementChain(gen, block, lineCursor, mappings) {
 function generatePythonCodeWithMapping(workspace) {
   const gen = getPythonGenerator();
   if (!gen) {
-    return { code: "# Ошибка: генератор Python не загружен", mappings: {} };
+    return { code: "# " + t("generator.not_loaded"), mappings: {} };
   }
 
   const prev = debugMarkersEnabled;
@@ -904,7 +904,7 @@ function generatePythonCodeWithMapping(workspace) {
     return { code: cleanCode, mappings: mappings };
   } catch (err) {
     console.error("generatePythonCodeWithMapping:", err);
-    return { code: "# Ошибка генерации: " + err.message, mappings: {} };
+    return { code: "# " + t("generator.error", "Ошибка генерации: {message}", { message: err.message }), mappings: {} };
   } finally {
     debugMarkersEnabled = prev;
   }

@@ -189,7 +189,7 @@ const GuidePreview = {
       console.error("GuidePreview.inject:", err);
       container.dataset.guideMounted = "0";
       container.classList.remove("guide-preview--mounted");
-      container.innerHTML = '<p class="guide-preview__error">Не удалось создать превью блоков</p>';
+      container.innerHTML = '<p class="guide-preview__error">' + t("guide.preview_create_error") + "</p>";
       return null;
     }
 
@@ -215,8 +215,10 @@ const GuidePreview = {
       container.dataset.guideMounted = "0";
       container.classList.remove("guide-preview--mounted");
       container.innerHTML =
-        '<p class="guide-preview__error">Не удалось показать блоки: ' +
-        String(err.message || err) +
+        '<p class="guide-preview__error">' +
+        t("guide.preview_show_error", "Не удалось показать блоки: {message}", {
+          message: String(err.message || err),
+        }) +
         "</p>";
       return null;
     }

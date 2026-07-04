@@ -1,12 +1,12 @@
-{% macro password_field(field, placeholder="", autocomplete="current-password") %}
+{% macro password_field(field, placeholder='', autocomplete='current-password') %}
 <div class="form-input-wrap">
   {{ field(class="form-input form-input--password", autocomplete=autocomplete, placeholder=placeholder) }}
   <button
     type="button"
     class="form-input-toggle"
-    aria-label="Показать пароль"
+    aria-label="{{ _('auth.show_password') }}"
     aria-pressed="false"
-    title="Показать пароль"
+    title="{{ _('auth.show_password') }}"
   >
     <svg class="form-input-toggle__icon form-input-toggle__icon--show" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
       <path fill="currentColor" d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>

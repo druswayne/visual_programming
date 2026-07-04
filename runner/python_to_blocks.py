@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 from typing import Any
 
+from i18n import _
 from runner.program_to_xml import program_to_xml
 
 BINOP_MAP = {
@@ -113,13 +114,13 @@ class PythonToBlocksConverter:
     def convert(self, code: str) -> dict[str, Any]:
         code = code.strip()
         if not code:
-            raise PythonToBlocksError("Код пуст")
+            raise PythonToBlocksError(_("runner.ptb.empty_code"))
 
         try:
             tree = ast.parse(code)
         except SyntaxError as exc:
             line = exc.lineno or 1
-            raise PythonToBlocksError(f"Синтаксическая ошибка: {exc.msg}", line) from exc
+            raise PythonToBlocksError(_("runner.ptb.syntax_error", msg=exc.msg), line) from exc
 
         chain: list[dict[str, Any]] = []
         for node in tree.body:
@@ -130,9 +131,9 @@ class PythonToBlocksConverter:
             "chain": chain,
         }
 
-    def _err(self, message: str, node: ast.AST) -> PythonToBlocksError:
+    def _err(self, key: str, node: ast.AST, **kwargs) -> PythonToBlocksError:
         line = getattr(node, "lineno", None)
-        return PythonToBlocksError(message, line)
+        return PythonToBlocksError(_(key, **kwargs), line)
 
     def _stmt(self, node: ast.AST) -> list[dict[str, Any]]:
         if isinstance(node, ast.Expr):
@@ -143,11 +144,11 @@ class PythonToBlocksConverter:
                 inner = self._call_expr(value)
                 if inner.get("statement"):
                     return [inner["block"]]
-            raise self._err("Выражение нельзя превратить в блок", node)
+            raise self._err("runner.ptb.expr_to_block", node)
 
         if isinstance(node, ast.Assign):
             if len(node.targets) != 1 or not isinstance(node.targets[0], ast.Name):
-                raise self._err("Поддерживается только простое присваивание: имя = значение", node)
+                raise self._err("runner.ptb.simple_assign", node)
             name = node.targets[0].id
             self.variables.add(name)
             return [
@@ -163,7 +164,7 @@ class PythonToBlocksConverter:
 
         if isinstance(node, ast.For):
             if not isinstance(node.target, ast.Name):
-                raise self._err("В for поддерживается только одна переменная", node)
+                raise self._err("runner.ptb.for_single_var", node)
             self.variables.add(node.target.id)
             return [
                 {
@@ -198,13 +199,13 @@ class PythonToBlocksConverter:
                 if alias.name in ("math", "random"):
                     blocks.append({"type": f"py_import_{alias.name}"})
                 else:
-                    raise self._err(f"Импорт «{alias.name}» не поддерживается блоками", node)
+                    raise self._err("runner.ptb.import_not_supported", node, name=alias.name)
             return blocks
 
         if isinstance(node, ast.ImportFrom):
-            raise self._err("Импорт from … не поддерживается — используйте блок «подключить math/random»", node)
+            raise self._err("runner.ptb.import_from", node)
 
-        raise self._err(f"Конструкция «{type(node).__name__}» не поддерживается блоками", node)
+        raise self._err("runner.ptb.stmt_not_supported", node, name=type(node).__name__)
 
     def _stmt_list(self, nodes: list[ast.AST]) -> list[dict[str, Any]]:
         result: list[dict[str, Any]] = []
@@ -260,7 +261,7 @@ class PythonToBlocksConverter:
                 return {"type": "math_number", "fields": {"NUM": node.value}}
             if isinstance(node.value, str):
                 return {"type": "text", "fields": {"TEXT": node.value}}
-            raise self._err(f"Литерал {type(node.value).__name__} не поддерживается", node)
+            raise self._err("runner.ptb.literal_not_supported", node, name=type(node.value).__name__)
 
         if isinstance(node, ast.Name):
             if node.id == "None":
@@ -290,7 +291,7 @@ class PythonToBlocksConverter:
         if isinstance(node, ast.BoolOp):
             op = BOOL_OP_MAP.get(type(node.op))
             if not op or len(node.values) < 2:
-                raise self._err("Логическое выражение не поддерживается", node)
+                raise self._err("runner.ptb.bool_op", node)
             result = self._expr(node.values[0])
             for value in node.values[1:]:
                 result = {
@@ -302,7 +303,7 @@ class PythonToBlocksConverter:
 
         if isinstance(node, ast.Compare):
             if len(node.ops) != 1 or len(node.comparators) != 1:
-                raise self._err("Сравнение с несколькими операторами не поддерживается", node)
+                raise self._err("runner.ptb.multi_compare", node)
             if isinstance(node.ops[0], ast.In):
                 return {
                     "type": "py_in",
@@ -326,7 +327,7 @@ class PythonToBlocksConverter:
                 }
             op = COMPARE_MAP.get(type(node.ops[0]))
             if not op:
-                raise self._err("Такое сравнение не поддерживается", node)
+                raise self._err("runner.ptb.compare_not_supported", node)
             return {
                 "type": "logic_compare",
                 "fields": {"OP": op},
@@ -353,15 +354,15 @@ class PythonToBlocksConverter:
                 elif isinstance(value, ast.FormattedValue):
                     parts.append(self._expr(value.value))
                 else:
-                    raise self._err("f-строки поддерживаются только с простыми выражениями", node)
+                    raise self._err("runner.ptb.fstring_simple", node)
             return self._text_join(parts)
 
-        raise self._err(f"Выражение «{type(node).__name__}» не поддерживается блоками", node)
+        raise self._err("runner.ptb.expr_not_supported", node, name=type(node).__name__)
 
     def _binop(self, node: ast.BinOp) -> dict[str, Any]:
         op = BINOP_MAP.get(type(node.op))
         if not op:
-            raise self._err("Такой оператор не поддерживается", node)
+            raise self._err("runner.ptb.operator_not_supported", node)
 
         flat = self._flatten_binop(node, type(node.op))
         block_type = {
@@ -420,10 +421,10 @@ class PythonToBlocksConverter:
         if isinstance(node.func, ast.Name):
             name = node.func.id
             if name == "print":
-                raise self._err("print() используйте как отдельную команду, не внутри выражения", node)
+                raise self._err("runner.ptb.print_as_stmt", node)
             if name == "len":
                 if len(node.args) != 1:
-                    raise self._err("len() принимает один аргумент", node)
+                    raise self._err("runner.ptb.len_one_arg", node)
                 return {"block": {"type": "py_len", "inputs": {"OBJ": self._expr(node.args[0])}}}
             if name == "input":
                 prompt = ""
@@ -436,7 +437,7 @@ class PythonToBlocksConverter:
                 return {"block": self._range_block(node)}
             if name in CONVERT_MAP:
                 if len(node.args) != 1:
-                    raise self._err(f"{name}() принимает один аргумент", node)
+                    raise self._err("runner.ptb.func_one_arg", node, name=name)
                 return {
                     "block": {
                         "type": "py_convert",
@@ -446,11 +447,11 @@ class PythonToBlocksConverter:
                 }
             if name == "isinstance":
                 if len(node.args) != 2:
-                    raise self._err("isinstance() принимает два аргумента", node)
+                    raise self._err("runner.ptb.isinstance_two_args", node)
                 py_type = self._type_name(node.args[1])
                 type_key = TYPE_CHECK_MAP.get(py_type)
                 if not type_key:
-                    raise self._err(f"Проверка типа «{py_type}» не поддерживается", node)
+                    raise self._err("runner.ptb.type_check_not_supported", node, type=py_type)
                 return {
                     "block": {
                         "type": "py_type_check",
@@ -460,7 +461,7 @@ class PythonToBlocksConverter:
                 }
             if name == "sorted":
                 if len(node.args) != 1:
-                    raise self._err("sorted() принимает один аргумент", node)
+                    raise self._err("runner.ptb.sorted_one_arg", node)
                 return {
                     "block": {
                         "type": "py_list_sorted",
@@ -487,7 +488,7 @@ class PythonToBlocksConverter:
         if isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
             if node.func.value.id == "math" and node.func.attr in MATH_SINGLE_MAP:
                 if len(node.args) != 1:
-                    raise self._err(f"math.{node.func.attr}() принимает один аргумент", node)
+                    raise self._err("runner.ptb.math_one_arg", node, name=node.func.attr)
                 return {
                     "block": {
                         "type": "math_single",
@@ -497,7 +498,7 @@ class PythonToBlocksConverter:
                 }
             if node.func.value.id == "random" and node.func.attr == "randint":
                 if len(node.args) != 2:
-                    raise self._err("random.randint() принимает два аргумента", node)
+                    raise self._err("runner.ptb.randint_two_args", node)
                 return {
                     "block": {
                         "type": "math_random_int",
@@ -511,7 +512,7 @@ class PythonToBlocksConverter:
         if isinstance(node.func, ast.Attribute):
             return self._method_call(node)
 
-        raise self._err("Вызов функции не поддерживается блоками", node)
+        raise self._err("runner.ptb.call_not_supported", node)
 
     def _method_call(self, node: ast.Call) -> dict[str, Any]:
         method = node.func.attr
@@ -522,11 +523,11 @@ class PythonToBlocksConverter:
             spec: dict[str, Any] = {"type": block_type, "inputs": {"OBJ": obj}}
             if method == "join":
                 if len(node.args) != 1:
-                    raise self._err("join() принимает один аргумент-список", node)
+                    raise self._err("runner.ptb.join_one_arg", node)
                 spec["inputs"]["LIST"] = self._expr(node.args[0])
             elif method == "replace":
                 if len(node.args) != 2:
-                    raise self._err("replace() принимает два аргумента", node)
+                    raise self._err("runner.ptb.replace_two_args", node)
                 spec["inputs"]["OLD"] = self._expr(node.args[0])
                 spec["inputs"]["NEW"] = self._expr(node.args[1])
             elif method == "split":
@@ -534,7 +535,7 @@ class PythonToBlocksConverter:
                     spec["inputs"]["SEP"] = self._expr(node.args[0])
             elif method in ("find", "count", "startswith", "endswith"):
                 if len(node.args) != 1:
-                    raise self._err(f"{method}() принимает один аргумент", node)
+                    raise self._err("runner.ptb.method_one_arg", node, method=method)
                 arg_name = {"find": "SUB", "count": "SUB", "startswith": "PREFIX", "endswith": "SUFFIX"}[method]
                 spec["inputs"][arg_name] = self._expr(node.args[0])
             return {"block": spec, "statement": False}
@@ -544,12 +545,12 @@ class PythonToBlocksConverter:
             spec = {"type": block_type, "inputs": {"OBJ": obj}}
             if method == "insert":
                 if len(node.args) != 2:
-                    raise self._err("insert() принимает индекс и значение", node)
+                    raise self._err("runner.ptb.insert_two_args", node)
                 spec["inputs"]["INDEX"] = self._expr(node.args[0])
                 spec["inputs"]["VALUE"] = self._expr(node.args[1])
             elif method in ("append", "extend", "remove"):
                 if len(node.args) != 1:
-                    raise self._err(f"{method}() принимает один аргумент", node)
+                    raise self._err("runner.ptb.method_one_arg", node, method=method)
                 arg_name = "VALUE" if method in ("append", "remove") else "SEQ"
                 spec["inputs"][arg_name] = self._expr(node.args[0])
             return {"block": spec, "statement": True}
@@ -562,11 +563,11 @@ class PythonToBlocksConverter:
                     spec["inputs"]["INDEX"] = self._expr(node.args[0])
             elif method in ("count", "index"):
                 if len(node.args) != 1:
-                    raise self._err(f"{method}() принимает один аргумент", node)
+                    raise self._err("runner.ptb.method_one_arg", node, method=method)
                 spec["inputs"]["VALUE"] = self._expr(node.args[0])
             return {"block": spec, "statement": False}
 
-        raise self._err(f"Метод «.{method}()» не поддерживается блоками", node)
+        raise self._err("runner.ptb.method_not_supported", node, method=method)
 
     def _range_block(self, node: ast.Call) -> dict[str, Any]:
         args = node.args
@@ -597,14 +598,14 @@ class PythonToBlocksConverter:
                     "BY": self._expr(args[2]),
                 },
             }
-        raise self._err("range() принимает от 1 до 3 аргументов", node)
+        raise self._err("runner.ptb.range_args", node)
 
     def _type_name(self, node: ast.AST) -> str:
         if isinstance(node, ast.Name):
             return node.id
         if isinstance(node, ast.Constant) and isinstance(node.value, str):
             return node.value
-        raise self._err("В isinstance второй аргумент должен быть именем типа", node)
+        raise self._err("runner.ptb.isinstance_type_name", node)
 
 
 def python_to_blocks(code: str) -> dict[str, Any]:

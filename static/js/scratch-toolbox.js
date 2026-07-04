@@ -6,16 +6,16 @@ const ScratchToolbox = {
   activeIndex: 0,
 
   categoryStyle: {
-    Основы: { color: "#4A6278", icon: "▷" },
-    Переменные: { color: "#4A5A82", icon: "x" },
-    Математика: { color: "#4A6B52", icon: "+" },
-    Текст: { color: "#5A5278", icon: "T" },
-    Логика: { color: "#4A6878", icon: "&" },
-    Условия: { color: "#8B7340", icon: "?" },
-    Циклы: { color: "#8B7340", icon: "↻" },
-    Списки: { color: "#6B5278", icon: "[]" },
-    Функции: { color: "#7A5260", icon: "f" },
-    Типы: { color: "#3A6B6B", icon: "τ" },
+    basics: { color: "#4A6278", icon: "▷" },
+    variables: { color: "#4A5A82", icon: "x" },
+    math: { color: "#4A6B52", icon: "+" },
+    text: { color: "#5A5278", icon: "T" },
+    logic: { color: "#4A6878", icon: "&" },
+    conditions: { color: "#8B7340", icon: "?" },
+    loops: { color: "#8B7340", icon: "↻" },
+    lists: { color: "#6B5278", icon: "[]" },
+    functions: { color: "#7A5260", icon: "f" },
+    types: { color: "#3A6B6B", icon: "τ" },
   },
 
   init(workspace) {
@@ -215,7 +215,7 @@ const ScratchToolbox = {
 
   getStyle(cat) {
     return (
-      this.categoryStyle[cat.name] || {
+      this.categoryStyle[cat.catKey] || {
         color: this.hueToColor(cat.colour || "210"),
         icon: cat.name.charAt(0),
       }

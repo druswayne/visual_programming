@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from data.registry import get_tasks_public, get_topics
 from data.skills_config import TOPIC_ORDER
+from i18n import _
 from models import TaskProgress
 
 TOPIC_UNLOCK_PERCENT = 50
@@ -82,10 +83,12 @@ def get_unlock_info(user_id: int, topic_id: str) -> dict:
         "unlock_hint": (
             None
             if unlocked
-            else (
-                f"Решите ещё {max(0, required - previous['completed'])} "
-                f"из {previous['total']} задач в «{prev_title}» "
-                f"({TOPIC_UNLOCK_PERCENT}% для открытия)"
+            else _(
+                "api.unlock_hint",
+                remaining=max(0, required - previous["completed"]),
+                total=previous["total"],
+                topic=prev_title,
+                percent=TOPIC_UNLOCK_PERCENT,
             )
         ),
     }

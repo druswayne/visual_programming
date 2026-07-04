@@ -182,7 +182,7 @@ const TopicsUI = {
     }
     if (this.btnTaskCollapse) {
       this.btnTaskCollapse.textContent = collapsed ? "▼" : "▲";
-      this.btnTaskCollapse.title = collapsed ? "Развернуть условие" : "Свернуть условие";
+      this.btnTaskCollapse.title = collapsed ? t("topics.expand_task") : t("topics.collapse_task");
       this.btnTaskCollapse.setAttribute("aria-expanded", collapsed ? "false" : "true");
     }
     requestAnimationFrame(() => this.updateWorkspaceLayout());
@@ -301,11 +301,11 @@ const TopicsUI = {
 
   renderGuideExample(example, index) {
     let html = '<div class="topic-guide__example topic-guide__example--task">';
-    html += '<div class="topic-guide__example-label">Задача ' + (index + 1) + "</div>";
+    html += '<div class="topic-guide__example-label">' + t("topics.task_number", "Задача {number}", { number: index + 1 }) + "</div>";
     html += '<div class="topic-guide__text topic-guide__task-text">' + this.renderGuideText(example.task) + "</div>";
     if (example.result) {
       html += '<div class="topic-guide__result">';
-      html += '<div class="topic-guide__result-label">Ожидаемый результат</div>';
+      html += '<div class="topic-guide__result-label">' + t("topics.expected_result") + "</div>";
       html += '<div class="topic-guide__result-text">' + this.escapeHtml(example.result) + "</div>";
       html += "</div>";
     }
@@ -315,9 +315,9 @@ const TopicsUI = {
         '<button type="button" class="btn btn--ghost guide-solution-toggle" ' +
         'data-solution-id="' +
         solutionId +
-        '" aria-expanded="false">Показать решение</button>';
+        '" aria-expanded="false">' + t("topics.show_solution") + "</button>";
       html += '<div class="guide-solution" hidden data-solution-for="' + solutionId + '">';
-      html += '<div class="topic-guide__example-label">Решение из блоков</div>';
+      html += '<div class="topic-guide__example-label">' + t("topics.block_solution") + "</div>";
       html += '<div class="guide-preview" data-preview-id="' + solutionId + '"></div>';
       html += "</div>";
     }
@@ -343,7 +343,7 @@ const TopicsUI = {
       }
       if (section.demo_xml) {
         html += '<div class="topic-guide__example">';
-        html += '<div class="topic-guide__example-label">Пример из блоков</div>';
+        html += '<div class="topic-guide__example-label">' + t("topics.block_example") + "</div>";
         html += TopicsUI.renderGuidePreview(section.demo_xml);
         html += "</div>";
       }
@@ -384,7 +384,7 @@ const TopicsUI = {
 
     const xml = this._guideXmlMap[solutionId];
     if (!xml) {
-      host.innerHTML = '<p class="guide-preview__error">XML решения не найден</p>';
+      host.innerHTML = '<p class="guide-preview__error">' + t("topics.solution_xml_not_found") + "</p>";
       return;
     }
 
@@ -405,7 +405,7 @@ const TopicsUI = {
     const wasHidden = panel.hidden;
     panel.hidden = !wasHidden;
     button.setAttribute("aria-expanded", wasHidden ? "true" : "false");
-    button.textContent = wasHidden ? "Скрыть решение" : "Показать решение";
+    button.textContent = wasHidden ? t("topics.hide_solution") : t("topics.show_solution");
 
     if (wasHidden) {
       this.mountGuideSolution(solutionId, panel);
@@ -423,10 +423,10 @@ const TopicsUI = {
       return t.id === TopicsUI.topicId;
     });
     if (this.topicGuideTitle) {
-      this.topicGuideTitle.textContent = topic ? topic.title : "О теме";
+      this.topicGuideTitle.textContent = topic ? topic.title : t("topics.about");
     }
     if (this.topicGuideBody) {
-      this.topicGuideBody.innerHTML = '<p class="topic-guide__text">Загрузка…</p>';
+      this.topicGuideBody.innerHTML = '<p class="topic-guide__text">' + t("topics.guide_loading") + "</p>";
     }
 
     this.topicGuideModal.hidden = false;
@@ -436,7 +436,7 @@ const TopicsUI = {
       let guide = this.guideCache[this.topicId];
       if (!guide) {
         const response = await fetch("/api/topics/" + encodeURIComponent(this.topicId) + "/guide");
-        if (!response.ok) throw new Error("Не удалось загрузить материалы");
+        if (!response.ok) throw new Error(t("topics.guide_load_error"));
         const data = await response.json();
         guide = data.guide;
         this.guideCache[this.topicId] = guide;
@@ -453,7 +453,11 @@ const TopicsUI = {
     } catch (err) {
       if (this.topicGuideBody) {
         this.topicGuideBody.innerHTML =
-          '<p class="topic-guide__text">Не удалось загрузить материалы: ' + this.escapeHtml(err.message) + "</p>";
+          '<p class="topic-guide__text">' +
+          t("topics.guide_error_detail", "Не удалось загрузить материалы: {message}", {
+            message: this.escapeHtml(err.message),
+          }) +
+          "</p>";
       }
     }
   },
@@ -506,7 +510,7 @@ const TopicsUI = {
   setHint(text) {
     if (!this.taskHint) return;
     if (text) {
-      this.taskHint.textContent = "Подсказка: " + text;
+      this.taskHint.textContent = t("topics.hint_prefix") + " " + text;
       this.taskHint.hidden = false;
     } else {
       this.taskHint.textContent = "";
@@ -520,7 +524,7 @@ const TopicsUI = {
       const response = await fetch("/api/topics");
       const data = await response.json();
       this.topics = data.topics || [];
-      this.topicSelect.innerHTML = '<option value="">Выберите тему</option>';
+      this.topicSelect.innerHTML = '<option value="">' + t("topics.select_topic") + "</option>";
       this.topics.forEach(function (topic) {
         const option = document.createElement("option");
         option.value = topic.id;
@@ -558,8 +562,8 @@ const TopicsUI = {
     this.topicId = "";
     if (this.topicSelect) this.topicSelect.value = "";
     this.showTopicIntro();
-    const hint = (topic && topic.unlock_hint) || "Сначала пройдите половину задач предыдущей темы.";
-    setStatus("error", "Тема закрыта");
+    const hint = (topic && topic.unlock_hint) || t("topics.unlock_default");
+    setStatus("error", t("topics.locked"));
     setOutput(hint, true);
   },
 
@@ -587,7 +591,7 @@ const TopicsUI = {
       this.taskId = "";
       if (this.topicSelect) this.topicSelect.value = "";
       if (this.taskSelect) {
-        this.taskSelect.innerHTML = '<option value="">Выберите задачу</option>';
+        this.taskSelect.innerHTML = '<option value="">' + t("topics.select_task") + "</option>";
         this.setSelectDisabled(this.taskSelect, true);
       }
       this.closeTopicGuide();
@@ -607,7 +611,7 @@ const TopicsUI = {
     this.taskId = "";
     if (this.taskSelect) this.taskSelect.value = "";
 
-    if (this.taskTitle) this.taskTitle.textContent = "Задача";
+    if (this.taskTitle) this.taskTitle.textContent = t("topics.task_label", "Task");
     this.setCondition("");
     this.setHint("");
     if (this.taskMeta) this.taskMeta.textContent = "";
@@ -620,7 +624,7 @@ const TopicsUI = {
   async onTopicChange() {
     this.topicId = this.topicSelect.value;
     this.taskId = "";
-    this.taskSelect.innerHTML = '<option value="">Выберите задачу</option>';
+    this.taskSelect.innerHTML = '<option value="">' + t("topics.select_task") + "</option>";
     this.setSelectDisabled(this.taskSelect, !this.topicId);
 
     if (!this.topicId) {
@@ -639,8 +643,8 @@ const TopicsUI = {
     workspace.clear();
     ProgramFrame.setup(workspace);
     updateCodePreview();
-    setStatus("idle", "Готов");
-    setOutput("Тема выбрана. Откройте задачу и соберите решение.", false);
+    setStatus("idle", t("status.ready"));
+    setOutput(t("topics.topic_selected"), false);
 
     try {
       const response = await fetch("/api/topics/" + encodeURIComponent(this.topicId) + "/tasks");
@@ -650,7 +654,7 @@ const TopicsUI = {
         return;
       }
       if (!response.ok) {
-        throw new Error(data.error || "Не удалось загрузить задачи");
+        throw new Error(data.error || t("topics.tasks_load_error"));
       }
       this.tasks = data.tasks || [];
       this.tasks.forEach(function (task, index) {
@@ -662,7 +666,7 @@ const TopicsUI = {
       this.refreshSelect(this.taskSelect);
       this.showTopicIntro();
     } catch (err) {
-      setOutput("Не удалось загрузить задачи: " + err.message, true);
+      setOutput(t("topics.tasks_load_error") + ": " + err.message, true);
     }
   },
 
@@ -686,17 +690,14 @@ const TopicsUI = {
     this.loadSavedSolution().then(function (loaded) {
       if (!loaded && task && task.starter_xml) {
         loadWorkspaceXml(workspace, task.starter_xml);
-        setStatus("idle", "Готов");
-        setOutput(
-          "Загружена программа с ошибкой. Исправьте блоки и нажмите «Проверить».",
-          false
-        );
+        setStatus("idle", t("status.ready"));
+        setOutput(t("topics.fix_task_loaded"), false);
       } else if (loaded) {
-        setStatus("idle", "Готов");
-        setOutput("Загружено сохранённое решение из блоков. Можно изменить и проверить снова.", false);
+        setStatus("idle", t("status.ready"));
+        setOutput(t("topics.saved_solution"), false);
       } else {
-        setStatus("idle", "Готов");
-        setOutput("Задача загружена. Соберите решение и нажмите «Проверить».", false);
+        setStatus("idle", t("status.ready"));
+        setOutput(t("topics.task_loaded"), false);
       }
       updateCodePreview();
       if (typeof scheduleWorkspaceLayoutRefresh === "function") {
@@ -711,7 +712,10 @@ const TopicsUI = {
     this.setCondition(task.condition);
     this.setHint(task.hint || "");
     if (this.taskMeta) {
-      this.taskMeta.textContent = "Задача " + (index + 1) + " из " + this.tasks.length;
+      this.taskMeta.textContent = t("topics.task_of", "Задача {current} из {total}", {
+        current: index + 1,
+        total: this.tasks.length,
+      });
     }
     this.updateTaskChrome();
     this.updateNavButtons();
@@ -764,21 +768,21 @@ const TopicsUI = {
     if (this.mode !== "topic" || !this.topicId || !this.taskId) return;
 
     if (typeof CodeEditor !== "undefined" && CodeEditor.isEditMode()) {
-      setStatus("error", "Ошибка");
-      setOutput("Перед проверкой нажмите «Собрать», чтобы синхронизировать код с рабочей областью.", true);
+      setStatus("error", t("status.error"));
+      setOutput(t("topics.sync_code_first"), true);
       return;
     }
 
     const code = generatePythonCode(workspace);
     const blocksXml = typeof serializeWorkspace === "function" ? serializeWorkspace(workspace) : "";
     if (!code.trim()) {
-      setStatus("error", "Ошибка");
-      setOutput("Сначала соберите программу из блоков.", true);
+      setStatus("error", t("status.error"));
+      setOutput(t("topics.build_first"), true);
       return;
     }
 
-    setStatus("running", "Проверка…");
-    setOutput("Проверяем решение…", false);
+    setStatus("running", t("topics.checking"));
+    setOutput(t("topics.checking_output"), false);
 
     try {
       const response = await fetch("/api/check", {
@@ -794,18 +798,18 @@ const TopicsUI = {
       const result = await response.json();
       const limitMsg = getApiErrorMessage(result, response);
       if (limitMsg) {
-        setStatus("error", "Подождите");
+        setStatus("error", t("status.wait"));
         setOutput(limitMsg, true);
         return;
       }
 
       if (result.success) {
-        setStatus("success", "Верно!");
+        setStatus("success", t("topics.correct"));
         let msg = result.message;
         if (result.progress) {
-          msg += "\n\nПопыток: " + result.progress.attempts_count;
+          msg += "\n\n" + t("topics.attempts", "Попыток: {count}", { count: result.progress.attempts_count });
           if (result.progress.completed) {
-            msg += " · Прогресс сохранён";
+            msg += " · " + t("topics.progress_saved");
           }
         }
         setOutput(msg, false);
@@ -816,19 +820,19 @@ const TopicsUI = {
         }
       } else {
         if (result.locked) {
-          setStatus("error", "Тема закрыта");
-          setOutput(result.message || "Тема ещё не открыта", true);
+          setStatus("error", t("topics.locked"));
+          setOutput(result.message || t("topics.not_unlocked_yet"), true);
           await this.loadTopics();
           return;
         }
-        setStatus("error", "Неверно");
-        let text = result.message || "Решение не прошло проверку";
+        setStatus("error", t("topics.incorrect"));
+        let text = result.message || t("topics.check_failed");
         if (result.details && result.details.length) {
           const failed = result.details.find(function (d) {
             return !d.passed;
           });
           if (failed && failed.actual !== undefined) {
-            text += "\n\nОжидалось:\n" + failed.expected + "\n\nПолучено:\n" + failed.actual;
+            text += "\n\n" + t("topics.expected_label") + "\n" + failed.expected + "\n\n" + t("topics.actual_label") + "\n" + failed.actual;
           } else if (failed && failed.message) {
             text += "\n\n" + failed.message;
           }
@@ -836,8 +840,8 @@ const TopicsUI = {
         setOutput(text, true);
       }
     } catch (err) {
-      setStatus("error", "Ошибка");
-      setOutput("Ошибка проверки: " + err.message, true);
+      setStatus("error", t("status.error"));
+      setOutput(t("topics.check_error") + ": " + err.message, true);
     }
   },
 };
