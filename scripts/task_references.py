@@ -361,6 +361,26 @@ print(фраза)""",
 print("Привет, " + имя + "!")
 print("Твоя мечта: " + мечта)
 print("Удачи!")""",
+    "io-31": """фам = input()
+имя = input()
+print("Сначала: " + фам)
+print("Потом: " + имя)""",
+    "io-32": """a = input()
+b = input()
+c = input()
+print(a + b + c)""",
+    "io-33": """блюдо = input()
+цена = input()
+print("Блюдо: " + блюдо + ", цена: " + цена + " руб.")""",
+    "io-34": """w1 = input()
+w2 = input()
+print(w1)
+print(len(w1))
+print(w2)
+print(len(w2))""",
+    "io-35": """название = input()
+номер = input()
+print("Партия " + номер + ": " + название + " — OK")""",
     # --- numbers advanced (21-30) ---
     "numbers-21": """a = int(input())
 b = int(input())
@@ -396,6 +416,20 @@ print(-x if x < 0 else x)""",
 print(2 * n + 1)
 print(n ** 2 - n)
 print(n // 3)""",
+    "numbers-31": """км = int(input())
+print(50 + 15 * км)""",
+    "numbers-32": """м = int(input())
+print(м // 60)
+print(м % 60)""",
+    "numbers-33": """n = 528
+print(n // 100)""",
+    "numbers-34": """цена = int(input())
+скидка = int(input())
+print(цена * (100 - скидка) / 100)""",
+    "numbers-35": """n = int(input())
+print(n - 1)
+print(n)
+print(n + 1)""",
     # --- conditions advanced (21-30) ---
     "cond-21": """y = int(input())
 print('високосный' if y % 4 == 0 else 'обычный')""",
@@ -463,6 +497,33 @@ score = int(input())
 print('Ученик: ' + name)
 print('сдал' if score >= 80 else 'не сдал')
 print('младший' if age < 10 else 'старший')""",
+    "cond-31": """x = int(input())
+a = int(input())
+b = int(input())
+print('в диапазоне' if a <= x <= b else 'вне диапазона')""",
+    "cond-32": """a = int(input())
+b = int(input())
+c = int(input())
+if b >= a and b >= c:
+    print('второе')
+elif a >= b and a >= c:
+    print('первое')
+else:
+    print('третье')""",
+    "cond-33": """a = int(input())
+b = int(input())
+print('делится' if a % b == 0 else 'не делится')""",
+    "cond-34": """a = int(input())
+b = int(input())
+c = int(input())
+if a + b > c and a + c > b and b + c > a:
+    print('возможен')
+else:
+    print('невозможен')""",
+    "cond-35": """o1 = int(input())
+o2 = int(input())
+d = o1 - o2 if o1 >= o2 else o2 - o1
+print('скачок' if d >= 2 else 'стабильно')""",
     # --- while advanced (21-30) ---
     "while-21": """n = 48291
 c = 0
@@ -529,6 +590,39 @@ while x > 0:
     s = s + x % 10
     x = x // 10
 print(s)""",
+    "while-31": """n = int(input())
+rev = 0
+while n > 0:
+    rev = rev * 10 + n % 10
+    n = n // 10
+print(rev)""",
+    "while-32": """s = 0
+x = int(input())
+while x != 0:
+    s = s + x
+    x = int(input())
+print(s)""",
+    "while-33": """a = int(input())
+b = int(input())
+while b != 0:
+    a, b = b, a % b
+print(a)""",
+    "while-34": """base = int(input())
+exp = int(input())
+result = 1
+i = 0
+while i < exp:
+    result = result * base
+    i = i + 1
+print(result)""",
+    "while-35": """n = int(input())
+d = 1
+count = 0
+while d <= n:
+    if n % d == 0:
+        count = count + 1
+    d = d + 1
+print(count)""",
     # --- for advanced (21-30) ---
     "for-21": "for i in range(1, 11, 1):\n    print(i * 7)",
     "for-22": """n = int(input())
@@ -581,6 +675,31 @@ for i in range(1, n + 1, 1):
 print(s)
 print(sq)
 print(c)""",
+    "for-31": """n = int(input())
+for i in range(1, 2 * n, 2):
+    print(i)""",
+    "for-32": """n = int(input())
+k = int(input())
+for i in range(k, n + 1, k):
+    print(i)""",
+    "for-33": """a = int(input())
+b = int(input())
+s = 0
+for i in range(a, b + 1, 1):
+    if i % 2 == 0:
+        s = s + i
+print(s)""",
+    "for-34": """ch = input()
+s = input()
+c = 0
+for x in s:
+    if x == ch:
+        c = c + 1
+print(c)""",
+    "for-35": """n = int(input())
+for i in range(1, n + 1, 1):
+    if i % 2 == 0 and i % 3 == 0:
+        print(i)""",
     # --- strings advanced (21-30) ---
     "str-21": """s = input()
 print('палиндром' if len(s) == 3 and s[0] == s[2] else 'не палиндром')""",
@@ -606,6 +725,21 @@ print(len(s))
 print(s.capitalize())
 print(s.isalpha())
 print(s.lower())""",
+    "str-31": """s = input()
+v = 'аеиоуыэюя'
+c = 0
+for ch in s:
+    if ch in v:
+        c = c + 1
+print(c)""",
+    "str-32": """s = input()
+print('палиндром' if s == s[::-1] else 'не палиндром')""",
+    "str-33": """s = input()
+print('[' + s + ']')""",
+    "str-34": """s = input()
+print(s + s)""",
+    "str-35": """s = input()
+print(s[::-1])""",
     # --- lists advanced (21-30) ---
     "list-21": """числа = [15, 3, 42, 7]
 m = числа[0]
@@ -663,6 +797,30 @@ s = 0
 for x in nums:
     s = s + x
 print(s)""",
+    "list-31": """числа = [1, 2, 3, 4]
+rev = []
+for x in числа:
+    rev.insert(0, x)
+print(rev)""",
+    "list-32": """nums = [2, 8, 5, 11, 3]
+big = []
+for x in nums:
+    if x > 5:
+        big.append(x)
+print(big)""",
+    "list-33": """nums = [10, 20, 30, 40, 50]
+i = int(input())
+if i >= 0 and i < len(nums):
+    print(nums[i])
+else:
+    print('ошибка')""",
+    "list-34": """nums = [1, 2, 3, 4, 5]
+nums.pop()
+nums.pop(0)
+print(nums)""",
+    "list-35": """nums = [10, 20, 30, 40, 50]
+for i in range(0, len(nums), 2):
+    print(nums[i])""",
 }
 
 from data.fix_tasks_defs import FIX_TASK_DEFS
