@@ -73,6 +73,12 @@ IO_HELLO = program(
     "</block>",
 )
 
+HELLO_WORLD = program(
+    '<block type="text_print" x="20" y="20">',
+    '<value name="TEXT"><block type="text"><field name="TEXT">Hello, world!</field></block></value>',
+    "</block>",
+)
+
 IO_WELCOME = program(
     '<block type="text_print" x="20" y="20">',
     '<value name="TEXT"><block type="text"><field name="TEXT">Добро пожаловать!</field></block></value>',

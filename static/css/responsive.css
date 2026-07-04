@@ -398,10 +398,6 @@ video {
     border-radius: 12px;
   }
 
-  .landing-demo__caption {
-    font-size: 0.75rem;
-  }
-
   .step-card__visual {
     min-height: 140px;
   }

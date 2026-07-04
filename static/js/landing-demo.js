@@ -37,66 +37,26 @@
     const main = document.getElementById("landingBlocksPreview");
     if (main && window.LANDING_DEMO_XML) {
       GuidePreview.mount(main, window.LANDING_DEMO_XML);
-    }
-  }
 
-  function ensureStepPreview() {
-    if (typeof GuidePreview === "undefined") return;
+      if (typeof ResizeObserver !== "undefined") {
+        const observer = new ResizeObserver(function () {
+          GuidePreview.resizeContainer(main);
+        });
+        observer.observe(main);
+        const col = main.closest(".landing-demo__col--blocks");
+        if (col) observer.observe(col);
+      }
 
-    const step = document.getElementById("stepBlocksPreview");
-    if (!step || !window.STEP_CONNECT_DEMO_XML) return;
-    if (step.clientWidth < 20) return;
-
-    if (step.dataset.guideMounted !== "1") {
-      GuidePreview.mount(step, window.STEP_CONNECT_DEMO_XML);
-    } else {
-      GuidePreview.resizeContainer(step);
-    }
-  }
-
-  function initStepPreview() {
-    const step = document.getElementById("stepBlocksPreview");
-    if (!step) return;
-
-    window.addEventListener("load", function () {
-      ensureStepPreview();
-      window.setTimeout(ensureStepPreview, 80);
-      window.setTimeout(ensureStepPreview, 300);
-    });
-
-    if (typeof ResizeObserver !== "undefined") {
-      const observer = new ResizeObserver(function () {
-        ensureStepPreview();
+      window.addEventListener("load", function () {
+        GuidePreview.resizeContainer(main);
       });
-      observer.observe(step);
-    }
-
-    const section = document.querySelector(".how-it-works");
-    if (section && "IntersectionObserver" in window) {
-      const observer = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              ensureStepPreview();
-            }
-          });
-        },
-        { threshold: 0.05, rootMargin: "60px 0px" }
-      );
-      observer.observe(section);
-    } else {
-      ensureStepPreview();
     }
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () {
-      mountHeroPreview();
-      initStepPreview();
-    });
+    document.addEventListener("DOMContentLoaded", mountHeroPreview);
   } else {
     mountHeroPreview();
-    initStepPreview();
   }
 
   const demo = document.getElementById("landingDemo");
@@ -136,7 +96,6 @@
     reveals.forEach(function (el) {
       el.classList.add("is-visible");
     });
-    ensureStepPreview();
     return;
   }
 
@@ -146,9 +105,6 @@
         if (entry.isIntersecting) {
           entry.target.classList.add("is-visible");
           observer.unobserve(entry.target);
-          if (entry.target.classList.contains("how-it-works")) {
-            ensureStepPreview();
-          }
         }
       });
     },

@@ -136,13 +136,23 @@ const GuidePreview = {
     };
   },
 
+  isLandingMode(container) {
+    return !!(container && container.classList.contains("landing-blocks-preview"));
+  },
+
   getContainerLimits(container) {
     const visual = container.closest(".step-card__visual");
+    const landingCol = container.closest(".landing-demo__col--blocks");
     const maxW = container.clientWidth || container.offsetWidth || 240;
-    const visualH = visual ? visual.clientHeight : 0;
+    let maxH = 150;
+    if (visual) {
+      maxH = Math.max(130, visual.clientHeight - 8);
+    } else if (landingCol) {
+      maxH = Math.max(120, landingCol.clientHeight - 24);
+    }
     return {
-      maxW: Math.max(180, maxW),
-      maxH: Math.max(130, visualH > 0 ? visualH - 8 : 150),
+      maxW: Math.max(120, maxW),
+      maxH: maxH,
     };
   },
 
@@ -216,7 +226,7 @@ const GuidePreview = {
     const host = container.querySelector(".guide-preview__host");
     if (!host || !ws) return;
 
-    if (this.isCompactMode(container)) {
+    if (this.isCompactMode(container) || this.isLandingMode(container)) {
       this.applyCompactSize(container, host, bounds, ws);
       return;
     }
@@ -232,9 +242,13 @@ const GuidePreview = {
 
   applyCompactSize(container, host, bounds, ws) {
     const limits = this.getContainerLimits(container);
-    const fitScale = Math.min(1, limits.maxW / bounds.width, limits.maxH / bounds.height);
-    const scale = Math.max(0.45, fitScale);
-    const visualH = Math.max(100, Math.ceil(bounds.height * scale));
+    const isLanding = this.isLandingMode(container);
+    let fitScale = Math.min(1, limits.maxW / bounds.width, limits.maxH / bounds.height);
+    if (isLanding) {
+      fitScale = Math.min(fitScale, 0.84);
+    }
+    const scale = Math.max(0.42, fitScale);
+    const visualH = Math.max(isLanding ? 110 : 100, Math.ceil(bounds.height * scale));
 
     host.style.width = bounds.width + "px";
     host.style.height = bounds.height + "px";
@@ -256,7 +270,10 @@ const GuidePreview = {
 
     const run = function () {
       try {
-        if (GuidePreview.isCompactMode(container) && container.clientWidth < 20) {
+        if (
+          (GuidePreview.isCompactMode(container) || GuidePreview.isLandingMode(container)) &&
+          container.clientWidth < 20
+        ) {
           return;
         }
 

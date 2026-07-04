@@ -65,14 +65,22 @@ const TopicsUI = {
     this.syncPickerPlaceholders();
     this.setupWorkspaceLayoutObserver();
 
+    const hasDemo = new URLSearchParams(window.location.search).has("demo");
+
     if (!this.authenticated) {
       this.mode = "sandbox";
       this.applyMode();
+      if (hasDemo) {
+        this.applySandboxDemo();
+      }
       return;
     }
 
     this.loadTopics().then(function () {
       TopicsUI.applyUrlParams();
+      if (hasDemo) {
+        TopicsUI.applySandboxDemo();
+      }
     });
     this.applyMode();
   },
@@ -94,6 +102,33 @@ const TopicsUI = {
     select.disabled = disabled;
     if (typeof CustomSelect !== "undefined") {
       CustomSelect.setDisabled(select, disabled);
+    }
+  },
+
+  async applySandboxDemo() {
+    const params = new URLSearchParams(window.location.search);
+    const demoId = params.get("demo");
+    if (!demoId || typeof workspace === "undefined" || !workspace) return;
+
+    try {
+      const response = await fetch("/api/sandbox-demo/" + encodeURIComponent(demoId));
+      const data = await response.json();
+      if (!data.success || !data.xml) return;
+
+      if (typeof loadWorkspaceXml === "function") {
+        loadWorkspaceXml(workspace, data.xml);
+      } else if (typeof WorkspaceStorage !== "undefined") {
+        WorkspaceStorage.load(workspace, data.xml);
+      }
+
+      if (typeof updateCodePreview === "function") {
+        updateCodePreview();
+      }
+      if (typeof centerWorkspaceOnBlocks === "function") {
+        centerWorkspaceOnBlocks();
+      }
+    } catch (err) {
+      console.error("applySandboxDemo:", err);
     }
   },
 

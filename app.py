@@ -8,7 +8,11 @@ from flask_login import current_user, login_required
 from auth_routes import auth_bp
 from config import Config
 from data.guide_xml import LANDING_DEMO, STEP_CONNECT_DEMO
-from data.registry import get_task_with_tests, get_tasks_public, get_topics
+from data.registry import TASKS_BY_TOPIC, get_task_with_tests, get_tasks_public, get_topics
+from data.sandbox_demos import (
+    LANDING_TOPIC_META,
+    get_sandbox_demo,
+)
 from data.topic_guides import get_topic_guide
 from extensions import csrf, db, login_manager
 from models import TaskProgress, User
@@ -114,6 +118,22 @@ def _execution_http_response(result: dict, *, ok_status: int = 200) -> tuple:
     return jsonify(result), status
 
 
+def _landing_topics():
+    topics = []
+    for topic in get_topics():
+        meta = LANDING_TOPIC_META.get(topic["id"], {})
+        topics.append(
+            {
+                **topic,
+                "task_count": len(TASKS_BY_TOPIC.get(topic["id"], [])),
+                "icon": meta.get("icon", "📘"),
+                "level": meta.get("level", ""),
+                "highlight": meta.get("highlight", False),
+            }
+        )
+    return topics
+
+
 def register_routes(app):
     @app.route("/")
     def landing():
@@ -121,11 +141,31 @@ def register_routes(app):
             "landing.html",
             landing_demo_xml=LANDING_DEMO,
             step_connect_demo_xml=STEP_CONNECT_DEMO,
+            landing_topics=_landing_topics(),
         )
 
     @app.route("/learn")
     def learn():
         return render_template("index.html")
+
+    @app.route("/privacy")
+    def privacy():
+        return render_template("privacy.html")
+
+    @app.route("/api/sandbox-demo/<demo_id>", methods=["GET"])
+    def sandbox_demo(demo_id):
+        demo = get_sandbox_demo(demo_id)
+        if not demo:
+            return jsonify({"success": False, "error": "Пример не найден"}), 404
+        return jsonify(
+            {
+                "success": True,
+                "id": demo["id"],
+                "title": demo["title"],
+                "description": demo["description"],
+                "xml": demo["xml"],
+            }
+        )
 
     @app.route("/api/run", methods=["POST"])
     @rate_limit_execution()
