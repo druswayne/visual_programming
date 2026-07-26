@@ -1,47 +1,93 @@
-<!DOCTYPE html>
-<html lang="{{ get_locale() }}">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{% block title %}PyBlocks{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
-  {% block extra_head %}{% endblock %}
-  <script>
-    window.__I18N__ = {{ js_messages|tojson }};
-    window.PYBLOCKS_BLOCK_MSG = {{ block_messages|tojson }};
-  </script>
-  <script src="{{ url_for('static', filename='js/i18n-core.js') }}"></script>
-</head>
-<body class="page-body">
-  {% include '_site_header.html' %}
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-list" role="status">
-        {% for category, message in messages %}
-          <div class="flash flash--{{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
-  <main class="page-main">
-    {% block content %}{% endblock %}
-  </main>
-
-  <footer class="site-footer">
-    <div class="site-footer__inner">
-      <p class="site-footer__tagline">{{ _('footer.tagline') }}</p>
-      <nav class="site-footer__links" aria-label="{{ _('footer.links') }}">
-        <a href="mailto:hello@pyblocks.ru">{{ _('footer.contacts') }}</a>
-        <a href="{{ url_for('privacy') }}">{{ _('footer.privacy') }}</a>
-      </nav>
-    </div>
-  </footer>
-  {% block extra_scripts %}{% endblock %}
-</body>
-</html>
-
+<!DOCTYPE html>
+
+<html lang="{{ get_locale() }}">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
+  <title>{% block title %}PyBlocks{% endblock %}</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+
+  {% block extra_head %}{% endblock %}
+
+  <script>
+
+    window.__I18N__ = {{ js_messages|tojson }};
+
+    window.PYBLOCKS_BLOCK_MSG = {{ block_messages|tojson }};
+
+  </script>
+
+  <script src="{{ url_for('static', filename='js/i18n-core.js') }}"></script>
+
+</head>
+
+<body class="page-body">
+
+  {% include '_site_header.html' %}
+
+
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+      <div class="flash-list" role="status">
+
+        {% for category, message in messages %}
+
+          <div class="flash flash--{{ category }}">{{ message }}</div>
+
+        {% endfor %}
+
+      </div>
+
+    {% endif %}
+
+  {% endwith %}
+
+
+
+  <main class="page-main">
+
+    {% block content %}{% endblock %}
+
+  </main>
+
+
+
+  <footer class="site-footer">
+
+    <div class="site-footer__inner">
+
+      <p class="site-footer__tagline">{{ _('footer.tagline') }}</p>
+
+      <nav class="site-footer__links" aria-label="{{ _('footer.links') }}">
+
+        <a href="mailto:hello@pyblocks.ru">{{ _('footer.contacts') }}</a>
+
+        <a href="{{ url_for('privacy') }}">{{ _('footer.privacy') }}</a>
+
+      </nav>
+
+    </div>
+
+  </footer>
+
+  {% block extra_scripts %}{% endblock %}
+
+</body>
+
+</html>
+
+

@@ -123,7 +123,7 @@ const MemoryViz = {
     const names = Object.keys(top.vars).sort();
 
     this.varsEl.innerHTML = names
-      .map(function (name) {
+      .map(function (name, index) {
         const cell = top.vars[name];
         const isChanged = changed.has(name);
         const isNew = !MemoryViz._prevVarCell(prevStack, name);
@@ -152,7 +152,9 @@ const MemoryViz = {
           classes +
           '" data-var="' +
           MemoryViz.escape(name) +
-          '">' +
+          '" style="animation-delay:' +
+          index * 35 +
+          'ms">' +
           '<div class="memory-var__head">' +
           '<span class="memory-var__name">' +
           MemoryViz.escape(name) +

@@ -175,64 +175,87 @@
         <pre id="outputConsole" class="output-console">{{ _('editor.output_idle') }}</pre>
       </section>
 
-      <section class="panel panel--debug" id="debugPanel" hidden>
-        <div class="panel__header">
-          <h2>{{ _('editor.time_machine') }}</h2>
-          <div class="panel__header-badges">
-            <span id="debugStepCounter" class="badge badge--idle">—</span>
-            <span id="debugStatusSlot"></span>
-          </div>
-        </div>
-
-        <div class="time-machine__scroll">
-        <div class="time-machine__controls debug-controls">
-          <button id="btnDebugPrev" class="btn btn--small" type="button" disabled title="{{ _('editor.step_back') }}">← {{ _('editor.step_back') }}</button>
-          <button id="btnDebugStep" class="btn btn--small btn--primary" type="button" disabled title="{{ _('editor.step_fwd') }}">{{ _('editor.step_fwd') }}</button>
-          <button id="btnDebugPlay" class="btn btn--small" type="button" disabled title="{{ _('editor.auto_run') }}">▶ {{ _('editor.auto_run') }}</button>
-          <label class="time-machine__speed" title="{{ _('editor.speed') }}">
-            <span class="time-machine__speed-label">{{ _('editor.speed') }}</span>
-            <select id="debugPlaySpeed" class="time-machine__speed-select" disabled>
-              <option value="1200">{{ _('editor.speed_slow') }}</option>
-              <option value="700" selected>{{ _('editor.speed_normal') }}</option>
-              <option value="350">{{ _('editor.speed_fast') }}</option>
-            </select>
-          </label>
-          <button id="btnDebugStop" class="btn btn--small btn--ghost" type="button" disabled title="{{ _('editor.reset') }}">{{ _('editor.reset') }}</button>
-        </div>
-
-        <div class="time-machine__timeline">
-          <input
-            id="debugTimeline"
-            class="time-machine__timeline-input"
-            type="range"
-            min="0"
-            max="0"
-            value="0"
-            disabled
-            aria-label="{{ _('editor.timeline_scrub') }}"
-          />
-        </div>
-
-        <div class="debug-output" id="debugOutputWrap">
-          <h3 class="debug-output__title">{{ _('editor.program_output') }}</h3>
-          <pre id="debugOutputConsole" class="output-console debug-output-console"></pre>
-        </div>
-
-        <div class="time-machine__body">
-          <div class="time-machine__memory">
-            <h3 class="memory-viz__title">{{ _('editor.variables') }}</h3>
-            <div id="debugMemoryVars" class="memory-viz__vars">
-              <p class="memory-viz__empty">{{ _('editor.vars_empty') }}</p>
-            </div>
-          </div>
-        </div>
-        </div>
-
-        <div id="debugVars" class="debug-vars debug-vars--legacy" hidden aria-hidden="true"></div>
-      </section>
-
     </aside>
   </main>
+
+  <div id="timeMachineModal" class="tm-modal" hidden>
+    <div
+      class="tm-modal__dialog"
+      role="dialog"
+      aria-labelledby="timeMachineTitle"
+      aria-modal="true"
+    >
+      <header class="tm-modal__header">
+        <div class="tm-modal__heading">
+          <span class="tm-modal__icon" aria-hidden="true">⏮</span>
+          <h2 id="timeMachineTitle">{{ _('editor.time_machine') }}</h2>
+          <span id="debugStepCounter" class="badge badge--idle tm-modal__step-badge">—</span>
+        </div>
+        <button id="timeMachineClose" class="tm-modal__close" type="button" aria-label="{{ _('common.close') }}">
+          ×
+        </button>
+      </header>
+
+      <div class="tm-modal__stage" id="debugPanel">
+        <div class="tm-modal__grid">
+          <section class="tm-modal__code" aria-label="{{ _('editor.python_code') }}">
+            <h3 class="tm-modal__section-title">{{ _('editor.python_code') }}</h3>
+            <pre id="debugCodePreview" class="tm-modal__code-preview code-preview"><code></code></pre>
+          </section>
+
+          <section class="tm-modal__side">
+            <div class="tm-modal__memory time-machine__memory">
+              <h3 class="memory-viz__title">{{ _('editor.variables') }}</h3>
+              <div id="debugMemoryVars" class="memory-viz__vars">
+                <p class="memory-viz__empty">{{ _('editor.vars_empty') }}</p>
+              </div>
+            </div>
+
+            <div class="debug-output" id="debugOutputWrap">
+              <h3 class="debug-output__title">{{ _('editor.program_output') }}</h3>
+              <pre id="debugOutputConsole" class="output-console debug-output-console"></pre>
+            </div>
+          </section>
+        </div>
+
+        <div class="tm-modal__footer">
+          <div class="time-machine__controls debug-controls">
+            <button id="btnDebugPrev" class="btn btn--small" type="button" disabled title="{{ _('editor.step_back') }}">← {{ _('editor.step_back') }}</button>
+            <button id="btnDebugStep" class="btn btn--small btn--primary" type="button" disabled title="{{ _('editor.step_fwd') }}">{{ _('editor.step_fwd') }}</button>
+            <button id="btnDebugPlay" class="btn btn--small" type="button" disabled title="{{ _('editor.auto_run') }}">▶ {{ _('editor.auto_run') }}</button>
+            <label class="time-machine__speed" title="{{ _('editor.speed') }}">
+              <span class="time-machine__speed-label">{{ _('editor.speed') }}</span>
+              <select id="debugPlaySpeed" class="time-machine__speed-select" disabled>
+                <option value="1200">{{ _('editor.speed_slow') }}</option>
+                <option value="700" selected>{{ _('editor.speed_normal') }}</option>
+                <option value="350">{{ _('editor.speed_fast') }}</option>
+              </select>
+            </label>
+            <button id="btnDebugStop" class="btn btn--small btn--ghost" type="button" disabled title="{{ _('editor.reset') }}">{{ _('editor.reset') }}</button>
+          </div>
+
+          <div class="time-machine__timeline">
+            <div class="tm-modal__timeline-track" aria-hidden="true">
+              <div id="debugTimelineFill" class="tm-modal__timeline-fill"></div>
+            </div>
+            <input
+              id="debugTimeline"
+              class="time-machine__timeline-input"
+              type="range"
+              min="0"
+              max="0"
+              value="0"
+              disabled
+              aria-label="{{ _('editor.timeline_scrub') }}"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div id="debugVars" class="debug-vars debug-vars--legacy" hidden aria-hidden="true"></div>
+      <span id="debugStatusSlot" hidden></span>
+    </div>
+  </div>
 
   <div id="topicGuideModal" class="topic-guide-modal" hidden>
     <div

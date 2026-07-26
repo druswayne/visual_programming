@@ -1,5 +1,5 @@
 /**
- * Пошаговая отладка: подсветка блоков, строк кода и переменных.
+ * Пошаговая отладка: модалка «Машина времени», подсветка блоков и строк.
  */
 const StepDebugger = {
   steps: [],
@@ -14,13 +14,16 @@ const StepDebugger = {
   playing: false,
   playTimer: null,
   panelEl: null,
+  modalEl: null,
   outputPanelEl: null,
   statusBadgeSlot: null,
   outputStatusSlot: null,
+  lastRenderedIndex: -1,
 
   init(workspace) {
     this.workspace = workspace;
     this.panelEl = document.getElementById("debugPanel");
+    this.modalEl = document.getElementById("timeMachineModal");
     this.outputPanelEl = document.getElementById("outputPanel");
     this.statusBadgeSlot = document.getElementById("debugStatusSlot");
     this.outputStatusSlot = document.getElementById("outputStatusSlot");
@@ -33,27 +36,11 @@ const StepDebugger = {
   },
 
   isPanelVisible() {
-    return Boolean(this.panelEl && !this.panelEl.hidden);
+    return Boolean(this.modalEl && !this.modalEl.hidden);
   },
 
   showPanel() {
-    if (this.outputPanelEl) {
-      this.outputPanelEl.hidden = true;
-    }
-    if (this.panelEl) {
-      this.panelEl.hidden = false;
-    }
-
-    const sidebar = document.querySelector(".sidebar");
-    if (sidebar) sidebar.classList.add("sidebar--debug");
-
-    const codePanel = document.getElementById("codePanel");
-    if (codePanel) codePanel.classList.add("panel--code--debug");
-
-    const badge = document.getElementById("statusBadge");
-    if (badge && this.statusBadgeSlot) {
-      this.statusBadgeSlot.appendChild(badge);
-    }
+    if (!this.modalEl) return;
 
     const mainOut = document.getElementById("outputConsole");
     const debugOut = document.getElementById("debugOutputConsole");
@@ -61,6 +48,17 @@ const StepDebugger = {
       debugOut.textContent = mainOut.textContent;
       debugOut.className = mainOut.className + " debug-output-console";
     }
+
+    this.modalEl.hidden = false;
+    this.modalEl.classList.remove("tm-modal--closing");
+    // Force reflow so open animation restarts.
+    void this.modalEl.offsetWidth;
+    this.modalEl.classList.add("tm-modal--open");
+
+    document.body.classList.add("tm-modal-open");
+
+    const codePanel = document.getElementById("codePanel");
+    if (codePanel) codePanel.classList.add("panel--code--debug");
 
     const btnStart = document.getElementById("btnDebugStart");
     if (btnStart) btnStart.classList.add("btn--active");
@@ -74,23 +72,15 @@ const StepDebugger = {
       mainOut.className = debugOut.className.replace(/\s*debug-output-console\s*/g, " ").trim();
     }
 
-    if (this.panelEl) {
-      this.panelEl.hidden = true;
-    }
-    if (this.outputPanelEl) {
-      this.outputPanelEl.hidden = false;
+    if (this.modalEl) {
+      this.modalEl.classList.remove("tm-modal--open");
+      this.modalEl.hidden = true;
     }
 
-    const sidebar = document.querySelector(".sidebar");
-    if (sidebar) sidebar.classList.remove("sidebar--debug");
+    document.body.classList.remove("tm-modal-open");
 
     const codePanel = document.getElementById("codePanel");
     if (codePanel) codePanel.classList.remove("panel--code--debug");
-
-    const badge = document.getElementById("statusBadge");
-    if (badge && this.outputStatusSlot) {
-      this.outputStatusSlot.appendChild(badge);
-    }
 
     const btnStart = document.getElementById("btnDebugStart");
     if (btnStart) btnStart.classList.remove("btn--active");
@@ -102,6 +92,7 @@ const StepDebugger = {
     const btnStop = document.getElementById("btnDebugStop");
     const btnPrev = document.getElementById("btnDebugPrev");
     const btnPlay = document.getElementById("btnDebugPlay");
+    const btnClose = document.getElementById("timeMachineClose");
     const timeline = document.getElementById("debugTimeline");
     const speed = document.getElementById("debugPlaySpeed");
 
@@ -110,6 +101,12 @@ const StepDebugger = {
     if (btnStop) btnStop.addEventListener("click", () => this.stop());
     if (btnPrev) btnPrev.addEventListener("click", () => this.stepBack());
     if (btnPlay) btnPlay.addEventListener("click", () => this.toggleAutoplay());
+    if (btnClose) btnClose.addEventListener("click", () => this.stop());
+    if (this.modalEl) {
+      this.modalEl.addEventListener("click", (event) => {
+        if (event.target === this.modalEl) this.stop();
+      });
+    }
     if (timeline) {
       timeline.addEventListener("input", () => this.seekTimeline(Number(timeline.value)));
     }
@@ -126,6 +123,13 @@ const StepDebugger = {
   },
 
   onKeyDown(event) {
+    if (!this.isPanelVisible()) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      this.stop();
+      return;
+    }
+
     if (!this.sessionActive || this.loading) return;
     const tag = (event.target && event.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
@@ -202,11 +206,16 @@ const StepDebugger = {
 
   updateTimeline() {
     const timeline = document.getElementById("debugTimeline");
+    const fill = document.getElementById("debugTimelineFill");
     if (!timeline) return;
     const max = Math.max(0, this.steps.length - 1);
     timeline.disabled = !this.sessionActive;
     timeline.max = String(max);
     timeline.value = String(this.stepIndex < 0 ? 0 : this.stepIndex);
+    if (fill) {
+      const pct = max > 0 ? (Math.max(0, this.stepIndex) / max) * 100 : 0;
+      fill.style.width = pct + "%";
+    }
   },
 
   async start() {
@@ -233,21 +242,23 @@ const StepDebugger = {
     this.displayLines = data.displayLines;
     this.debugLineToDisplay = data.debugLineToDisplay;
     this.lineBlockMap = data.lineBlockMap;
-    this.showPanel();
+    this.lastRenderedIndex = -1;
     this.setControls();
-    this.showCleanPreview();
     setStatus("running", t("debugger.status"));
     setOutput(t("debugger.collecting_steps"), false);
 
     const stdinText = await InputHelper.collectStdin(data.code);
     if (stdinText === null) {
       this.loading = false;
-      this.hidePanel();
       this.setControls();
       setStatus("idle", t("status.ready"));
       setOutput(t("run.input_cancelled"), false);
       return;
     }
+
+    this.showPanel();
+    this.showCleanPreview();
+    setOutput(t("debugger.collecting_steps"), false);
 
     try {
       const response = await fetch("/api/debug", {
@@ -308,6 +319,7 @@ const StepDebugger = {
     this.sessionActive = false;
     this.steps = [];
     this.stepIndex = -1;
+    this.lastRenderedIndex = -1;
     this.displayLines = [];
     this.debugLineToDisplay = {};
     this.clearBlockHighlight();
@@ -367,9 +379,23 @@ const StepDebugger = {
     }
   },
 
+  pulseStage(direction) {
+    const stage = this.panelEl;
+    if (!stage) return;
+    stage.classList.remove("tm-modal__stage--forward", "tm-modal__stage--back");
+    void stage.offsetWidth;
+    stage.classList.add(direction === "back" ? "tm-modal__stage--back" : "tm-modal__stage--forward");
+  },
+
   renderStep() {
     const step = this.steps[this.stepIndex];
     if (!step) return;
+
+    const direction = this.stepIndex < this.lastRenderedIndex ? "back" : "forward";
+    if (this.lastRenderedIndex !== this.stepIndex) {
+      this.pulseStage(direction);
+    }
+    this.lastRenderedIndex = this.stepIndex;
 
     const counter = document.getElementById("debugStepCounter");
     if (counter) {
@@ -377,6 +403,9 @@ const StepDebugger = {
         current: this.stepIndex + 1,
         total: this.steps.length,
       });
+      counter.classList.remove("tm-modal__step-badge--pulse");
+      void counter.offsetWidth;
+      counter.classList.add("tm-modal__step-badge--pulse");
     }
 
     this.highlightLine(step.line);
@@ -395,15 +424,74 @@ const StepDebugger = {
     this.updateTimeline();
   },
 
+  getDebugCodeNodes() {
+    const preview = document.getElementById("debugCodePreview");
+    if (!preview) return null;
+    let codeEl = preview.querySelector("code");
+    if (!codeEl) {
+      preview.textContent = "";
+      codeEl = document.createElement("code");
+      preview.appendChild(codeEl);
+    }
+    return { preview: preview, codeEl: codeEl };
+  },
+
   showCleanPreview() {
     const text = this.displayLines.join("\n").trim();
-    setCodePreviewPlain(text || t("code.placeholder"));
+    const plain = text || t("code.placeholder");
+    setCodePreviewPlain(plain);
+
+    const nodes = this.getDebugCodeNodes();
+    if (!nodes) return;
+    if (typeof PythonHighlighter !== "undefined") {
+      nodes.codeEl.innerHTML = PythonHighlighter.highlight(plain);
+    } else {
+      nodes.codeEl.textContent = plain;
+    }
   },
 
   highlightLine(lineNo) {
     const displayLineNo = this.debugLineToDisplay[lineNo];
     if (!displayLineNo) return;
     setCodePreviewHighlight(this.displayLines, displayLineNo);
+    this.highlightDebugCode(this.displayLines, displayLineNo);
+  },
+
+  highlightDebugCode(lines, activeLineNo) {
+    const nodes = this.getDebugCodeNodes();
+    if (!nodes) return;
+
+    const normalized = lines.slice();
+    while (normalized.length && normalized[0].trim() === "") {
+      normalized.shift();
+      activeLineNo--;
+    }
+    while (normalized.length && normalized[normalized.length - 1].trim() === "") {
+      normalized.pop();
+    }
+    if (activeLineNo < 1) activeLineNo = 1;
+    if (activeLineNo > normalized.length) activeLineNo = normalized.length;
+
+    const html = normalized
+      .map(function (line, index) {
+        const highlighted =
+          typeof PythonHighlighter !== "undefined"
+            ? PythonHighlighter.highlightLine(line)
+            : escapeHtml(line);
+        if (index + 1 === activeLineNo) {
+          return '<mark class="code-line--active">' + highlighted + "</mark>";
+        }
+        return highlighted;
+      })
+      .join("\n");
+
+    nodes.codeEl.innerHTML = html || t("code.placeholder");
+
+    const active = nodes.codeEl.querySelector(".code-line--active");
+    if (active) {
+      active.classList.add("code-line--enter");
+      active.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
   },
 
   highlightBlock(blockId) {
@@ -419,6 +507,9 @@ const StepDebugger = {
     const svg = typeof block.getSvgRoot === "function" ? block.getSvgRoot() : null;
     if (svg) {
       svg.classList.add("py-debug-highlight");
+      svg.classList.remove("py-debug-highlight--pulse");
+      void svg.offsetWidth;
+      svg.classList.add("py-debug-highlight--pulse");
     }
 
     this.scrollBlockIntoView(block);
@@ -455,7 +546,7 @@ const StepDebugger = {
           ? this.highlightedBlock.getSvgRoot()
           : null;
       if (svg) {
-        svg.classList.remove("py-debug-highlight");
+        svg.classList.remove("py-debug-highlight", "py-debug-highlight--pulse");
       }
     }
 
