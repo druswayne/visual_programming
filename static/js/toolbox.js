@@ -62,6 +62,8 @@ const PYBLOCKS_TOOLBOX = {
 
       { kind: "block", type: "py_input" },
 
+      { kind: "block", type: "py_convert" },
+
       { kind: "block", type: "py_comment" },
 
       { kind: "block", type: "py_pass" },

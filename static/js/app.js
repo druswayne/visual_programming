@@ -406,6 +406,7 @@ function centerWorkspaceOnBlocks() {
 document.addEventListener("DOMContentLoaded", function () {
   initBlockly();
   initEditorResponsive();
+  if (typeof SandboxSavesUI !== "undefined") SandboxSavesUI.init();
   TopicsUI.init();
   CodeEditor.init();
   document.getElementById("btnRun").addEventListener("click", runCode);

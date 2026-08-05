@@ -63,6 +63,21 @@
                 <option value="sandbox">{{ _('editor.mode_sandbox') }}</option>
                 <option value="topic">{{ _('editor.mode_tasks') }}</option>
               </select>
+              <div class="sandbox-saves-bar" id="sandboxSavesBar" hidden>
+                <span class="sandbox-saves-bar__title" id="sandboxSaveTitle" hidden></span>
+                <button
+                  id="btnSandboxSave"
+                  class="btn btn--small btn--ghost"
+                  type="button"
+                  title="{{ _('editor.sandbox_save') }}"
+                >{{ _('editor.sandbox_save') }}</button>
+                <button
+                  id="btnSandboxOpen"
+                  class="btn btn--small btn--ghost"
+                  type="button"
+                  title="{{ _('editor.sandbox_open') }}"
+                >{{ _('editor.sandbox_open') }}</button>
+              </div>
             {% else %}
               <span class="mode-badge__label">{{ _('editor.mode_sandbox') }}</span>
               <a href="{{ url_for('auth.login', next=url_for('learn')) }}" class="btn btn--ghost btn--small btn--nav-login">{{ _('editor.login_for_tasks') }}</a>
@@ -345,6 +360,70 @@
     </div>
   </div>
 
+  <div id="sandboxSavesModal" class="sandbox-saves-modal" hidden>
+    <div
+      class="sandbox-saves-modal__dialog"
+      role="dialog"
+      aria-labelledby="sandboxSavesModalTitle"
+      aria-modal="true"
+    >
+      <header class="sandbox-saves-modal__header">
+        <h3 id="sandboxSavesModalTitle">{{ _('editor.sandbox_saves_title') }}</h3>
+        <button id="sandboxSavesModalClose" class="sandbox-saves-modal__close" type="button" aria-label="{{ _('common.close') }}">
+          ×
+        </button>
+      </header>
+
+      <div class="sandbox-saves-modal__body">
+        <div id="sandboxSavesMainView">
+          <section class="sandbox-saves-modal__section" id="sandboxSaveFormSection">
+            <h4 class="sandbox-saves-modal__section-title">{{ _('editor.sandbox_save_section') }}</h4>
+            <form id="sandboxSaveForm" class="sandbox-saves-form">
+              <label class="sandbox-saves-form__label" for="sandboxSaveNameInput">{{ _('editor.sandbox_save_name') }}</label>
+              <input
+                id="sandboxSaveNameInput"
+                class="sandbox-saves-form__input"
+                type="text"
+                maxlength="80"
+                autocomplete="off"
+                placeholder="{{ _('editor.sandbox_save_name_placeholder') }}"
+              />
+              <div class="sandbox-saves-form__actions">
+                <button id="btnSandboxSaveAsNew" class="btn btn--ghost btn--small" type="button" hidden>
+                  {{ _('editor.sandbox_save_as_new') }}
+                </button>
+                <button id="btnSandboxSaveConfirm" class="btn btn--primary btn--small" type="submit">
+                  {{ _('editor.sandbox_save') }}
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="sandbox-saves-modal__section">
+            <div class="sandbox-saves-modal__list-head">
+              <h4 class="sandbox-saves-modal__section-title">{{ _('editor.sandbox_saved_list') }}</h4>
+              <span class="sandbox-saves-modal__count" id="sandboxSavesCount"></span>
+            </div>
+            <div id="sandboxSavesList" class="sandbox-saves-list" aria-live="polite"></div>
+            <p id="sandboxSavesEmpty" class="sandbox-saves-empty" hidden>{{ _('editor.sandbox_saves_empty') }}</p>
+          </section>
+        </div>
+
+        <div id="sandboxSavesDeleteView" class="sandbox-saves-delete" hidden>
+          <p class="sandbox-saves-delete__text" id="sandboxSavesDeleteText"></p>
+          <div class="sandbox-saves-delete__actions">
+            <button id="btnSandboxDeleteCancel" class="btn btn--ghost btn--small" type="button">
+              {{ _('common.cancel') }}
+            </button>
+            <button id="btnSandboxDeleteConfirm" class="btn btn--danger btn--small" type="button">
+              {{ _('editor.sandbox_delete_confirm_btn') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="{{ url_for('static', filename='js/compact-renderer.js') }}"></script>
   <script src="{{ url_for('static', filename='js/method-blocks.js') }}"></script>
   <script src="{{ url_for('static', filename='js/toolbox.js') }}"></script>
@@ -363,6 +442,7 @@
   <script src="{{ url_for('static', filename='js/debugger.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom-select.js') }}"></script>
   <script src="{{ url_for('static', filename='js/topics-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sandbox-saves.js') }}"></script>
   <script src="{{ url_for('static', filename='js/pyblocks-theme.js') }}"></script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>

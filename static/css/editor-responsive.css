@@ -78,6 +78,11 @@ body.editor-narrow .mode-switch {
   min-width: 0;
 }
 
+body.editor-narrow .sandbox-saves-bar {
+  flex: 1 1 auto;
+  justify-content: flex-end;
+}
+
 body.editor-narrow .sidebar {
   max-height: none;
   min-height: min(280px, 40dvh);

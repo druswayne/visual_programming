@@ -35,12 +35,36 @@ from models import TaskProgress, User
 from limits import init_rate_limiter, rate_limit_execution
 from profile_routes import profile_bp
 from progress_service import get_user_task_progress, maybe_record_check
+from sandbox_saves_service import (
+    MAX_SAVES_PER_USER,
+    create_user_save,
+    delete_user_save,
+    get_user_save,
+    list_user_saves,
+    update_user_save,
+)
 from topic_unlock_service import assert_topic_unlocked, enrich_topics_for_user
-from runner.checker import check_solution
+from runner.checker import check_solution, strip_input_prompts
 from runner.debugger import debug_python_code
 from runner.pool import init_execution_pool
 from runner.python_to_blocks import python_to_blocks_safe
 from runner.sandbox import run_python_code
+
+
+def _strip_run_output(code: str, result: dict) -> dict:
+    """Убирает подсказки input() из stdout — они уже показаны в модальном окне."""
+    result = {**result}
+    if result.get("output"):
+        result["output"] = strip_input_prompts(code, result["output"])
+    steps = result.get("steps")
+    if steps:
+        cleaned = []
+        for step in steps:
+            if step.get("output"):
+                step = {**step, "output": strip_input_prompts(code, step["output"])}
+            cleaned.append(step)
+        result["steps"] = cleaned
+    return result
 
 
 def create_app(config_class=Config):
@@ -224,7 +248,7 @@ def register_routes(app):
         if not code.strip():
             return jsonify({"success": False, "output": "", "error": _("api.code_empty")}), 400
 
-        result = run_python_code(code, stdin_text=stdin_text)
+        result = _strip_run_output(code, run_python_code(code, stdin_text=stdin_text))
         return _execution_http_response(result)
 
     @app.route("/api/debug", methods=["POST"])
@@ -237,7 +261,7 @@ def register_routes(app):
         if not code.strip():
             return jsonify({"success": False, "steps": [], "error": "Код пуст"}), 400
 
-        result = debug_python_code(code, stdin_text=stdin_text)
+        result = _strip_run_output(code, debug_python_code(code, stdin_text=stdin_text))
         return _execution_http_response(result)
 
     @app.route("/api/python-to-blocks", methods=["POST"])
@@ -349,6 +373,76 @@ def register_routes(app):
                 "solution_code": progress.solution_code,
             }
         )
+
+    def _sandbox_save_error_response(errors: list[str]):
+        code = errors[0] if errors else "invalid"
+        messages = {
+            "title_required": _("sandbox_saves.error_title_required"),
+            "blocks_required": _("sandbox_saves.error_blocks_required"),
+            "blocks_too_large": _("sandbox_saves.error_blocks_too_large"),
+            "code_too_large": _("sandbox_saves.error_code_too_large"),
+            "limit_reached": _("sandbox_saves.error_limit", limit=MAX_SAVES_PER_USER),
+            "not_found": _("sandbox_saves.error_not_found"),
+        }
+        status = 404 if code == "not_found" else 400
+        return jsonify({"success": False, "error": messages.get(code, code), "code": code}), status
+
+    @app.route("/api/sandbox/saves", methods=["GET"])
+    @login_required
+    def sandbox_saves_list():
+        saves = list_user_saves(current_user)
+        return jsonify(
+            {
+                "success": True,
+                "saves": [s.to_summary_dict() for s in saves],
+                "limit": MAX_SAVES_PER_USER,
+                "count": len(saves),
+            }
+        )
+
+    @app.route("/api/sandbox/saves", methods=["POST"])
+    @login_required
+    def sandbox_saves_create():
+        data = request.get_json(silent=True) or {}
+        save, errors = create_user_save(
+            current_user,
+            data.get("title"),
+            data.get("blocks_xml"),
+            data.get("code"),
+        )
+        if errors:
+            return _sandbox_save_error_response(errors)
+        return jsonify({"success": True, "save": save.to_detail_dict()}), 201
+
+    @app.route("/api/sandbox/saves/<int:save_id>", methods=["GET"])
+    @login_required
+    def sandbox_saves_get(save_id):
+        save = get_user_save(current_user, save_id)
+        if not save:
+            return _sandbox_save_error_response(["not_found"])
+        return jsonify({"success": True, "save": save.to_detail_dict()})
+
+    @app.route("/api/sandbox/saves/<int:save_id>", methods=["PUT"])
+    @login_required
+    def sandbox_saves_update(save_id):
+        data = request.get_json(silent=True) or {}
+        save, errors = update_user_save(
+            current_user,
+            save_id,
+            title=data.get("title"),
+            blocks_xml=data.get("blocks_xml"),
+            code=data.get("code"),
+        )
+        if errors:
+            return _sandbox_save_error_response(errors)
+        return jsonify({"success": True, "save": save.to_detail_dict()})
+
+    @app.route("/api/sandbox/saves/<int:save_id>", methods=["DELETE"])
+    @login_required
+    def sandbox_saves_delete(save_id):
+        if not delete_user_save(current_user, save_id):
+            return _sandbox_save_error_response(["not_found"])
+        return jsonify({"success": True})
 
     @app.route("/api/me", methods=["GET"])
     def current_user_info():

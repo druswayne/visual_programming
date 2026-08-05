@@ -268,6 +268,14 @@ const TopicsUI = {
     if (this.btnPrev) this.btnPrev.hidden = !showNav;
     if (this.btnNext) this.btnNext.hidden = !showNav;
 
+    if (typeof SandboxSavesUI !== "undefined") {
+      const showSandboxSaves = this.authenticated && !isTopic;
+      SandboxSavesUI.setVisible(showSandboxSaves);
+      if (isTopic) {
+        SandboxSavesUI.clearCurrent();
+      }
+    }
+
     this.updateTopicIntroFooter();
     this.syncModeSwitch();
     this.syncPickerPlaceholders();

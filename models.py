@@ -56,6 +56,12 @@ class User(UserMixin, db.Model):
         cascade="all, delete-orphan",
         lazy="dynamic",
     )
+    sandbox_saves = db.relationship(
+        "SandboxSave",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="dynamic",
+    )
 
     @validates("username")
     def _set_username(self, key, value: str) -> str:
@@ -121,6 +127,42 @@ class TaskAttempt(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), default=_utcnow, nullable=False)
 
     user = db.relationship("User", back_populates="attempts")
+
+
+class SandboxSave(db.Model):
+    """Сохранённая программа из режима песочницы."""
+
+    __tablename__ = "sandbox_saves"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    title = db.Column(db.String(80), nullable=False)
+    blocks_xml = db.Column(db.Text, nullable=False)
+    code = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime(timezone=True),
+        default=_utcnow,
+        onupdate=_utcnow,
+        nullable=False,
+    )
+
+    user = db.relationship("User", back_populates="sandbox_saves")
+
+    def to_summary_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+    def to_detail_dict(self) -> dict:
+        return {
+            **self.to_summary_dict(),
+            "blocks_xml": self.blocks_xml,
+            "code": self.code,
+        }
 
 
 class SkillBranchXp(db.Model):
