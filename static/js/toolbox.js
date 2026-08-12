@@ -64,6 +64,8 @@ const PYBLOCKS_TOOLBOX = {
 
       { kind: "block", type: "py_convert" },
 
+      { kind: "block", type: "py_type" },
+
       { kind: "block", type: "py_comment" },
 
       { kind: "block", type: "py_pass" },
@@ -227,6 +229,8 @@ const PYBLOCKS_TOOLBOX = {
     toolboxCat("types", "Типы", "20", [
 
       { kind: "block", type: "py_convert" },
+
+      { kind: "block", type: "py_type" },
 
       { kind: "block", type: "py_type_check" },
 

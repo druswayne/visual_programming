@@ -137,6 +137,14 @@ function getPyblocksCustomBlocks() {
     tooltip: pbMsg("tooltip.import_random", "Подключить модуль random"),
   },
   {
+    type: "py_type",
+    message0: pbMsg("type", "тип(%1)"),
+    args0: [{ type: "input_value", name: "VALUE" }],
+    output: null,
+    style: "math_blocks",
+    tooltip: pbMsg("tooltip.type", "Определить тип значения (type)"),
+  },
+  {
     type: "py_convert",
     message0: pbMsg("convert", "преобразовать %1 в %2"),
     args0: [

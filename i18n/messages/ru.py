@@ -453,6 +453,7 @@ MESSAGES = {
     "runner.ptb.operator_not_supported": "Такой оператор не поддерживается",
     "runner.ptb.print_as_stmt": "print() используйте как отдельную команду, не внутри выражения",
     "runner.ptb.len_one_arg": "len() принимает один аргумент",
+    "runner.ptb.type_one_arg": "type() принимает один аргумент",
     "runner.ptb.func_one_arg": "{name}() принимает один аргумент",
     "runner.ptb.isinstance_two_args": "isinstance() принимает два аргумента",
     "runner.ptb.type_check_not_supported": "Проверка типа «{type}» не поддерживается",

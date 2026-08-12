@@ -429,6 +429,7 @@ MESSAGES = {
     "runner.ptb.operator_not_supported": "This operator is not supported",
     "runner.ptb.print_as_stmt": "Use print() as a separate statement, not inside an expression",
     "runner.ptb.len_one_arg": "len() takes one argument",
+    "runner.ptb.type_one_arg": "type() takes one argument",
     "runner.ptb.func_one_arg": "{name}() takes one argument",
     "runner.ptb.isinstance_two_args": "isinstance() takes two arguments",
     "runner.ptb.type_check_not_supported": "Type check «{type}» is not supported",

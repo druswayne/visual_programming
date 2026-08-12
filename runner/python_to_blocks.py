@@ -426,6 +426,10 @@ class PythonToBlocksConverter:
                 if len(node.args) != 1:
                     raise self._err("runner.ptb.len_one_arg", node)
                 return {"block": {"type": "py_len", "inputs": {"OBJ": self._expr(node.args[0])}}}
+            if name == "type":
+                if len(node.args) != 1:
+                    raise self._err("runner.ptb.type_one_arg", node)
+                return {"block": {"type": "py_type", "inputs": {"VALUE": self._expr(node.args[0])}}}
             if name == "input":
                 prompt = ""
                 if node.args:

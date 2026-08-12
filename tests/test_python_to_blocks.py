@@ -51,6 +51,13 @@ def test_for_body_has_single_program_end():
     assert result["xml"].count('type="py_end"') == 1
 
 
+def test_type_call():
+    result = python_to_blocks("print(type(x))")
+    xml = result["xml"]
+    assert 'type="py_type"' in xml
+    assert 'name="VALUE"' in xml
+
+
 def test_unsupported_syntax():
     result = python_to_blocks_safe("def foo():\n    pass")
     assert result["success"] is False

@@ -204,6 +204,11 @@ function registerCustomGenerators() {
     return "import random\n";
   };
 
+  gen.forBlock["py_type"] = function (block, generator) {
+    const value = generator.valueToCode(block, "VALUE", Order.NONE) || "None";
+    return ["type(" + value + ")", Order.FUNCTION_CALL];
+  };
+
   gen.forBlock["py_convert"] = function (block, generator) {
     const value = generator.valueToCode(block, "VALUE", Order.NONE) || "0";
     const target = block.getFieldValue("TO");
