@@ -125,6 +125,7 @@ def create_app(config_class=Config):
         db.create_all()
         _ensure_solution_xml_column()
         _normalize_existing_usernames()
+        _ensure_admin_user()
 
     register_routes(app)
     return app
@@ -165,6 +166,57 @@ def _ensure_solution_xml_column():
     if "solution_xml" not in columns:
         db.session.execute(text("ALTER TABLE task_progress ADD COLUMN solution_xml TEXT"))
         db.session.commit()
+
+
+def _ensure_admin_user():
+    """Создать admin/admin123 со всеми темами открытыми и пройденными."""
+    from datetime import datetime, timezone
+
+    from flask import current_app
+
+    from skills_service import ensure_skills_synced
+
+    admin = User.query.filter_by(username="admin").first()
+    changed = False
+    if not admin:
+        admin = User(username="admin", email="admin@pyblocks.local")
+        admin.set_password("admin123")
+        db.session.add(admin)
+        db.session.flush()
+        changed = True
+
+    by_key = {
+        (row.topic_id, row.task_id): row
+        for row in TaskProgress.query.filter_by(user_id=admin.id).all()
+    }
+    now = datetime.now(timezone.utc)
+    for topic_id, tasks in TASKS_BY_TOPIC.items():
+        for task in tasks:
+            task_id = task["id"]
+            progress = by_key.get((topic_id, task_id))
+            if progress is None:
+                db.session.add(
+                    TaskProgress(
+                        user_id=admin.id,
+                        topic_id=topic_id,
+                        task_id=task_id,
+                        completed=True,
+                        attempts_count=1,
+                        completed_at=now,
+                    )
+                )
+                changed = True
+            elif not progress.completed:
+                progress.completed = True
+                progress.completed_at = progress.completed_at or now
+                progress.attempts_count = max(progress.attempts_count or 0, 1)
+                changed = True
+
+    if changed:
+        db.session.commit()
+
+    with current_app.test_request_context():
+        ensure_skills_synced(admin.id)
 
 
 def _execution_http_response(result: dict, *, ok_status: int = 200) -> tuple:
