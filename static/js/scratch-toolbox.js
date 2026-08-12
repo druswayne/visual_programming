@@ -30,6 +30,7 @@ const ScratchToolbox = {
 
     this.buildCategoryRail();
     this.setupPersistentFlyout();
+    this.patchFlyoutIndependentScale();
     this.patchFlyoutFixedWidth();
     this.patchToolboxRefresh();
     this.setupVariableChangeGuard();
@@ -53,6 +54,66 @@ const ScratchToolbox = {
     }
   },
 
+  getFlyoutScale() {
+    const opts = this.workspace && this.workspace.options && this.workspace.options.zoomOptions;
+    const start = opts && typeof opts.startScale === "number" ? opts.startScale : 0.79;
+    return start;
+  },
+
+  /**
+   * Палитра не должна следовать за зумом рабочей области.
+   * По умолчанию Blockly ставит flyout.scale = workspace.scale.
+   */
+  patchFlyoutIndependentScale() {
+    const flyout = this.toolbox.getFlyout && this.toolbox.getFlyout();
+    if (!flyout || flyout._pyblocksScalePatched) return;
+
+    const self = this;
+    flyout._pyblocksScalePatched = true;
+
+    flyout.getFlyoutScale = function () {
+      return self.getFlyoutScale();
+    };
+
+    const originalLayout = flyout.layout_;
+    if (typeof originalLayout === "function") {
+      flyout.layout_ = function (contents) {
+        this.workspace_.scale = this.getFlyoutScale();
+        originalLayout.call(this, contents);
+        this.workspace_.scale = this.getFlyoutScale();
+      };
+    }
+
+    this.workspace.addChangeListener(function (event) {
+      if (!event || event.type !== Blockly.Events.VIEWPORT_CHANGE) return;
+      self.applyFlyoutScale();
+    });
+
+    this.applyFlyoutScale();
+  },
+
+  applyFlyoutScale() {
+    const flyout = this.toolbox && this.toolbox.getFlyout && this.toolbox.getFlyout();
+    if (!flyout) return;
+
+    const flyoutWorkspace = flyout.getWorkspace ? flyout.getWorkspace() : flyout.workspace_;
+    if (!flyoutWorkspace) return;
+
+    const scale = typeof flyout.getFlyoutScale === "function" ? flyout.getFlyoutScale() : this.getFlyoutScale();
+    const alreadyApplied =
+      Math.abs((flyoutWorkspace.scale || 0) - scale) < 1e-4 && flyoutWorkspace._pyblocksFlyoutScale === scale;
+    flyoutWorkspace.scale = scale;
+    if (alreadyApplied) return;
+    flyoutWorkspace._pyblocksFlyoutScale = scale;
+
+    if (typeof flyoutWorkspace.translate === "function") {
+      const metrics = typeof flyoutWorkspace.getMetrics === "function" ? flyoutWorkspace.getMetrics() : null;
+      const left = metrics && metrics.absoluteLeft ? metrics.absoluteLeft : 0;
+      const top = metrics && metrics.absoluteTop ? metrics.absoluteTop : 0;
+      flyoutWorkspace.translate(flyoutWorkspace.scrollX + left, flyoutWorkspace.scrollY + top);
+    }
+  },
+
   /**
    * Blockly по умолчанию подстраивает ширину flyout под содержимое и сдвигает
    * рабочую область (translate). У нас ширина задаётся CSS (--palette-width).
@@ -67,6 +128,7 @@ const ScratchToolbox = {
     flyout.reflowInternal_ = function () {
       const fixedWidth = self.getPaletteWidth();
       this.workspace_.scale = this.getFlyoutScale();
+      self.applyFlyoutScale();
 
       if (this.getWidth() === fixedWidth) return;
 
@@ -308,6 +370,11 @@ const ScratchToolbox = {
     flyout.visible = true;
     flyout.containerVisible = true;
     flyout.width_ = width;
+
+    const flyoutWorkspace = flyout.getWorkspace ? flyout.getWorkspace() : flyout.workspace_;
+    if (flyoutWorkspace) {
+      flyoutWorkspace.scale = this.getFlyoutScale();
+    }
 
     const shellHeight = this.shell ? this.shell.getBoundingClientRect().height : 0;
     const titleHeight =

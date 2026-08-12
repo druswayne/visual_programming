@@ -13,7 +13,7 @@ from data.guide_xml import (
     STEP_CONNECT_DEMO,
     STEP_CONNECT_DEMO_EN,
 )
-from data.registry import TASKS_BY_TOPIC, get_task_with_tests, get_tasks_public, get_topics
+from data.registry import TASKS_BY_TOPIC, get_task_with_tests, get_topics
 from data.localized import get_localized_sandbox_demo, get_localized_topic_guide, get_localized_topics
 from data.sandbox_demos import (
     LANDING_TOPIC_META,
@@ -43,7 +43,7 @@ from sandbox_saves_service import (
     list_user_saves,
     update_user_save,
 )
-from topic_unlock_service import assert_topic_unlocked, enrich_topics_for_user
+from topic_unlock_service import assert_topic_unlocked, enrich_tasks_for_user, enrich_topics_for_user
 from runner.checker import check_solution, strip_input_prompts
 from runner.debugger import debug_python_code
 from runner.pool import init_execution_pool
@@ -339,7 +339,7 @@ def register_routes(app):
         locked = assert_topic_unlocked(current_user.id, topic_id)
         if locked:
             return jsonify({"error": locked["unlock_hint"], "locked": True, **locked}), 403
-        return jsonify({"tasks": get_tasks_public(topic_id)})
+        return jsonify({"tasks": enrich_tasks_for_user(current_user, topic_id)})
 
     @app.route("/api/topics/<topic_id>/guide", methods=["GET"])
     @login_required

@@ -200,6 +200,7 @@ MESSAGES = {
     "editor.prev_task": "Previous task",
     "editor.next_task": "Next task",
     "editor.check": "✓ Check",
+    "editor.my_solution": "My solution",
     "editor.runbar": "Program run",
     "editor.run": "Run program",
     "editor.debug": "Time machine — step-by-step execution",

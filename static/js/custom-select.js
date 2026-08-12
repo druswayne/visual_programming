@@ -33,7 +33,11 @@ const CustomSelect = {
     const chevron = document.createElement("span");
     chevron.className = "cselect__chevron";
     chevron.setAttribute("aria-hidden", "true");
-    trigger.append(valueEl, chevron);
+    const checkEl = document.createElement("span");
+    checkEl.className = "cselect__check";
+    checkEl.hidden = true;
+    checkEl.setAttribute("aria-hidden", "true");
+    trigger.append(valueEl, checkEl, chevron);
 
     const menu = document.createElement("ul");
     menu.className = "cselect__menu";
@@ -53,6 +57,7 @@ const CustomSelect = {
       wrap: wrap,
       trigger: trigger,
       valueEl: valueEl,
+      checkEl: checkEl,
       menu: menu,
       highlight: -1,
     };
@@ -105,9 +110,23 @@ const CustomSelect = {
       li.className = "cselect__option";
       li.dataset.value = opt.value;
       li.setAttribute("role", "option");
-      li.textContent = opt.textContent;
+
+      const label = document.createElement("span");
+      label.className = "cselect__option-label";
+      label.textContent = opt.textContent;
+      li.appendChild(label);
+
       if (!opt.value) li.classList.add("is-placeholder");
       if (opt.disabled) li.classList.add("is-disabled");
+      if (opt.dataset.completed === "1" && opt.value) {
+        li.classList.add("is-completed");
+        const check = document.createElement("span");
+        check.className = "cselect__check";
+        check.setAttribute("aria-hidden", "true");
+        li.appendChild(check);
+        const solved = opt.title || (typeof t === "function" ? t("topics.task_solved", "Solved") : "Solved");
+        li.setAttribute("aria-label", opt.textContent + " — " + solved);
+      }
       if (opt.value === select.value) {
         li.classList.add("is-selected");
         li.setAttribute("aria-selected", "true");
@@ -131,7 +150,15 @@ const CustomSelect = {
     inst.valueEl.textContent = text;
     inst.valueEl.classList.toggle("is-placeholder", empty);
     inst.wrap.classList.toggle("has-value", !empty);
-    inst.trigger.title = empty ? "" : text;
+
+    const completed = !empty && opt && opt.dataset.completed === "1";
+    inst.wrap.classList.toggle("is-completed", completed);
+    if (inst.checkEl) {
+      inst.checkEl.hidden = !completed;
+      inst.checkEl.title = completed ? (opt.title || "") : "";
+    }
+
+    inst.trigger.title = empty ? "" : (completed && opt.title ? text + " — " + opt.title : text);
   },
 
   setDisabled(select, disabled) {

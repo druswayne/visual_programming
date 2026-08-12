@@ -41,6 +41,22 @@ def get_topic_completion(user_id: int, topic_id: str) -> dict:
     return {"completed": completed, "total": total, "percent": percent}
 
 
+def enrich_tasks_for_user(user, topic_id: str) -> list[dict]:
+    rows = TaskProgress.query.filter_by(user_id=user.id, topic_id=topic_id).all()
+    by_id = {row.task_id: row for row in rows}
+    result = []
+    for task in get_tasks_public(topic_id):
+        progress = by_id.get(task["id"])
+        result.append(
+            {
+                **task,
+                "completed": bool(progress and progress.completed),
+                "has_solution": bool(progress and (progress.solution_xml or progress.solution_code)),
+            }
+        )
+    return result
+
+
 def is_topic_unlocked(user_id: int, topic_id: str) -> bool:
     previous_id = get_previous_topic_id(topic_id)
     if not previous_id:

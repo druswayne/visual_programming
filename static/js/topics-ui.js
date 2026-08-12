@@ -23,6 +23,7 @@ const TopicsUI = {
     this.workspaceChrome = document.getElementById("workspaceChrome");
     this.blocklyShell = document.getElementById("blocklyShell");
     this.btnCheck = document.getElementById("btnCheckTask");
+    this.btnMySolution = document.getElementById("btnMySolution");
     this.btnPrev = document.getElementById("btnTaskPrev");
     this.btnNext = document.getElementById("btnTaskNext");
     this.btnTaskCollapse = document.getElementById("btnTaskCollapse");
@@ -45,6 +46,9 @@ const TopicsUI = {
 
     if (this.btnCheck) {
       this.btnCheck.addEventListener("click", () => this.checkSolution());
+    }
+    if (this.btnMySolution) {
+      this.btnMySolution.addEventListener("click", () => this.loadMySolution());
     }
     if (this.btnPrev) {
       this.btnPrev.addEventListener("click", () => this.navigateTask(-1));
@@ -103,6 +107,35 @@ const TopicsUI = {
     if (typeof CustomSelect !== "undefined") {
       CustomSelect.setDisabled(select, disabled);
     }
+  },
+
+  createTaskOption(task, index) {
+    const option = document.createElement("option");
+    option.value = task.id;
+    option.textContent = index + 1 + ". " + task.title;
+    if (task.completed) {
+      option.dataset.completed = "1";
+      option.title = t("topics.task_solved");
+    }
+    return option;
+  },
+
+  markTaskCompleted(taskId) {
+    if (!taskId || !this.taskSelect) return;
+    const task = this.tasks.find(function (item) {
+      return item.id === taskId;
+    });
+    if (task) {
+      task.completed = true;
+      task.has_solution = true;
+    }
+    const option = this.taskSelect.querySelector('option[value="' + taskId + '"]');
+    if (option) {
+      option.dataset.completed = "1";
+      option.title = t("topics.task_solved");
+    }
+    this.refreshSelect(this.taskSelect);
+    this.updateMySolutionButton();
   },
 
   async applySandboxDemo() {
@@ -267,6 +300,7 @@ const TopicsUI = {
     if (this.btnCheck) this.btnCheck.hidden = !showNav;
     if (this.btnPrev) this.btnPrev.hidden = !showNav;
     if (this.btnNext) this.btnNext.hidden = !showNav;
+    this.updateMySolutionButton();
 
     if (typeof SandboxSavesUI !== "undefined") {
       const showSandboxSaves = this.authenticated && !isTopic;
@@ -280,6 +314,20 @@ const TopicsUI = {
     this.syncModeSwitch();
     this.syncPickerPlaceholders();
     requestAnimationFrame(() => this.updateWorkspaceLayout());
+  },
+
+  updateMySolutionButton() {
+    if (!this.btnMySolution) return;
+    const task = this.tasks.find(function (item) {
+      return item.id === TopicsUI.taskId;
+    });
+    const show =
+      this.mode === "topic" &&
+      !!this.taskId &&
+      !!task &&
+      !!task.completed &&
+      task.has_solution !== false;
+    this.btnMySolution.hidden = !show;
   },
 
   escapeHtml(text) {
@@ -666,10 +714,7 @@ const TopicsUI = {
       }
       this.tasks = data.tasks || [];
       this.tasks.forEach(function (task, index) {
-        const option = document.createElement("option");
-        option.value = task.id;
-        option.textContent = index + 1 + ". " + task.title;
-        TopicsUI.taskSelect.appendChild(option);
+        TopicsUI.taskSelect.appendChild(TopicsUI.createTaskOption(task, index));
       });
       this.refreshSelect(this.taskSelect);
       this.showTopicIntro();
@@ -742,13 +787,55 @@ const TopicsUI = {
       if (!response.ok) return false;
 
       const data = await response.json();
-      if (!data.solution_xml) return false;
-
-      return loadWorkspaceXml(workspace, data.solution_xml);
+      if (data.solution_xml) {
+        return loadWorkspaceXml(workspace, data.solution_xml);
+      }
+      if (data.solution_code) {
+        return await this.loadSolutionFromCode(data.solution_code);
+      }
+      return false;
     } catch (err) {
       console.error("loadSavedSolution:", err);
       return false;
     }
+  },
+
+  async loadSolutionFromCode(code) {
+    if (!code || !code.trim()) return false;
+    try {
+      const response = await fetch("/api/python-to-blocks", {
+        method: "POST",
+        headers: getJsonHeaders(),
+        body: JSON.stringify({ code: code }),
+      });
+      const data = await response.json();
+      if (!data.success || !data.xml) return false;
+      return loadWorkspaceXml(workspace, data.xml);
+    } catch (err) {
+      console.error("loadSolutionFromCode:", err);
+      return false;
+    }
+  },
+
+  async loadMySolution() {
+    if (!this.topicId || !this.taskId) return;
+
+    StepDebugger.stop();
+    if (typeof CodeEditor !== "undefined") CodeEditor.leaveEditMode();
+
+    const loaded = await this.loadSavedSolution();
+    if (loaded) {
+      setStatus("idle", t("status.ready"));
+      setOutput(t("topics.saved_solution"), false);
+      updateCodePreview();
+      if (typeof scheduleWorkspaceLayoutRefresh === "function") {
+        scheduleWorkspaceLayoutRefresh();
+      }
+      return;
+    }
+
+    setStatus("error", t("status.error"));
+    setOutput(t("topics.my_solution_missing"), true);
   },
 
   navigateTask(delta) {
@@ -821,6 +908,7 @@ const TopicsUI = {
           }
         }
         setOutput(msg, false);
+        this.markTaskCompleted(this.taskId);
         await this.loadTopics();
         if (this.topicSelect && this.topicId) {
           this.topicSelect.value = this.topicId;

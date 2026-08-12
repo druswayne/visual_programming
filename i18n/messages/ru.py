@@ -216,6 +216,7 @@ MESSAGES = {
     "editor.prev_task": "Предыдущая задача",
     "editor.next_task": "Следующая задача",
     "editor.check": "✓ Проверить",
+    "editor.my_solution": "Моё решение",
     "editor.runbar": "Запуск программы",
     "editor.run": "Запустить программу",
     "editor.debug": "Машина времени — пошаговое выполнение",
