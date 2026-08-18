@@ -14,6 +14,7 @@ from models import SkillXpAward, TaskProgress, User
 TOP_LIMIT = 50
 MIN_ACCURACY_SOLVED = 5
 EXCLUDED_USERNAMES = frozenset({"admin"})
+EXCLUDED_EMAIL_DOMAINS = frozenset({"test.local"})
 
 SCORE_SOLVED = 150
 SCORE_FIRST_TRY = 35
@@ -32,6 +33,20 @@ TITLES = (
 )
 
 _TOPIC_TOTALS = {tid: len(tasks) for tid, tasks in TASKS_BY_TOPIC.items()}
+
+
+def is_hidden_from_leaderboard(user: User) -> bool:
+    """Скрыть служебные и тестовые аккаунты из публичной таблицы."""
+    name = (user.username or "").strip().lower()
+    if not name or name in EXCLUDED_USERNAMES:
+        return True
+    if name.startswith("__") and name.endswith("__"):
+        return True
+    if "_test" in name or name.startswith("test_"):
+        return True
+    email = (user.email or "").strip().lower()
+    domain = email.rsplit("@", 1)[-1] if "@" in email else ""
+    return domain in EXCLUDED_EMAIL_DOMAINS
 
 
 def _utcnow() -> datetime:
@@ -231,7 +246,7 @@ def build_leaderboard(
     ranked: list[dict] = []
     for user_id, stats in grouped.items():
         user = users_by_id.get(user_id)
-        if not user or user.username in EXCLUDED_USERNAMES:
+        if not user or is_hidden_from_leaderboard(user):
             continue
         solved = stats["solved"]
         if solved <= 0:
