@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('lb.title') }}{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="leaderboard-page">
+
+  <header class="lb-hero">
+    <div class="lb-hero__text">
+      <p class="lb-hero__eyebrow">{{ _('lb.eyebrow') }}</p>
+      <h1 class="lb-hero__title">{{ _('lb.heading') }}</h1>
+      <p class="lb-hero__lead">{{ _('lb.lead') }}</p>
+    </div>
+    <ul class="lb-hero__stats" aria-label="{{ _('lb.stats_aria') }}">
+      <li>
+        <span class="lb-hero__stat-value">{{ total_ranked }}</span>
+        <span class="lb-hero__stat-label">{{ _('lb.stat_ranked') }}</span>
+      </li>
+      <li>
+        <span class="lb-hero__stat-value">{{ score_solved }}</span>
+        <span class="lb-hero__stat-label">{{ _('lb.stat_per_task') }}</span>
+      </li>
+    </ul>
+  </header>
+
+  {% if me %}
+    <section class="lb-me{% if me.rank <= 3 %} lb-me--podium{% endif %}" aria-label="{{ _('lb.me_aria') }}">
+      <div class="lb-me__rank" aria-hidden="true">#{{ me.rank }}</div>
+      <div class="lb-me__body">
+        <p class="lb-me__label">{{ _('lb.me_label') }}</p>
+        <h2 class="lb-me__title">
+          {{ me.title.icon }} {{ _('lb.title.' ~ me.title.key) }}
+          {% if me.rank == 1 %}
+            — {{ _('lb.me_first') }}
+          {% elif me.chase %}
+            — {{ _('lb.me_chase', name=me.chase.username, n=me.chase.tasks_label) }}
+          {% endif %}
+        </h2>
+        <p class="lb-me__meta">
+          {{ _('lb.me_meta', solved=me.solved, accuracy=me.accuracy, xp=me.xp, score=me.score, percentile=me.percentile) }}
+        </p>
+        {% if me.chase %}
+          <div class="lb-race" title="{{ _('lb.me_race', name=me.chase.username, ratio=me.chase.ratio) }}">
+            <span class="lb-race__label">{{ _('lb.me_race', name=me.chase.username, ratio=me.chase.ratio) }}</span>
+            <span class="lb-race__bar" aria-hidden="true"><span style="width: {{ me.chase.ratio }}%"></span></span>
+          </div>
+        {% endif %}
+      </div>
+      <a href="{{ url_for('learn') }}" class="btn btn--primary">{{ _('lb.me_cta') }}</a>
+    </section>
+  {% elif current_user.is_authenticated %}
+    <section class="lb-me lb-me--empty">
+      <div class="lb-me__body">
+        <p class="lb-me__label">{{ _('lb.me_label') }}</p>
+        <h2 class="lb-me__title">{{ _('lb.me_empty_title') }}</h2>
+        <p class="lb-me__meta">{{ _('lb.me_empty_text') }}</p>
+      </div>
+      <a href="{{ url_for('learn') }}" class="btn btn--primary">{{ _('lb.me_empty_cta') }}</a>
+    </section>
+  {% else %}
+    <section class="lb-me lb-me--guest">
+      <div class="lb-me__body">
+        <p class="lb-me__label">{{ _('lb.guest_label') }}</p>
+        <h2 class="lb-me__title">{{ _('lb.guest_title') }}</h2>
+        <p class="lb-me__meta">{{ _('lb.guest_text') }}</p>
+      </div>
+      <a href="{{ url_for('auth.register', next=url_for('leaderboard.ranking')) }}" class="btn btn--primary">{{ _('lb.guest_cta') }}</a>
+    </section>
+  {% endif %}
+
+  <div class="lb-toolbar" id="lb-filters">
+    <div class="lb-tabs" role="tablist" aria-label="{{ _('lb.period_aria') }}">
+      {% for key in periods %}
+        <a
+          href="{{ url_for('leaderboard.ranking', sort=sort, period=key) }}#lb-filters"
+          class="lb-tab{% if period == key %} is-active{% endif %}"
+          role="tab"
+          aria-selected="{{ 'true' if period == key else 'false' }}"
+        >{{ _('lb.period.' ~ key) }}</a>
+      {% endfor %}
+    </div>
+    <div class="lb-tabs lb-tabs--sort" role="tablist" aria-label="{{ _('lb.sort_aria') }}">
+      {% for key in sorts %}
+        <a
+          href="{{ url_for('leaderboard.ranking', sort=key, period=period) }}#lb-filters"
+          class="lb-tab{% if sort == key %} is-active{% endif %}"
+          role="tab"
+          aria-selected="{{ 'true' if sort == key else 'false' }}"
+        >{{ _('lb.sort.' ~ key) }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if sort == 'accuracy' %}
+    <p class="lb-hint">{{ _('lb.accuracy_hint', n=min_accuracy_solved) }}</p>
+  {% endif %}
+
+  {% if podium %}
+    <ol class="lb-podium" aria-label="{{ _('lb.podium_aria') }}">
+      {% for player in podium %}
+        <li class="lb-podium__place lb-podium__place--{{ player.rank }}{% if player.is_me %} is-me{% endif %}">
+          <div class="lb-podium__crown" aria-hidden="true">
+            {% if player.rank == 1 %}👑{% elif player.rank == 2 %}🥈{% else %}🥉{% endif %}
+          </div>
+          <div class="lb-avatar lb-avatar--lg{% if player.rank == 1 %} lb-avatar--gold{% endif %}" style="--hue: {{ player.hue }}">{{ player.initial }}</div>
+          <p class="lb-podium__name">{{ player.username }}</p>
+          <p class="lb-podium__title">{{ player.title.icon }} {{ _('lb.title.' ~ player.title.key) }}</p>
+          <p class="lb-podium__score">{{ player.score }}</p>
+          <p class="lb-podium__sub">{{ _('lb.podium_sub', solved=player.solved, accuracy=player.accuracy) }}</p>
+          <div class="lb-podium__step" aria-hidden="true">{{ player.rank }}</div>
+        </li>
+      {% endfor %}
+    </ol>
+  {% endif %}
+
+  {% if highlights %}
+    <ul class="lb-highlights" aria-label="{{ _('lb.highlights_aria') }}">
+      {% for item in highlights %}
+        <li class="lb-highlight lb-highlight--{{ item.kind }}">
+          <span class="lb-highlight__icon" aria-hidden="true">
+            {% if item.kind == 'sniper' %}🎯{% elif item.kind == 'volume' %}🔥{% else %}⚡{% endif %}
+          </span>
+          <div>
+            <p class="lb-highlight__kind">{{ _('lb.highlight.' ~ item.kind) }}</p>
+            <p class="lb-highlight__who">
+              <span class="lb-avatar lb-avatar--xs" style="--hue: {{ item.hue }}">{{ item.initial }}</span>
+              {{ item.username }}
+              {% if item.value %}<span class="lb-highlight__value">{{ item.value }}</span>{% endif %}
+            </p>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if rows %}
+    <div class="lb-table-wrap">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th scope="col">{{ _('lb.col.rank') }}</th>
+            <th scope="col">{{ _('lb.col.player') }}</th>
+            <th scope="col">{{ _('lb.col.solved') }}</th>
+            <th scope="col">{{ _('lb.col.accuracy') }}</th>
+            <th scope="col" class="lb-col--hide-sm">{{ _('lb.col.topics') }}</th>
+            <th scope="col" class="lb-col--hide-sm">{{ _('lb.col.xp') }}</th>
+            <th scope="col">{{ _('lb.col.score') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for player in rows %}
+            <tr class="lb-row{% if player.is_me %} lb-row--me{% endif %}{% if player.rank <= 3 %} lb-row--top{% endif %}">
+              <td class="lb-td-rank">
+                <span class="lb-rank lb-rank--{{ player.rank if player.rank <= 3 else 'rest' }}">{{ player.rank }}</span>
+              </td>
+              <td>
+                <div class="lb-player">
+                  <span class="lb-avatar" style="--hue: {{ player.hue }}" aria-hidden="true">{{ player.initial }}</span>
+                  <div class="lb-player__meta">
+                    <span class="lb-player__name">
+                      {{ player.username }}
+                      {% if player.is_me %}<span class="lb-you">{{ _('lb.you') }}</span>{% endif %}
+                      {% if player.activity == 'today' %}
+                        <span class="lb-live">{{ _('lb.live_today') }}</span>
+                      {% elif player.activity == 'week' %}
+                        <span class="lb-live lb-live--week">{{ _('lb.live_week') }}</span>
+                      {% endif %}
+                    </span>
+                    <span class="lb-player__title">
+                      {{ player.title.icon }} {{ _('lb.title.' ~ player.title.key) }}
+                      {% if player.specialty %} · {{ player.specialty }}{% endif %}
+                    </span>
+                    {% if player.badges %}
+                      <span class="lb-badges">
+                        {% for badge in player.badges %}
+                          <span class="lb-badge lb-badge--{{ badge }}" title="{{ _('lb.badge.' ~ badge) }}">{{ _('lb.badge.' ~ badge) }}</span>
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td class="lb-num">{{ player.solved }}</td>
+              <td>
+                <div class="lb-acc" title="{{ _('lb.accuracy_title', first=player.first_try, solved=player.solved) }}">
+                  <span class="lb-acc__value">{{ player.accuracy }}%</span>
+                  <span class="lb-acc__bar" aria-hidden="true"><span style="width: {{ player.accuracy }}%"></span></span>
+                </div>
+              </td>
+              <td class="lb-num lb-col--hide-sm">{{ player.topics_mastered }}/{{ player.topics_total }}</td>
+              <td class="lb-num lb-col--hide-sm">{{ player.xp }}</td>
+              <td class="lb-num lb-num--score">{{ player.score }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <section class="lb-empty">
+      <p class="lb-empty__title">{{ _('lb.empty_title') }}</p>
+      <p class="lb-empty__text">{{ _('lb.empty_text') }}</p>
+      <a href="{{ url_for('learn') }}" class="btn btn--primary">{{ _('lb.empty_cta') }}</a>
+    </section>
+  {% endif %}
+
+  <details class="lb-rules">
+    <summary>{{ _('lb.rules_summary') }}</summary>
+    <ul>
+      <li>{{ _('lb.rules_solved') }}</li>
+      <li>{{ _('lb.rules_first') }}</li>
+      <li>{{ _('lb.rules_topics') }}</li>
+      <li>{{ _('lb.rules_xp') }}</li>
+    </ul>
+  </details>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+{% endblock %}

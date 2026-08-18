@@ -263,6 +263,13 @@
   margin-bottom: 10px;
 }
 
+.sidebar-card__text {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+
 .sidebar-card--account .sidebar-card__email {
   font-size: 0.88rem;
   color: var(--text);

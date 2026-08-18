@@ -13,6 +13,7 @@
           <a href="{{ url_for('landing') }}" class="site-nav__link{% if request.endpoint == 'landing' %} is-active{% endif %}">{{ _('nav.home') }}</a>
         {% endif %}
         <a href="{{ url_for('learn') }}" class="site-nav__link{% if request.endpoint == 'learn' %} is-active{% endif %}">{{ _('nav.editor') }}</a>
+        <a href="{{ url_for('leaderboard.ranking') }}" class="site-nav__link{% if request.endpoint == 'leaderboard.ranking' %} is-active{% endif %}">{{ _('nav.leaderboard') }}</a>
         {% if current_user.is_authenticated %}
           <a href="{{ url_for('profile.dashboard') }}" class="site-nav__link{% if request.endpoint and request.endpoint.startswith('profile.') %} is-active{% endif %}">{{ _('nav.profile') }}</a>
           <a href="{{ url_for('auth.logout') }}" class="site-nav__link site-nav__link--muted">{{ _('nav.logout') }}</a>
@@ -20,6 +21,9 @@
           {% if request.endpoint == 'learn' %}
             <a href="{{ url_for('auth.login', next=url_for('learn')) }}" class="site-nav__link">{{ _('nav.login') }}</a>
             <a href="{{ url_for('auth.register', next=url_for('learn')) }}" class="btn btn--primary btn--nav">{{ _('nav.register') }}</a>
+          {% elif request.endpoint == 'leaderboard.ranking' %}
+            <a href="{{ url_for('auth.login', next=url_for('leaderboard.ranking')) }}" class="site-nav__link">{{ _('nav.login') }}</a>
+            <a href="{{ url_for('auth.register', next=url_for('leaderboard.ranking')) }}" class="btn btn--primary btn--nav">{{ _('nav.register') }}</a>
           {% else %}
             <a href="{{ url_for('auth.login') }}" class="site-nav__link">{{ _('nav.login') }}</a>
             <a href="{{ url_for('auth.register') }}" class="btn btn--primary btn--nav">{{ _('nav.register') }}</a>

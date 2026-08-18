@@ -74,6 +74,8 @@
 
       <nav class="site-footer__links" aria-label="{{ _('footer.links') }}">
 
+        <a href="{{ url_for('leaderboard.ranking') }}">{{ _('nav.leaderboard') }}</a>
+
         <a href="mailto:hello@pyblocks.ru">{{ _('footer.contacts') }}</a>
 
         <a href="{{ url_for('privacy') }}">{{ _('footer.privacy') }}</a>

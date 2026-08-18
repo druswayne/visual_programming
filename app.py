@@ -33,6 +33,7 @@ from i18n import (
 )
 from models import TaskProgress, User
 from limits import init_rate_limiter, rate_limit_execution
+from leaderboard_routes import leaderboard_bp
 from profile_routes import profile_bp
 from progress_service import get_user_task_progress, maybe_record_check
 from sandbox_saves_service import (
@@ -120,6 +121,7 @@ def create_app(config_class=Config):
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
+    app.register_blueprint(leaderboard_bp)
 
     with app.app_context():
         db.create_all()
