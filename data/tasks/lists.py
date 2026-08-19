@@ -1,5 +1,7 @@
 """Задачи темы: списки и операции с ними."""
 
+from data.tasks.common import infer_difficulty
+
 
 def _task(task_id, title, condition, tests, hint=None):
     return {
@@ -8,6 +10,7 @@ def _task(task_id, title, condition, tests, hint=None):
         "condition": condition,
         "tests": tests,
         "hint": hint,
+        "difficulty": infer_difficulty(task_id),
     }
 
 

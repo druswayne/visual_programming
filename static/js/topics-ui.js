@@ -20,6 +20,7 @@ const TopicsUI = {
     this.taskCondition = document.getElementById("taskCondition");
     this.taskHint = document.getElementById("taskHint");
     this.taskMeta = document.getElementById("taskMeta");
+    this.taskDifficulty = document.getElementById("taskDifficulty");
     this.workspaceChrome = document.getElementById("workspaceChrome");
     this.blocklyShell = document.getElementById("blocklyShell");
     this.btnCheck = document.getElementById("btnCheckTask");
@@ -109,13 +110,45 @@ const TopicsUI = {
     }
   },
 
+  difficultyLabel(level) {
+    if (!level) return "";
+    return t("topics.difficulty." + level, level);
+  },
+
+  setTaskDifficulty(level) {
+    const el = this.taskDifficulty;
+    if (!el) return;
+    if (!level) {
+      el.hidden = true;
+      el.textContent = "";
+      el.className = "task-difficulty";
+      el.removeAttribute("title");
+      return;
+    }
+    const label = this.difficultyLabel(level);
+    el.hidden = false;
+    el.className = "task-difficulty task-difficulty--" + level;
+    el.textContent = label;
+    el.title = label;
+  },
+
   createTaskOption(task, index) {
     const option = document.createElement("option");
     option.value = task.id;
     option.textContent = index + 1 + ". " + task.title;
+    if (task.difficulty) {
+      option.dataset.difficulty = task.difficulty;
+    }
+    const hints = [];
     if (task.completed) {
       option.dataset.completed = "1";
-      option.title = t("topics.task_solved");
+      hints.push(t("topics.task_solved"));
+    }
+    if (task.difficulty) {
+      hints.push(this.difficultyLabel(task.difficulty));
+    }
+    if (hints.length) {
+      option.title = hints.join(" · ");
     }
     return option;
   },
@@ -132,7 +165,11 @@ const TopicsUI = {
     const option = this.taskSelect.querySelector('option[value="' + taskId + '"]');
     if (option) {
       option.dataset.completed = "1";
-      option.title = t("topics.task_solved");
+      const hints = [t("topics.task_solved")];
+      if (option.dataset.difficulty) {
+        hints.push(this.difficultyLabel(option.dataset.difficulty));
+      }
+      option.title = hints.join(" · ");
     }
     this.refreshSelect(this.taskSelect);
     this.updateMySolutionButton();
@@ -671,6 +708,7 @@ const TopicsUI = {
     this.setCondition("");
     this.setHint("");
     if (this.taskMeta) this.taskMeta.textContent = "";
+    this.setTaskDifficulty("");
     if (this.btnPrev) this.btnPrev.disabled = true;
     if (this.btnNext) this.btnNext.disabled = true;
 
@@ -770,6 +808,7 @@ const TopicsUI = {
         total: this.tasks.length,
       });
     }
+    this.setTaskDifficulty(task.difficulty || "");
     this.updateTaskChrome();
     this.updateNavButtons();
   },

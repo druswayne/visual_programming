@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from data.registry import TASKS_BY_TOPIC, get_topics
+from data.tasks.common import VALID_DIFFICULTIES
 from runner.checker import check_solution, normalize_output
 from runner.sandbox import run_python_code
 
@@ -49,6 +50,8 @@ def validate_structure():
                 errors.append(f"{tid}: {task.get('id')} без title")
             if not task.get("condition"):
                 errors.append(f"{tid}: {task.get('id')} без condition")
+            if task.get("difficulty") not in VALID_DIFFICULTIES:
+                errors.append(f"{tid}: {task.get('id')} без уровня сложности")
             tests = task.get("tests") or []
             if not tests:
                 errors.append(f"{tid}: {task.get('id')} без тестов")

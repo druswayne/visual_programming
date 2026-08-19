@@ -74,6 +74,7 @@ def get_localized_tasks_public(topic_id: str, locale: str | None = None) -> list
                 "condition": plain_text(localized["condition"]),
                 "hint": plain_text(localized.get("hint") or "") or None,
                 "starter_xml": starter_xml,
+                "difficulty": localized.get("difficulty") or task.get("difficulty"),
             }
         )
     return result

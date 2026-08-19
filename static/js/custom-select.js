@@ -33,11 +33,14 @@ const CustomSelect = {
     const chevron = document.createElement("span");
     chevron.className = "cselect__chevron";
     chevron.setAttribute("aria-hidden", "true");
+    const difficultyEl = document.createElement("span");
+    difficultyEl.className = "task-difficulty";
+    difficultyEl.hidden = true;
     const checkEl = document.createElement("span");
     checkEl.className = "cselect__check";
     checkEl.hidden = true;
     checkEl.setAttribute("aria-hidden", "true");
-    trigger.append(valueEl, checkEl, chevron);
+    trigger.append(valueEl, difficultyEl, checkEl, chevron);
 
     const menu = document.createElement("ul");
     menu.className = "cselect__menu";
@@ -57,6 +60,7 @@ const CustomSelect = {
       wrap: wrap,
       trigger: trigger,
       valueEl: valueEl,
+      difficultyEl: difficultyEl,
       checkEl: checkEl,
       menu: menu,
       highlight: -1,
@@ -116,6 +120,15 @@ const CustomSelect = {
       label.textContent = opt.textContent;
       li.appendChild(label);
 
+      const extras = [];
+      if (opt.dataset.difficulty && opt.value) {
+        const badge = CustomSelect.makeDifficultyBadge(opt.dataset.difficulty);
+        if (badge) {
+          li.appendChild(badge);
+          extras.push(badge.textContent);
+        }
+      }
+
       if (!opt.value) li.classList.add("is-placeholder");
       if (opt.disabled) li.classList.add("is-disabled");
       if (opt.dataset.completed === "1" && opt.value) {
@@ -124,8 +137,10 @@ const CustomSelect = {
         check.className = "cselect__check";
         check.setAttribute("aria-hidden", "true");
         li.appendChild(check);
-        const solved = opt.title || (typeof t === "function" ? t("topics.task_solved", "Solved") : "Solved");
-        li.setAttribute("aria-label", opt.textContent + " — " + solved);
+        extras.unshift(typeof t === "function" ? t("topics.task_solved", "Solved") : "Solved");
+      }
+      if (extras.length) {
+        li.setAttribute("aria-label", opt.textContent + " — " + extras.join(", "));
       }
       if (opt.value === select.value) {
         li.classList.add("is-selected");
@@ -141,6 +156,37 @@ const CustomSelect = {
     inst.trigger.disabled = !!select.disabled;
   },
 
+  difficultyLabel(level) {
+    if (!level) return "";
+    if (typeof t === "function") {
+      return t("topics.difficulty." + level, level);
+    }
+    return level;
+  },
+
+  makeDifficultyBadge(level) {
+    if (!level) return null;
+    const badge = document.createElement("span");
+    this.syncDifficultyBadge(badge, level);
+    return badge;
+  },
+
+  syncDifficultyBadge(el, level) {
+    if (!el) return;
+    if (!level) {
+      el.hidden = true;
+      el.textContent = "";
+      el.className = "task-difficulty";
+      el.removeAttribute("title");
+      return;
+    }
+    const label = this.difficultyLabel(level);
+    el.hidden = false;
+    el.className = "task-difficulty task-difficulty--" + level;
+    el.textContent = label;
+    el.title = label;
+  },
+
   syncDisplay(inst) {
     const select = inst.select;
     const opt = select.options[select.selectedIndex];
@@ -151,6 +197,9 @@ const CustomSelect = {
     inst.valueEl.classList.toggle("is-placeholder", empty);
     inst.wrap.classList.toggle("has-value", !empty);
 
+    const level = !empty && opt && opt.dataset.difficulty;
+    CustomSelect.syncDifficultyBadge(inst.difficultyEl, level);
+
     const completed = !empty && opt && opt.dataset.completed === "1";
     inst.wrap.classList.toggle("is-completed", completed);
     if (inst.checkEl) {
@@ -158,7 +207,7 @@ const CustomSelect = {
       inst.checkEl.title = completed ? (opt.title || "") : "";
     }
 
-    inst.trigger.title = empty ? "" : (completed && opt.title ? text + " — " + opt.title : text);
+    inst.trigger.title = empty ? "" : (opt.title ? text + " — " + opt.title : text);
   },
 
   setDisabled(select, disabled) {

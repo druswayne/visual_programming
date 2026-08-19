@@ -29,6 +29,8 @@ def merge_fix_tasks(topic_id: str, base_tasks: list[dict]) -> list[dict]:
                 base["tests"],
                 hint=fix_def["hint"],
                 starter_xml=starter,
+                difficulty=base.get("difficulty"),
+                based_on=fix_def["based_on"],
             )
         )
     return merged
