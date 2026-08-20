@@ -306,6 +306,155 @@ TASKS_EN: dict[str, dict] = {
  {'stdin': '4\n5\n', 'expected_output': 'stable'},
  {'stdin': '2\n5\n', 'expected_output': 'jump'}],
     },
+    "cond-36": {
+        'title': 'Coordinate quarter',
+        'condition': (
+            'Ask for point coordinates x and y (integers). Print the quarter number: 1 (x>0 and y>0), 2 (x<0 and y>0), 3 (x<0 and y<0), 4 (x>0 and y<0). If the point lies on an axis (x = 0 or y = 0) — print axis.'
+        ),
+        'hint': 'Check the axes first, then the signs of x and y.',
+        'tests': [{'stdin': '3\n4\n', 'expected_output': '1'},
+ {'stdin': '-2\n5\n', 'expected_output': '2'},
+ {'stdin': '-1\n-1\n', 'expected_output': '3'},
+ {'stdin': '4\n-3\n', 'expected_output': '4'},
+ {'stdin': '0\n5\n', 'expected_output': 'axis'}],
+    },
+    "cond-37": {
+        'title': 'Ticket price',
+        'condition': (
+            'Ask for age (integer) and print the ticket price: under 6 — 0, under 18 — 500, under 60 — 1000, otherwise — 700.'
+        ),
+        'hint': 'Check ages from smaller to larger.',
+        'tests': [{'stdin': '3\n', 'expected_output': '0'},
+ {'stdin': '12\n', 'expected_output': '500'},
+ {'stdin': '30\n', 'expected_output': '1000'},
+ {'stdin': '60\n', 'expected_output': '700'}],
+    },
+    "cond-38": {
+        'title': 'Leap year fully',
+        'condition': (
+            'Ask for a year (integer). A year is a leap year if it divides by 400, or divides by 4 but not by 100. Print leap or common.'
+        ),
+        'hint': 'Check division by 400 first, then by 100, then by 4.',
+        'tests': [{'stdin': '2000\n', 'expected_output': 'leap'},
+ {'stdin': '1900\n', 'expected_output': 'common'},
+ {'stdin': '2024\n', 'expected_output': 'leap'},
+ {'stdin': '2023\n', 'expected_output': 'common'}],
+    },
+    "cond-39": {
+        'title': 'In ascending order',
+        'condition': (
+            'Ask for two integers. Print them on two lines in non-decreasing order: the smaller (or equal) first, then the larger.'
+        ),
+        'tests': [{'stdin': '5\n2\n', 'expected_output': '2\n5'},
+ {'stdin': '3\n3\n', 'expected_output': '3\n3'},
+ {'stdin': '-1\n4\n', 'expected_output': '-1\n4'}],
+    },
+    "cond-40": {
+        'title': 'Lucky ticket',
+        'condition': (
+            'Ask for a six-digit ticket number as an integer. If the sum of the first three digits equals the sum of the last three — print lucky, otherwise — ordinary.'
+        ),
+        'hint': 'Split the number into digits with // and %, as in the Numbers topic.',
+        'tests': [{'stdin': '123321\n', 'expected_output': 'lucky'},
+ {'stdin': '123456\n', 'expected_output': 'ordinary'},
+ {'stdin': '111111\n', 'expected_output': 'lucky'}],
+    },
+    "cond-41": {
+        'title': 'Rock, paper, scissors',
+        'condition': (
+            "Ask for two strings: the first player's move and the second's (rock, scissors or paper). Print first, second or draw. Rock beats scissors, scissors beat paper, paper beats rock."
+        ),
+        'hint': 'Check a draw first, then the three winning pairs for player one.',
+        'tests': [{'stdin': 'rock\nscissors\n', 'expected_output': 'first'},
+ {'stdin': 'scissors\nrock\n', 'expected_output': 'second'},
+ {'stdin': 'paper\npaper\n', 'expected_output': 'draw'},
+ {'stdin': 'rock\npaper\n', 'expected_output': 'second'}],
+    },
+    "cond-42": {
+        'title': 'Point in a rectangle',
+        'condition': (
+            'Ask for a point x, y and rectangle bounds x1, y1, x2, y2 (all integers, x1 ≤ x2, y1 ≤ y2). If the point is inside or on the border — yes, otherwise — no.'
+        ),
+        'tests': [{'stdin': '3\n4\n1\n1\n5\n5\n', 'expected_output': 'yes'},
+ {'stdin': '0\n0\n1\n1\n5\n5\n', 'expected_output': 'no'},
+ {'stdin': '1\n5\n1\n1\n5\n5\n', 'expected_output': 'yes'}],
+    },
+    "cond-43": {
+        'title': 'Three numbers ascending',
+        'condition': (
+            'Ask for three integers and print them on three lines in non-decreasing order.'
+        ),
+        'hint': 'You can find min, max and the middle as the sum minus min minus max.',
+        'tests': [{'stdin': '5\n1\n3\n', 'expected_output': '1\n3\n5'},
+ {'stdin': '2\n2\n2\n', 'expected_output': '2\n2\n2'},
+ {'stdin': '-1\n4\n0\n', 'expected_output': '-1\n0\n4'}],
+    },
+    "cond-44": {
+        'title': 'Course admission',
+        'condition': (
+            'Ask for age and a score (integers). Admission requires age at least 14 and score at least 70. Print yes or no.'
+        ),
+        'tests': [{'stdin': '15\n80\n', 'expected_output': 'yes'},
+ {'stdin': '13\n90\n', 'expected_output': 'no'},
+ {'stdin': '16\n60\n', 'expected_output': 'no'}],
+    },
+    "cond-45": {
+        'title': 'Valid time',
+        'condition': (
+            'Ask for hours and minutes (integers). If hours are 0–23 and minutes are 0–59 — print ok, otherwise — error.'
+        ),
+        'tests': [{'stdin': '23\n59\n', 'expected_output': 'ok'},
+ {'stdin': '24\n0\n', 'expected_output': 'error'},
+ {'stdin': '12\n60\n', 'expected_output': 'error'},
+ {'stdin': '0\n0\n', 'expected_output': 'ok'}],
+    },
+    "cond-46": {
+        'title': 'Who won',
+        'condition': "Ask for two players' scores (integers). Print first, second or draw.",
+        'tests': [{'stdin': '10\n7\n', 'expected_output': 'first'},
+ {'stdin': '3\n3\n', 'expected_output': 'draw'},
+ {'stdin': '1\n8\n', 'expected_output': 'second'}],
+    },
+    "cond-47": {
+        'title': 'Sign of the discriminant',
+        'condition': (
+            'Ask for integers a, b, c. Compute D = b² − 4×a×c and print positive, zero or negative — according to the sign of D.'
+        ),
+        'tests': [{'stdin': '1\n2\n1\n', 'expected_output': 'zero'},
+ {'stdin': '1\n0\n-1\n', 'expected_output': 'positive'},
+ {'stdin': '1\n1\n1\n', 'expected_output': 'negative'}],
+    },
+    "cond-48": {
+        'title': 'Enough money',
+        'condition': (
+            'Ask for the amount of money, the item price and the quantity (integers). If the money covers the whole purchase — enough, otherwise — not enough.'
+        ),
+        'tests': [{'stdin': '100\n30\n3\n', 'expected_output': 'enough'},
+ {'stdin': '50\n20\n3\n', 'expected_output': 'not enough'},
+ {'stdin': '90\n30\n3\n', 'expected_output': 'enough'}],
+    },
+    "cond-49": {
+        'title': 'Number type in detail',
+        'condition': (
+            'Ask for an integer n. Print: positive even, positive odd, negative or zero.'
+        ),
+        'hint': 'Handle zero and negatives first, then check evenness.',
+        'tests': [{'stdin': '4\n', 'expected_output': 'positive even'},
+ {'stdin': '3\n', 'expected_output': 'positive odd'},
+ {'stdin': '-1\n', 'expected_output': 'negative'},
+ {'stdin': '0\n', 'expected_output': 'zero'}],
+    },
+    "cond-50": {
+        'title': 'Between two numbers',
+        'condition': (
+            'Ask for three integers x, a, b. If x lies between a and b inclusive (the order of a and b is unknown) — print inside, otherwise — outside.'
+        ),
+        'hint': 'Compare x with both the smaller and the larger of a and b.',
+        'tests': [{'stdin': '5\n1\n10\n', 'expected_output': 'inside'},
+ {'stdin': '5\n10\n1\n', 'expected_output': 'inside'},
+ {'stdin': '0\n1\n10\n', 'expected_output': 'outside'},
+ {'stdin': '10\n10\n1\n', 'expected_output': 'inside'}],
+    },
     "cond-fix-01": {
         'title': 'Fix: greater than ten?',
         'condition': (
@@ -624,7 +773,7 @@ TASKS_EN: dict[str, dict] = {
         'condition': (
             'Ask for a letter, then a word. Count in a for loop how many times that letter appears in the word, and print the number.'
         ),
-        'tests': [{'stdin': 'a\nbanana\n', 'expected_output': '3'}, {'stdin': 'o\ndog\n', 'expected_output': '1'}],
+        'tests': [{'stdin': 'a\nbanana\n', 'expected_output': '2'}, {'stdin': 'o\ncat\n', 'expected_output': '1'}],
     },
     "for-35": {
         'title': 'Numbers divisible by six',
@@ -633,6 +782,141 @@ TASKS_EN: dict[str, dict] = {
         ),
         'tests': [{'stdin': '30\n', 'expected_output': '6\n12\n18\n24\n30'},
  {'stdin': '12\n', 'expected_output': '6\n12'}],
+    },
+    "for-36": {
+        'title': 'Factorial with for',
+        'condition': (
+            'Ask for an integer n ≥ 0. Compute n! in a for loop and print the result. Treat 0! as 1.'
+        ),
+        'hint': 'Start the product at 1 and multiply by each number from 1 to n.',
+        'tests': [{'stdin': '5\n', 'expected_output': '120'},
+ {'stdin': '0\n', 'expected_output': '1'},
+ {'stdin': '6\n', 'expected_output': '720'}],
+    },
+    "for-37": {
+        'title': 'Sum of multiples of 3 or 5',
+        'condition': (
+            'Ask for an integer n. In a for loop add all numbers from 1 to n inclusive that divide by 3 or by 5, and print the sum.'
+        ),
+        'hint': 'Number 15 divides by both 3 and 5 — still add it only once.',
+        'tests': [{'stdin': '10\n', 'expected_output': '33'},
+ {'stdin': '9\n', 'expected_output': '23'},
+ {'stdin': '2\n', 'expected_output': '0'}],
+    },
+    "for-38": {
+        'title': 'Prime with for',
+        'condition': (
+            'Ask for an integer n > 0. In a for loop count the divisors from 1 to n. If there are exactly 2 divisors — print prime, otherwise — composite.'
+        ),
+        'tests': [{'stdin': '7\n', 'expected_output': 'prime'},
+ {'stdin': '9\n', 'expected_output': 'composite'},
+ {'stdin': '2\n', 'expected_output': 'prime'}],
+    },
+    "for-39": {
+        'title': 'Number ladder',
+        'condition': (
+            'Ask for an integer n ≥ 1. On line i (i from 1 to n) print the numbers from 1 to i joined with no spaces. For example, for n = 4: 1, then 12, then 123, then 1234.'
+        ),
+        'hint': (
+            'Accumulate a string: on each step glue the next digit and print the current result.'
+        ),
+        'tests': [{'stdin': '4\n', 'expected_output': '1\n12\n123\n1234'}, {'stdin': '1\n', 'expected_output': '1'}],
+    },
+    "for-40": {
+        'title': 'Alternating sum',
+        'condition': (
+            'Ask for an integer n ≥ 1. Compute 1 − 2 + 3 − 4 + … ± n in a for loop and print the result. Add odd terms and subtract even terms.'
+        ),
+        'tests': [{'stdin': '5\n', 'expected_output': '3'},
+ {'stdin': '4\n', 'expected_output': '-2'},
+ {'stdin': '1\n', 'expected_output': '1'}],
+    },
+    "for-41": {
+        'title': 'Perfect number',
+        'condition': (
+            'Ask for an integer n > 1. If the sum of all divisors of n except n itself equals n — print perfect, otherwise — no. Examples: 6 = 1+2+3, 28 = 1+2+4+7+14.'
+        ),
+        'hint': 'In a for loop add the divisors from 1 to n − 1.',
+        'tests': [{'stdin': '6\n', 'expected_output': 'perfect'},
+ {'stdin': '28\n', 'expected_output': 'perfect'},
+ {'stdin': '12\n', 'expected_output': 'no'}],
+    },
+    "for-42": {
+        'title': 'Primes up to n',
+        'condition': (
+            'Ask for an integer n ≥ 2. Print all prime numbers from 2 to n inclusive, each on a new line. A prime number has exactly two divisors.'
+        ),
+        'hint': 'For each x from 2 to n count the divisors with an inner loop.',
+        'tests': [{'stdin': '10\n', 'expected_output': '2\n3\n5\n7'}, {'stdin': '5\n', 'expected_output': '2\n3\n5'}],
+    },
+    "for-43": {
+        'title': 'Rectangle of stars',
+        'condition': (
+            'Ask for the number of rows n and the number of columns m. Print a rectangle of * characters (n rows, each with exactly m asterisks and no spaces).'
+        ),
+        'hint': "A row of m stars can be built with '*' * m or with a loop.",
+        'tests': [{'stdin': '2\n3\n', 'expected_output': '***\n***'},
+ {'stdin': '3\n1\n', 'expected_output': '*\n*\n*'}],
+    },
+    "for-44": {
+        'title': 'GCD by brute force',
+        'condition': (
+            'Ask for two integers a and b > 0. Find the GCD: iterate d from 1 up to the smaller of them and print the last d that divides both numbers.'
+        ),
+        'tests': [{'stdin': '24\n18\n', 'expected_output': '6'},
+ {'stdin': '7\n3\n', 'expected_output': '1'},
+ {'stdin': '10\n10\n', 'expected_output': '10'}],
+    },
+    "for-45": {
+        'title': 'How many perfect squares',
+        'condition': (
+            'Ask for an integer n ≥ 1. How many positive perfect squares are not greater than n? Print that count (for 10 these are 1, 4 and 9 — the answer is 3).'
+        ),
+        'hint': 'Iterate i while i × i ≤ n and count such i.',
+        'tests': [{'stdin': '10\n', 'expected_output': '3'},
+ {'stdin': '1\n', 'expected_output': '1'},
+ {'stdin': '16\n', 'expected_output': '4'}],
+    },
+    "for-46": {
+        'title': 'Multiples of 4 but not 6',
+        'condition': (
+            'Ask for an integer n. Print all numbers from 1 to n inclusive that are divisible by 4 and not divisible by 6 — each on a new line.'
+        ),
+        'tests': [{'stdin': '20\n', 'expected_output': '4\n8\n16\n20'}, {'stdin': '8\n', 'expected_output': '4\n8'}],
+    },
+    "for-47": {
+        'title': 'Factorial table',
+        'condition': (
+            'Ask for an integer n ≥ 1. Print n lines: 1!, 2!, …, n! — one number per line.'
+        ),
+        'hint': 'You can accumulate a product in a variable and print it on each step.',
+        'tests': [{'stdin': '4\n', 'expected_output': '1\n2\n6\n24'}, {'stdin': '1\n', 'expected_output': '1'}],
+    },
+    "for-48": {
+        'title': 'Nested series sum',
+        'condition': (
+            'Ask for an integer n ≥ 1. Compute the sum: for each i from 1 to n add the sum of numbers from 1 to i. That is (1) + (1+2) + (1+2+3) + … and print the result.'
+        ),
+        'hint': 'You need an outer loop over i and an inner loop over j from 1 to i.',
+        'tests': [{'stdin': '3\n', 'expected_output': '10'},
+ {'stdin': '1\n', 'expected_output': '1'},
+ {'stdin': '4\n', 'expected_output': '20'}],
+    },
+    "for-49": {
+        'title': 'Count of primes',
+        'condition': (
+            'Ask for an integer n ≥ 1. Print how many prime numbers there are from 2 to n inclusive. If n < 2, the answer is 0.'
+        ),
+        'tests': [{'stdin': '10\n', 'expected_output': '4'},
+ {'stdin': '1\n', 'expected_output': '0'},
+ {'stdin': '2\n', 'expected_output': '1'}],
+    },
+    "for-50": {
+        'title': 'Number pyramid',
+        'condition': (
+            'Ask for an integer n ≥ 1. On row i (from top to bottom, i from n down to 1) print i asterisks. For n = 3 you get 3 rows: ***, then **, then *.'
+        ),
+        'tests': [{'stdin': '3\n', 'expected_output': '***\n**\n*'}, {'stdin': '1\n', 'expected_output': '*'}],
     },
     "for-fix-01": {
         'title': 'Fix: from 1 to 5',
@@ -706,7 +990,7 @@ TASKS_EN: dict[str, dict] = {
             'Counting the letter «a» in the word «banana» gives 1 — each character is compared to the whole string. A program is already assembled in the workspace, but it behaves incorrectly when checked. Find the mistake in the blocks and fix it.'
         ),
         'hint': 'Compare each character with the sought letter ch.',
-        'tests': [{'stdin': 'a\nbanana\n', 'expected_output': '3'}, {'stdin': 'o\ndog\n', 'expected_output': '1'}],
+        'tests': [{'stdin': 'a\nbanana\n', 'expected_output': '2'}, {'stdin': 'o\ncat\n', 'expected_output': '1'}],
     },
     "for-fix-10": {
         'title': 'Fix: numbers divisible by six',
@@ -967,6 +1251,126 @@ TASKS_EN: dict[str, dict] = {
             'A warehouse labels goods. Ask for product name and batch number (as text) and print: Batch NUMBER: NAME — OK'
         ),
         'tests': [{'stdin': 'milk\n42\n', 'expected_output': 'Batch 42: milk — OK'}],
+    },
+    "io-36": {
+        'title': 'Student card',
+        'condition': (
+            'Build a student card from four fields. Ask for name, grade, city and hobby (all as text) and print four lines: Name: …, Class: …, City: …, Hobby: …'
+        ),
+        'hint': 'First store all four answers in variables, then format the output.',
+        'tests': [{'stdin': 'Mary\n5\nLondon\ndrawing\n',
+  'expected_output': 'Name: Mary\nClass: 5\nCity: London\nHobby: drawing'},
+ {'stdin': 'Pete\n7\nYork\nfootball\n',
+  'expected_output': 'Name: Pete\nClass: 7\nCity: York\nHobby: football'}],
+    },
+    "io-37": {
+        'title': 'Short letter',
+        'condition': (
+            'Write a short letter. Ask for a name, a city and a wish. Print three lines: Hello, NAME! — City: CITY — Wish: TEXT'
+        ),
+        'tests': [{'stdin': 'Pete\nLondon\nhealth\n', 'expected_output': 'Hello, Pete!\nCity: London\nWish: health'},
+ {'stdin': 'Amy\nYork\nsuccess\n', 'expected_output': 'Hello, Amy!\nCity: York\nWish: success'}],
+    },
+    "io-38": {
+        'title': 'Three items and a total',
+        'condition': (
+            'A cashier prints a mini receipt of three items. Ask for three names and print a numbered list (1. …, 2. …, 3. …), then the line Total items: 3'
+        ),
+        'tests': [{'stdin': 'milk\nbread\ncheese\n',
+  'expected_output': '1. milk\n2. bread\n3. cheese\nTotal items: 3'}],
+    },
+    "io-39": {
+        'title': 'Repeat a business card',
+        'condition': (
+            'Build a business card: ask for a name and a job title. Print the line NAME — ROLE twice (each on a new line).'
+        ),
+        'tests': [{'stdin': 'Anna\ndoctor\n', 'expected_output': 'Anna — doctor\nAnna — doctor'},
+ {'stdin': 'Igor\nteacher\n', 'expected_output': 'Igor — teacher\nIgor — teacher'}],
+    },
+    "io-40": {
+        'title': 'Code from parts',
+        'condition': (
+            'A passcode is assembled from three parts with hyphens. Ask for three fragments (as text) and print them as one line: A-B-C'
+        ),
+        'hint': 'Store the three inputs in variables and join them with hyphens.',
+        'tests': [{'stdin': '12\nAB\n9\n', 'expected_output': '12-AB-9'},
+ {'stdin': 'X\nY\nZ\n', 'expected_output': 'X-Y-Z'}],
+    },
+    "io-41": {
+        'title': 'Full form',
+        'condition': (
+            'Build a form with five fields. Ask for surname, first name, class, city and school and print five lines: Surname: …, Name: …, Class: …, City: …, School: …'
+        ),
+        'hint': 'First store all five answers, then format each line.',
+        'tests': [{'stdin': 'Smith\nPete\n6\nLondon\nLyceum\n',
+  'expected_output': 'Surname: Smith\nName: Pete\nClass: 6\nCity: London\nSchool: Lyceum'}],
+    },
+    "io-42": {
+        'title': 'Four lines of dialogue',
+        'condition': (
+            'Record a dialogue of four lines. Ask for four phrases and print them with a dash at the start of each line: — phrase'
+        ),
+        'tests': [{'stdin': "Hello\nHow are you?\nFine\nLet's go\n",
+  'expected_output': "— Hello\n— How are you?\n— Fine\n— Let's go"}],
+    },
+    "io-43": {
+        'title': 'Two addressees',
+        'condition': (
+            'Ask for two names. Print two lines: Hello, NAME1 and NAME2! and See you, NAME2 and NAME1!'
+        ),
+        'hint': 'In the second line the names go in reverse order.',
+        'tests': [{'stdin': 'Ann\nPete\n', 'expected_output': 'Hello, Ann and Pete!\nSee you, Pete and Ann!'},
+ {'stdin': 'Amy\nDan\n', 'expected_output': 'Hello, Amy and Dan!\nSee you, Dan and Amy!'}],
+    },
+    "io-44": {
+        'title': 'File path',
+        'condition': (
+            'Build a path: ask for a folder, a file name and an extension. Print one line: folder/name.extension'
+        ),
+        'tests': [{'stdin': 'docs\nreport\ntxt\n', 'expected_output': 'docs/report.txt'},
+ {'stdin': 'img\ncat\npng\n', 'expected_output': 'img/cat.png'}],
+    },
+    "io-45": {
+        'title': 'Email address',
+        'condition': 'Build an email: ask for a login and a domain. Print login@domain',
+        'tests': [{'stdin': 'ivan\nschool.ru\n', 'expected_output': 'ivan@school.ru'},
+ {'stdin': 'anna\nmail.com\n', 'expected_output': 'anna@mail.com'}],
+    },
+    "io-46": {
+        'title': 'Quoted phrase',
+        'condition': 'Format a quote. Ask for a phrase and print it in guillemets: «phrase»',
+        'tests': [{'stdin': 'Learn\n', 'expected_output': '«Learn»'},
+ {'stdin': 'Python\n', 'expected_output': '«Python»'}],
+    },
+    "io-47": {
+        'title': 'Gradebook line',
+        'condition': (
+            "A teacher fills the gradebook. Ask for a subject, a grade (as text) and a student's surname. Print: Subject: … | Grade: … | Student: …"
+        ),
+        'tests': [{'stdin': 'math\n5\nSmith\n', 'expected_output': 'Subject: math | Grade: 5 | Student: Smith'}],
+    },
+    "io-48": {
+        'title': 'Receipt of four items',
+        'condition': (
+            'Ask for four product names. Print a numbered list 1. … … 4. … and then the line Total items: 4'
+        ),
+        'tests': [{'stdin': 'bread\nmilk\ncheese\neggs\n',
+  'expected_output': '1. bread\n2. milk\n3. cheese\n4. eggs\nTotal items: 4'}],
+    },
+    "io-49": {
+        'title': 'Surname and full name',
+        'condition': (
+            'Ask for surname, first name and patronymic. Print two lines: the full Surname First Patronymic and the surname alone.'
+        ),
+        'tests': [{'stdin': 'Petrov\nIvan\nSergeevich\n', 'expected_output': 'Petrov Ivan Sergeevich\nPetrov'}],
+    },
+    "io-50": {
+        'title': 'Day schedule',
+        'condition': (
+            'Ask for a weekday and three lessons. Print: Day: …, then three lines 1) …, 2) …, 3) …'
+        ),
+        'tests': [{'stdin': 'Monday\nmath\nhistory\nPE\n',
+  'expected_output': 'Day: Monday\n1) math\n2) history\n3) PE'}],
     },
     "io-fix-01": {
         'title': 'Fix: Hello, world!',
@@ -1307,6 +1711,130 @@ TASKS_EN: dict[str, dict] = {
         ),
         'tests': [{'expected_output': '10\n30\n50'}],
     },
+    "list-36": {
+        'title': 'Sum of even elements',
+        'condition': (
+            'Given the list [1, 2, 3, 4, 5, 6]. In a for loop add only the even elements and print the sum.'
+        ),
+        'hint': 'Check evenness with the remainder of division by 2.',
+        'tests': [{'expected_output': '12'}],
+    },
+    "list-37": {
+        'title': 'Second largest',
+        'condition': (
+            'Given the list [15, 3, 42, 7]. Find the second-largest element and print it. You may sort the list.'
+        ),
+        'hint': (
+            'After sorting in ascending order the second maximum is in the second-to-last place.'
+        ),
+        'tests': [{'expected_output': '15'}],
+    },
+    "list-38": {
+        'title': 'Shift left',
+        'condition': (
+            'Given the list [10, 20, 30, 40]. Shift it left by one step: the first element moves to the end. Print the resulting list.'
+        ),
+        'hint': 'Remove the first element with pop(0) and append it at the end.',
+        'tests': [{'expected_output': '[20, 30, 40, 10]'}],
+    },
+    "list-39": {
+        'title': 'Product of elements',
+        'condition': (
+            'Given the list [2, 3, 4]. Multiply all elements in a for loop and print the product.'
+        ),
+        'hint': 'Start the product at 1, not 0.',
+        'tests': [{'expected_output': '24'}],
+    },
+    "list-40": {
+        'title': 'Above average',
+        'condition': (
+            'Given the grade list [4, 5, 3, 5, 4]. Compute the arithmetic mean and print how many elements are strictly greater than that mean.'
+        ),
+        'hint': (
+            'First find the sum and the mean, then in a second loop count matching elements.'
+        ),
+        'tests': [{'expected_output': '2'}],
+    },
+    "list-41": {
+        'title': 'Common elements',
+        'condition': (
+            'Given lists [1, 2, 3, 4] and [3, 4, 5, 3]. Print the elements of the first list that appear in the second, each on a new line (no duplicates from the first: 3, then 4).'
+        ),
+        'hint': 'For each element of the first list check in and print immediately.',
+        'tests': [{'expected_output': '3\n4'}],
+    },
+    "list-42": {
+        'title': 'Prefix sums',
+        'condition': (
+            'Given the list [1, 2, 3, 4]. Build the list of prefix sums [1, 1+2, 1+2+3, 1+2+3+4] and print it.'
+        ),
+        'hint': 'Keep a running sum variable and on each step append it to a new list.',
+        'tests': [{'expected_output': '[1, 3, 6, 10]'}],
+    },
+    "list-43": {
+        'title': 'Shift right',
+        'condition': (
+            'Given the list [10, 20, 30, 40]. Shift it one step to the right: the last element moves to the beginning. Print the list.'
+        ),
+        'hint': (
+            'Pop the last element with pop() and insert it at the beginning with insert(0, …).'
+        ),
+        'tests': [{'expected_output': '[40, 10, 20, 30]'}],
+    },
+    "list-44": {
+        'title': 'Negatives to zeros',
+        'condition': (
+            'Given the list [2, -3, 5, -1, 0]. Replace all negative elements with 0 and print the resulting list.'
+        ),
+        'hint': (
+            'Build a new list: append 0 for negatives and the original value otherwise.'
+        ),
+        'tests': [{'expected_output': '[2, 0, 5, 0, 0]'}],
+    },
+    "list-45": {
+        'title': 'Second minimum',
+        'condition': (
+            'Given the list [15, 3, 42, 7]. Find the second smallest element (you may sort the list). Print it.'
+        ),
+        'tests': [{'expected_output': '7'}],
+    },
+    "list-46": {
+        'title': 'Index of the maximum',
+        'condition': (
+            'Given the list [3, 9, 4, 9, 1]. Print the index of the first occurrence of the maximum (0-based).'
+        ),
+        'hint': 'Remember both the current maximum and its index.',
+        'tests': [{'expected_output': '1'}],
+    },
+    "list-47": {
+        'title': 'Odds only',
+        'condition': (
+            'From the list [1, 2, 3, 4, 5, 6] build a new list of odd elements only and print it.'
+        ),
+        'tests': [{'expected_output': '[1, 3, 5]'}],
+    },
+    "list-48": {
+        'title': 'Neighbor products',
+        'condition': (
+            'Given the list [2, 3, 4, 5]. Print the products of adjacent pairs (2×3, 3×4, 4×5) — each on a new line.'
+        ),
+        'tests': [{'expected_output': '6\n12\n20'}],
+    },
+    "list-49": {
+        'title': 'Gap from the maximum',
+        'condition': (
+            'Given the list [1, 5, 3]. Find the maximum and print for each element the difference maximum − element (each number on a new line).'
+        ),
+        'tests': [{'expected_output': '4\n0\n2'}],
+    },
+    "list-50": {
+        'title': 'Evens to the front',
+        'condition': (
+            'Given the list [1, 2, 3, 4, 5]. Build a new list: first all even numbers in original order, then all odd numbers. Print it.'
+        ),
+        'hint': 'You can keep two lists and then extend.',
+        'tests': [{'expected_output': '[2, 4, 1, 3, 5]'}],
+    },
     "list-fix-01": {
         'title': 'Fix: first element',
         'condition': (
@@ -1642,6 +2170,149 @@ TASKS_EN: dict[str, dict] = {
             'On a number line neighbors matter. Ask for integer n and print three numbers on separate lines: n − 1, n and n + 1.'
         ),
         'tests': [{'stdin': '10\n', 'expected_output': '9\n10\n11'}, {'stdin': '0\n', 'expected_output': '-1\n0\n1'}],
+    },
+    "numbers-36": {
+        'title': 'Digits of a three-digit number',
+        'condition': (
+            'Ask for a three-digit integer n. Print its digits on three lines: hundreds, tens and units (using // and %).'
+        ),
+        'hint': 'Hundreds: n // 100. Tens: (n // 10) % 10. Units: n % 10.',
+        'tests': [{'stdin': '528\n', 'expected_output': '5\n2\n8'},
+ {'stdin': '100\n', 'expected_output': '1\n0\n0'},
+ {'stdin': '907\n', 'expected_output': '9\n0\n7'}],
+    },
+    "numbers-37": {
+        'title': 'Seconds to h:m:s',
+        'condition': (
+            'Ask for a time in seconds (integer). Split it into hours, minutes and seconds and print three numbers on separate lines.'
+        ),
+        'hint': (
+            'Hours are // 3600, then split the remainder into minutes (// 60) and seconds (% 60).'
+        ),
+        'tests': [{'stdin': '3661\n', 'expected_output': '1\n1\n1'},
+ {'stdin': '60\n', 'expected_output': '0\n1\n0'},
+ {'stdin': '7200\n', 'expected_output': '2\n0\n0'}],
+    },
+    "numbers-38": {
+        'title': 'Digit sum of a three-digit number',
+        'condition': (
+            'Ask for a three-digit integer. Print the sum of its three digits (no loop — only // and %).'
+        ),
+        'tests': [{'stdin': '528\n', 'expected_output': '15'},
+ {'stdin': '100\n', 'expected_output': '1'},
+ {'stdin': '999\n', 'expected_output': '27'}],
+    },
+    "numbers-39": {
+        'title': 'Making change',
+        'condition': (
+            'Ask for an amount in dollars (integer). Give it as 100s, 10s and 1s — three numbers on separate lines: how many hundreds, tens and ones.'
+        ),
+        'hint': 'First take n // 100, then from the remainder n // 10 and n % 10.',
+        'tests': [{'stdin': '237\n', 'expected_output': '2\n3\n7'},
+ {'stdin': '100\n', 'expected_output': '1\n0\n0'},
+ {'stdin': '19\n', 'expected_output': '0\n1\n9'}],
+    },
+    "numbers-40": {
+        'title': 'Change from a thousand',
+        'condition': (
+            'A customer paid 1000. Ask for the prices of three items (integers) and print the change: 1000 minus the sum of the three prices.'
+        ),
+        'tests': [{'stdin': '100\n200\n300\n', 'expected_output': '400'},
+ {'stdin': '50\n50\n50\n', 'expected_output': '850'},
+ {'stdin': '400\n400\n200\n', 'expected_output': '0'}],
+    },
+    "numbers-41": {
+        'title': 'Digits of a four-digit number',
+        'condition': (
+            'Ask for a four-digit integer. Print on four lines the thousands, hundreds, tens and units digits.'
+        ),
+        'hint': 'Thousands: n // 1000, then take the next digits with // and %.',
+        'tests': [{'stdin': '4829\n', 'expected_output': '4\n8\n2\n9'},
+ {'stdin': '1000\n', 'expected_output': '1\n0\n0\n0'},
+ {'stdin': '2703\n', 'expected_output': '2\n7\n0\n3'}],
+    },
+    "numbers-42": {
+        'title': 'Reverse a three-digit number',
+        'condition': (
+            'Ask for a three-digit integer and print the number with digits reversed. Leading zeros are not extra digits — it is a normal number (e.g. 100 → 1).'
+        ),
+        'hint': 'Build the answer: units×100 + tens×10 + hundreds.',
+        'tests': [{'stdin': '123\n', 'expected_output': '321'},
+ {'stdin': '508\n', 'expected_output': '805'},
+ {'stdin': '100\n', 'expected_output': '1'}],
+    },
+    "numbers-43": {
+        'title': 'Weeks and days',
+        'condition': (
+            'Ask for a number of days (integer). Print on two lines full weeks (// 7) and remaining days (% 7).'
+        ),
+        'tests': [{'stdin': '20\n', 'expected_output': '2\n6'},
+ {'stdin': '7\n', 'expected_output': '1\n0'},
+ {'stdin': '3\n', 'expected_output': '0\n3'}],
+    },
+    "numbers-44": {
+        'title': 'Add time',
+        'condition': (
+            'Ask for hours, minutes and how many minutes to add (all integers). Print the new hours (0–23) and minutes (0–59) on two lines.'
+        ),
+        'hint': (
+            'Convert everything to minutes, add, then hours are // 60 % 24, minutes are % 60.'
+        ),
+        'tests': [{'stdin': '10\n30\n45\n', 'expected_output': '11\n15'},
+ {'stdin': '23\n50\n20\n', 'expected_output': '0\n10'},
+ {'stdin': '0\n5\n55\n', 'expected_output': '1\n0'}],
+    },
+    "numbers-45": {
+        'title': 'Last two digits of a square',
+        'condition': (
+            'Ask for an integer n and print the last two digits of n² (that is n² % 100).'
+        ),
+        'tests': [{'stdin': '12\n', 'expected_output': '44'},
+ {'stdin': '10\n', 'expected_output': '0'},
+ {'stdin': '7\n', 'expected_output': '49'}],
+    },
+    "numbers-46": {
+        'title': 'Arithmetic sequence term',
+        'condition': (
+            'Ask for the first term a, the difference d and the index n (integers). Print the n-th term: a + (n − 1) × d.'
+        ),
+        'tests': [{'stdin': '3\n2\n5\n', 'expected_output': '11'},
+ {'stdin': '10\n-3\n4\n', 'expected_output': '1'},
+ {'stdin': '0\n5\n1\n', 'expected_output': '0'}],
+    },
+    "numbers-47": {
+        'title': 'What percent',
+        'condition': (
+            'Ask for integers a and b (b ≠ 0). What percent is a of b? Print a × 100 / b.'
+        ),
+        'tests': [{'stdin': '25\n200\n', 'expected_output': '12.5'},
+ {'stdin': '3\n4\n', 'expected_output': '75.0'},
+ {'stdin': '10\n10\n', 'expected_output': '100.0'}],
+    },
+    "numbers-48": {
+        'title': 'Harmonic mean',
+        'condition': (
+            'Ask for two positive integers a and b. Print the harmonic mean: 2 × a × b / (a + b).'
+        ),
+        'hint': 'First find the product and the sum, then divide.',
+        'tests': [{'stdin': '3\n6\n', 'expected_output': '4.0'}, {'stdin': '5\n5\n', 'expected_output': '5.0'}],
+    },
+    "numbers-49": {
+        'title': 'Change with 500 bills',
+        'condition': (
+            'Ask for an amount (integer). Give it as 500s, 100s, 10s and 1s — four numbers on separate lines.'
+        ),
+        'hint': 'After each denomination take the remainder % and go to the next.',
+        'tests': [{'stdin': '1670\n', 'expected_output': '3\n1\n7\n0'},
+ {'stdin': '237\n', 'expected_output': '0\n2\n3\n7'},
+ {'stdin': '500\n', 'expected_output': '1\n0\n0\n0'}],
+    },
+    "numbers-50": {
+        'title': 'Digit sum of a four-digit number',
+        'condition': 'Ask for a four-digit integer and print the sum of its four digits.',
+        'tests': [{'stdin': '4829\n', 'expected_output': '23'},
+ {'stdin': '1000\n', 'expected_output': '1'},
+ {'stdin': '9999\n', 'expected_output': '36'}],
     },
     "numbers-fix-01": {
         'title': 'Fix: multiplication',
@@ -1988,6 +2659,140 @@ TASKS_EN: dict[str, dict] = {
         'condition': 'Ask for a word and print its letters in reverse order.',
         'tests': [{'stdin': 'cat\n', 'expected_output': 'tac'}, {'stdin': 'Python\n', 'expected_output': 'nohtyP'}],
     },
+    "str-36": {
+        'title': 'Word edges',
+        'condition': (
+            'Ask for a non-empty word. Print its first and last letters on two lines.'
+        ),
+        'hint': 'The first letter is s[0], the last is s[-1] or s[len(s) - 1].',
+        'tests': [{'stdin': 'cat\n', 'expected_output': 'c\nt'},
+ {'stdin': 'Python\n', 'expected_output': 'P\nn'},
+ {'stdin': 'I\n', 'expected_output': 'I\nI'}],
+    },
+    "str-37": {
+        'title': 'No spaces',
+        'condition': 'Ask for a phrase and print it with all spaces removed.',
+        'hint': 'Replace a space with an empty string using replace.',
+        'tests': [{'stdin': 'I learn python\n', 'expected_output': 'Ilearnpython'},
+ {'stdin': 'one\n', 'expected_output': 'one'}],
+    },
+    "str-38": {
+        'title': 'Same edges',
+        'condition': (
+            'Ask for a non-empty word. If the first and last letters match — print yes, otherwise — no.'
+        ),
+        'tests': [{'stdin': 'anna\n', 'expected_output': 'yes'},
+ {'stdin': 'cat\n', 'expected_output': 'no'},
+ {'stdin': 'A\n', 'expected_output': 'yes'}],
+    },
+    "str-39": {
+        'title': 'Double the letters',
+        'condition': (
+            'Ask for a word. Build a new string where each letter is repeated twice and print it (cat → ccaatt).'
+        ),
+        'hint': 'In a for loop append the character to the result twice.',
+        'tests': [{'stdin': 'cat\n', 'expected_output': 'ccaatt'}, {'stdin': 'ab\n', 'expected_output': 'aabb'}],
+    },
+    "str-40": {
+        'title': 'Without vowels',
+        'condition': (
+            'Ask for a lowercase word. Remove all vowels from the set aeiou and print the remaining letters joined together. If there were no vowels — print the word as is.'
+        ),
+        'hint': (
+            'In a loop add to the result only letters that are not in the vowel set.'
+        ),
+        'tests': [{'stdin': 'banana\n', 'expected_output': 'bnn'},
+ {'stdin': 'rhythm\n', 'expected_output': 'rhythm'},
+ {'stdin': 'test\n', 'expected_output': 'tst'}],
+    },
+    "str-41": {
+        'title': 'How many consonants',
+        'condition': (
+            'Ask for a lowercase word. Count the letters that are not in the vowel set aeiou and print that number.'
+        ),
+        'tests': [{'stdin': 'mama\n', 'expected_output': '2'},
+ {'stdin': 'cat\n', 'expected_output': '2'},
+ {'stdin': 'au\n', 'expected_output': '0'}],
+    },
+    "str-42": {
+        'title': 'Swap the edges',
+        'condition': (
+            'Ask for a non-empty word. Swap the first and last letters and print the result. If there is only one letter — print it as is.'
+        ),
+        'hint': 'Build s[-1] + the middle + s[0]; for length 1 the middle is empty.',
+        'tests': [{'stdin': 'cat\n', 'expected_output': 'tac'},
+ {'stdin': 'ab\n', 'expected_output': 'ba'},
+ {'stdin': 'I\n', 'expected_output': 'I'}],
+    },
+    "str-43": {
+        'title': 'The longer word',
+        'condition': (
+            'Ask for two words. Print the one that has more letters. If the lengths are equal — print the first.'
+        ),
+        'tests': [{'stdin': 'cat\nelephant\n', 'expected_output': 'elephant'},
+ {'stdin': 'yes\nno\n', 'expected_output': 'yes'},
+ {'stdin': 'sun\ndog\n', 'expected_output': 'sun'}],
+    },
+    "str-44": {
+        'title': 'Three-word abbreviation',
+        'condition': (
+            'Ask for three words separated by spaces on one line. Print the abbreviation: the first letters joined together, with no spaces.'
+        ),
+        'hint': 'Split the string by space and take [0] of each part.',
+        'tests': [{'stdin': 'red orange tart\n', 'expected_output': 'rot'},
+ {'stdin': 'Big Green House\n', 'expected_output': 'BGH'}],
+    },
+    "str-45": {
+        'title': 'Vowels to stars',
+        'condition': (
+            'Ask for a lowercase word. Replace each vowel from the set aeiou with the * character and print the result.'
+        ),
+        'tests': [{'stdin': 'mama\n', 'expected_output': 'm*m*'},
+ {'stdin': 'rhythm\n', 'expected_output': 'rhythm'},
+ {'stdin': 'elm\n', 'expected_output': '*lm'}],
+    },
+    "str-46": {
+        'title': 'Letters in a column',
+        'condition': 'Ask for a word and print each letter on a separate line.',
+        'tests': [{'stdin': 'cat\n', 'expected_output': 'c\na\nt'}, {'stdin': 'I\n', 'expected_output': 'I'}],
+    },
+    "str-47": {
+        'title': 'Palindrome ignoring case',
+        'condition': (
+            'Ask for a word. Convert it to lowercase and check whether it is a palindrome. Print palindrome or not palindrome.'
+        ),
+        'tests': [{'stdin': 'Topot\n', 'expected_output': 'palindrome'},
+ {'stdin': 'Cat\n', 'expected_output': 'not palindrome'},
+ {'stdin': 'A\n', 'expected_output': 'palindrome'}],
+    },
+    "str-48": {
+        'title': 'Words longer than three',
+        'condition': (
+            'Ask for a phrase of several words. Count how many words are longer than 3 letters and print the number.'
+        ),
+        'hint': 'Split by space and in a loop check the length of each word.',
+        'tests': [{'stdin': 'I love python\n', 'expected_output': '2'},
+ {'stdin': 'yes no\n', 'expected_output': '0'},
+ {'stdin': 'I am coding\n', 'expected_output': '1'}],
+    },
+    "str-49": {
+        'title': 'The last word',
+        'condition': (
+            'Ask for a phrase of several words separated by spaces and print only the last word.'
+        ),
+        'tests': [{'stdin': 'red house by river\n', 'expected_output': 'river'},
+ {'stdin': 'one\n', 'expected_output': 'one'}],
+    },
+    "str-50": {
+        'title': 'The middle of a word',
+        'condition': (
+            'Ask for a non-empty word. If the length is odd — print the middle letter. If even — the two middle letters joined together.'
+        ),
+        'hint': 'For an odd length the middle index is len // 2.',
+        'tests': [{'stdin': 'cat\n', 'expected_output': 'a'},
+ {'stdin': 'cats\n', 'expected_output': 'at'},
+ {'stdin': 'I\n', 'expected_output': 'I'}],
+    },
     "str-fix-01": {
         'title': 'Fix: uppercase',
         'condition': (
@@ -2310,6 +3115,149 @@ TASKS_EN: dict[str, dict] = {
         'tests': [{'stdin': '12\n', 'expected_output': '6'},
  {'stdin': '7\n', 'expected_output': '2'},
  {'stdin': '1\n', 'expected_output': '1'}],
+    },
+    "while-36": {
+        'title': 'Digit sum of a number',
+        'condition': (
+            'Ask for an integer n > 0. In a while loop add up all its digits and print the sum.'
+        ),
+        'hint': 'On each step take n % 10 and divide n by 10 using integer division.',
+        'tests': [{'stdin': '48291\n', 'expected_output': '24'},
+ {'stdin': '100\n', 'expected_output': '1'},
+ {'stdin': '9\n', 'expected_output': '9'}],
+    },
+    "while-37": {
+        'title': 'Powers of two up to n',
+        'condition': (
+            'Ask for an integer n ≥ 1. Starting from 1, print powers of two (1, 2, 4, 8, …) while the next number is not greater than n. Each on a new line.'
+        ),
+        'tests': [{'stdin': '20\n', 'expected_output': '1\n2\n4\n8\n16'},
+ {'stdin': '1\n', 'expected_output': '1'},
+ {'stdin': '8\n', 'expected_output': '1\n2\n4\n8'}],
+    },
+    "while-38": {
+        'title': 'Prime or composite',
+        'condition': (
+            'Ask for an integer n > 0. In a while loop count the number of divisors. If there are exactly 2 divisors — print prime, otherwise — composite.'
+        ),
+        'hint': 'A prime number has only 1 and itself as divisors.',
+        'tests': [{'stdin': '7\n', 'expected_output': 'prime'},
+ {'stdin': '12\n', 'expected_output': 'composite'},
+ {'stdin': '1\n', 'expected_output': 'composite'}],
+    },
+    "while-39": {
+        'title': 'Collatz steps',
+        'condition': (
+            'Ask for an integer n > 0. While n is not 1: if n is even — divide it by 2, otherwise replace it with 3×n + 1. Count how many steps it took and print that number. The value 1 itself is not a step.'
+        ),
+        'hint': 'Increase the counter after each change of n.',
+        'tests': [{'stdin': '6\n', 'expected_output': '8'},
+ {'stdin': '1\n', 'expected_output': '0'},
+ {'stdin': '3\n', 'expected_output': '7'}],
+    },
+    "while-40": {
+        'title': 'Even digits',
+        'condition': (
+            'Ask for an integer n > 0. In a while loop count how many of its digits are even and print that count. The digit 0 counts as even.'
+        ),
+        'tests': [{'stdin': '246\n', 'expected_output': '3'},
+ {'stdin': '135\n', 'expected_output': '0'},
+ {'stdin': '1024\n', 'expected_output': '3'}],
+    },
+    "while-41": {
+        'title': 'Palindrome number',
+        'condition': (
+            'Ask for an integer n > 0. Reverse its digits in a while loop. If you get the same number — print yes, otherwise — no.'
+        ),
+        'hint': 'Keep the original value and compare the reversed number with it.',
+        'tests': [{'stdin': '121\n', 'expected_output': 'yes'},
+ {'stdin': '123\n', 'expected_output': 'no'},
+ {'stdin': '10\n', 'expected_output': 'no'}],
+    },
+    "while-42": {
+        'title': 'Odd digits',
+        'condition': (
+            'Ask for an integer n > 0. Count how many of its digits are odd and print that number.'
+        ),
+        'tests': [{'stdin': '135\n', 'expected_output': '3'},
+ {'stdin': '246\n', 'expected_output': '0'},
+ {'stdin': '1024\n', 'expected_output': '1'}],
+    },
+    "while-43": {
+        'title': 'Least common multiple',
+        'condition': (
+            'Ask for two integers a and b > 0. Find the GCD with the Euclidean algorithm, then print the LCM = a × b / GCD.'
+        ),
+        'hint': (
+            'It is convenient to compute LCM via GCD so you do not iterate over large numbers.'
+        ),
+        'tests': [{'stdin': '12\n18\n', 'expected_output': '36'},
+ {'stdin': '7\n5\n', 'expected_output': '35'},
+ {'stdin': '6\n9\n', 'expected_output': '18'}],
+    },
+    "while-44": {
+        'title': 'Digital root',
+        'condition': (
+            'Ask for an integer n > 0. While the number is greater than 9, replace it with the sum of its digits. Print the resulting single digit.'
+        ),
+        'hint': 'Inside the outer while loop, sum the digits again with an inner loop.',
+        'tests': [{'stdin': '38\n', 'expected_output': '2'},
+ {'stdin': '999\n', 'expected_output': '9'},
+ {'stdin': '10\n', 'expected_output': '1'}],
+    },
+    "while-45": {
+        'title': 'Maximum digit',
+        'condition': 'Ask for an integer n > 0 and print its largest digit.',
+        'tests': [{'stdin': '582\n', 'expected_output': '8'},
+ {'stdin': '100\n', 'expected_output': '1'},
+ {'stdin': '7\n', 'expected_output': '7'}],
+    },
+    "while-46": {
+        'title': 'Power of two?',
+        'condition': (
+            'Ask for an integer n > 0. If n is a power of two (1, 2, 4, 8, …) — yes, otherwise — no. Divide n by 2 while it is even, then check whether 1 remains.'
+        ),
+        'tests': [{'stdin': '8\n', 'expected_output': 'yes'},
+ {'stdin': '12\n', 'expected_output': 'no'},
+ {'stdin': '1\n', 'expected_output': 'yes'}],
+    },
+    "while-47": {
+        'title': 'Fibonacci up to n',
+        'condition': (
+            'Ask for an integer n ≥ 1. Print Fibonacci numbers not greater than n, starting from 1, 1 — each on a new line.'
+        ),
+        'tests': [{'stdin': '10\n', 'expected_output': '1\n1\n2\n3\n5\n8'},
+ {'stdin': '1\n', 'expected_output': '1\n1'},
+ {'stdin': '2\n', 'expected_output': '1\n1\n2'}],
+    },
+    "while-48": {
+        'title': 'How many times divisible by two',
+        'condition': (
+            'Ask for an integer n > 0. While n is even, divide it by 2 and count the steps. Print the number of divisions.'
+        ),
+        'tests': [{'stdin': '80\n', 'expected_output': '4'},
+ {'stdin': '7\n', 'expected_output': '0'},
+ {'stdin': '16\n', 'expected_output': '4'}],
+    },
+    "while-49": {
+        'title': 'Product of digits',
+        'condition': 'Ask for an integer n > 0 and print the product of its digits.',
+        'hint': (
+            'Start the product at 1. A zero among the digits will make the answer zero.'
+        ),
+        'tests': [{'stdin': '23\n', 'expected_output': '6'},
+ {'stdin': '105\n', 'expected_output': '0'},
+ {'stdin': '22\n', 'expected_output': '4'}],
+    },
+    "while-50": {
+        'title': 'Sum until greater than n',
+        'condition': (
+            'Ask for an integer n ≥ 1. Add 1 + 2 + 3 + … in a while loop until the sum becomes greater than n. Print how many terms were added by that moment (the last term after which the sum exceeded n also counts).'
+        ),
+        'hint': 'For n = 10: 1+2+3+4=10 is not yet greater, +5 gives 15 — 5 terms.',
+        'tests': [{'stdin': '10\n', 'expected_output': '5'},
+ {'stdin': '1\n', 'expected_output': '2'},
+ {'stdin': '6\n', 'expected_output': '4'}],
     },
     "while-fix-01": {
         'title': 'Fix: numbers from 1 to 5',

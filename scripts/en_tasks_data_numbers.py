@@ -359,6 +359,189 @@ NUMBERS: dict[str, dict] = {
             {"stdin": "0\n", "expected_output": "-1\n0\n1"},
         ],
     },
+    "numbers-36": {
+        "title": "Digits of a three-digit number",
+        "condition": (
+            "Ask for a three-digit integer n. Print its digits on three lines: "
+            "hundreds, tens and units (using // and %)."
+        ),
+        "tests": [
+            {"stdin": "528\n", "expected_output": "5\n2\n8"},
+            {"stdin": "100\n", "expected_output": "1\n0\n0"},
+            {"stdin": "907\n", "expected_output": "9\n0\n7"},
+        ],
+        "hint": "Hundreds: n // 100. Tens: (n // 10) % 10. Units: n % 10.",
+    },
+    "numbers-37": {
+        "title": "Seconds to h:m:s",
+        "condition": (
+            "Ask for a time in seconds (integer). Split it into hours, minutes and seconds "
+            "and print three numbers on separate lines."
+        ),
+        "tests": [
+            {"stdin": "3661\n", "expected_output": "1\n1\n1"},
+            {"stdin": "60\n", "expected_output": "0\n1\n0"},
+            {"stdin": "7200\n", "expected_output": "2\n0\n0"},
+        ],
+        "hint": "Hours are // 3600, then split the remainder into minutes (// 60) and seconds (% 60).",
+    },
+    "numbers-38": {
+        "title": "Digit sum of a three-digit number",
+        "condition": (
+            "Ask for a three-digit integer. Print the sum of its three digits "
+            "(no loop — only // and %)."
+        ),
+        "tests": [
+            {"stdin": "528\n", "expected_output": "15"},
+            {"stdin": "100\n", "expected_output": "1"},
+            {"stdin": "999\n", "expected_output": "27"},
+        ],
+    },
+    "numbers-39": {
+        "title": "Making change",
+        "condition": (
+            "Ask for an amount in dollars (integer). Give it as 100s, 10s and 1s — "
+            "three numbers on separate lines: how many hundreds, tens and ones."
+        ),
+        "tests": [
+            {"stdin": "237\n", "expected_output": "2\n3\n7"},
+            {"stdin": "100\n", "expected_output": "1\n0\n0"},
+            {"stdin": "19\n", "expected_output": "0\n1\n9"},
+        ],
+        "hint": "First take n // 100, then from the remainder n // 10 and n % 10.",
+    },
+    "numbers-40": {
+        "title": "Change from a thousand",
+        "condition": (
+            "A customer paid 1000. Ask for the prices of three items (integers) "
+            "and print the change: 1000 minus the sum of the three prices."
+        ),
+        "tests": [
+            {"stdin": "100\n200\n300\n", "expected_output": "400"},
+            {"stdin": "50\n50\n50\n", "expected_output": "850"},
+            {"stdin": "400\n400\n200\n", "expected_output": "0"},
+        ],
+    },
+    "numbers-41": {
+        "title": "Digits of a four-digit number",
+        "condition": (
+            "Ask for a four-digit integer. Print on four lines the thousands, hundreds, "
+            "tens and units digits."
+        ),
+        "tests": [
+            {"stdin": "4829\n", "expected_output": "4\n8\n2\n9"},
+            {"stdin": "1000\n", "expected_output": "1\n0\n0\n0"},
+            {"stdin": "2703\n", "expected_output": "2\n7\n0\n3"},
+        ],
+        "hint": "Thousands: n // 1000, then take the next digits with // and %.",
+    },
+    "numbers-42": {
+        "title": "Reverse a three-digit number",
+        "condition": (
+            "Ask for a three-digit integer and print the number with digits reversed. "
+            "Leading zeros are not extra digits — it is a normal number (e.g. 100 → 1)."
+        ),
+        "tests": [
+            {"stdin": "123\n", "expected_output": "321"},
+            {"stdin": "508\n", "expected_output": "805"},
+            {"stdin": "100\n", "expected_output": "1"},
+        ],
+        "hint": "Build the answer: units×100 + tens×10 + hundreds.",
+    },
+    "numbers-43": {
+        "title": "Weeks and days",
+        "condition": (
+            "Ask for a number of days (integer). Print on two lines full weeks (// 7) "
+            "and remaining days (% 7)."
+        ),
+        "tests": [
+            {"stdin": "20\n", "expected_output": "2\n6"},
+            {"stdin": "7\n", "expected_output": "1\n0"},
+            {"stdin": "3\n", "expected_output": "0\n3"},
+        ],
+    },
+    "numbers-44": {
+        "title": "Add time",
+        "condition": (
+            "Ask for hours, minutes and how many minutes to add (all integers). "
+            "Print the new hours (0–23) and minutes (0–59) on two lines."
+        ),
+        "tests": [
+            {"stdin": "10\n30\n45\n", "expected_output": "11\n15"},
+            {"stdin": "23\n50\n20\n", "expected_output": "0\n10"},
+            {"stdin": "0\n5\n55\n", "expected_output": "1\n0"},
+        ],
+        "hint": "Convert everything to minutes, add, then hours are // 60 % 24, minutes are % 60.",
+    },
+    "numbers-45": {
+        "title": "Last two digits of a square",
+        "condition": (
+            "Ask for an integer n and print the last two digits of n² (that is n² % 100)."
+        ),
+        "tests": [
+            {"stdin": "12\n", "expected_output": "44"},
+            {"stdin": "10\n", "expected_output": "0"},
+            {"stdin": "7\n", "expected_output": "49"},
+        ],
+    },
+    "numbers-46": {
+        "title": "Arithmetic sequence term",
+        "condition": (
+            "Ask for the first term a, the difference d and the index n (integers). "
+            "Print the n-th term: a + (n − 1) × d."
+        ),
+        "tests": [
+            {"stdin": "3\n2\n5\n", "expected_output": "11"},
+            {"stdin": "10\n-3\n4\n", "expected_output": "1"},
+            {"stdin": "0\n5\n1\n", "expected_output": "0"},
+        ],
+    },
+    "numbers-47": {
+        "title": "What percent",
+        "condition": (
+            "Ask for integers a and b (b ≠ 0). What percent is a of b? "
+            "Print a × 100 / b."
+        ),
+        "tests": [
+            {"stdin": "25\n200\n", "expected_output": "12.5"},
+            {"stdin": "3\n4\n", "expected_output": "75.0"},
+            {"stdin": "10\n10\n", "expected_output": "100.0"},
+        ],
+    },
+    "numbers-48": {
+        "title": "Harmonic mean",
+        "condition": (
+            "Ask for two positive integers a and b. "
+            "Print the harmonic mean: 2 × a × b / (a + b)."
+        ),
+        "tests": [
+            {"stdin": "3\n6\n", "expected_output": "4.0"},
+            {"stdin": "5\n5\n", "expected_output": "5.0"},
+        ],
+        "hint": "First find the product and the sum, then divide.",
+    },
+    "numbers-49": {
+        "title": "Change with 500 bills",
+        "condition": (
+            "Ask for an amount (integer). Give it as 500s, 100s, 10s and 1s — "
+            "four numbers on separate lines."
+        ),
+        "tests": [
+            {"stdin": "1670\n", "expected_output": "3\n1\n7\n0"},
+            {"stdin": "237\n", "expected_output": "0\n2\n3\n7"},
+            {"stdin": "500\n", "expected_output": "1\n0\n0\n0"},
+        ],
+        "hint": "After each denomination take the remainder % and go to the next.",
+    },
+    "numbers-50": {
+        "title": "Digit sum of a four-digit number",
+        "condition": "Ask for a four-digit integer and print the sum of its four digits.",
+        "tests": [
+            {"stdin": "4829\n", "expected_output": "23"},
+            {"stdin": "1000\n", "expected_output": "1"},
+            {"stdin": "9999\n", "expected_output": "36"},
+        ],
+    },
 }
 
 NUMBERS_FIX: dict[str, dict] = {

@@ -3,6 +3,7 @@
 import re
 
 from data.fix_tasks import merge_fix_tasks
+from data.task_difficulty import sort_tasks_by_difficulty
 from data.tasks.io import TASKS as IO_TASKS
 from data.tasks.numbers import TASKS as NUMBERS_TASKS
 from data.tasks.conditions import TASKS as CONDITIONS_TASKS
@@ -59,13 +60,13 @@ TOPICS = [
 ]
 
 TASKS_BY_TOPIC = {
-    "io": merge_fix_tasks("io", IO_TASKS),
-    "numbers": merge_fix_tasks("numbers", NUMBERS_TASKS),
-    "conditions": merge_fix_tasks("conditions", CONDITIONS_TASKS),
-    "while": merge_fix_tasks("while", WHILE_TASKS),
-    "for": merge_fix_tasks("for", FOR_TASKS),
-    "strings": merge_fix_tasks("strings", STRINGS_TASKS),
-    "lists": merge_fix_tasks("lists", LISTS_TASKS),
+    "io": sort_tasks_by_difficulty(merge_fix_tasks("io", IO_TASKS)),
+    "numbers": sort_tasks_by_difficulty(merge_fix_tasks("numbers", NUMBERS_TASKS)),
+    "conditions": sort_tasks_by_difficulty(merge_fix_tasks("conditions", CONDITIONS_TASKS)),
+    "while": sort_tasks_by_difficulty(merge_fix_tasks("while", WHILE_TASKS)),
+    "for": sort_tasks_by_difficulty(merge_fix_tasks("for", FOR_TASKS)),
+    "strings": sort_tasks_by_difficulty(merge_fix_tasks("strings", STRINGS_TASKS)),
+    "lists": sort_tasks_by_difficulty(merge_fix_tasks("lists", LISTS_TASKS)),
 }
 
 

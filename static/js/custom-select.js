@@ -36,11 +36,7 @@ const CustomSelect = {
     const difficultyEl = document.createElement("span");
     difficultyEl.className = "task-difficulty";
     difficultyEl.hidden = true;
-    const checkEl = document.createElement("span");
-    checkEl.className = "cselect__check";
-    checkEl.hidden = true;
-    checkEl.setAttribute("aria-hidden", "true");
-    trigger.append(valueEl, difficultyEl, checkEl, chevron);
+    trigger.append(valueEl, difficultyEl, chevron);
 
     const menu = document.createElement("ul");
     menu.className = "cselect__menu";
@@ -61,7 +57,6 @@ const CustomSelect = {
       trigger: trigger,
       valueEl: valueEl,
       difficultyEl: difficultyEl,
-      checkEl: checkEl,
       menu: menu,
       highlight: -1,
     };
@@ -133,10 +128,6 @@ const CustomSelect = {
       if (opt.disabled) li.classList.add("is-disabled");
       if (opt.dataset.completed === "1" && opt.value) {
         li.classList.add("is-completed");
-        const check = document.createElement("span");
-        check.className = "cselect__check";
-        check.setAttribute("aria-hidden", "true");
-        li.appendChild(check);
         extras.unshift(typeof t === "function" ? t("topics.task_solved", "Solved") : "Solved");
       }
       if (extras.length) {
@@ -202,10 +193,6 @@ const CustomSelect = {
 
     const completed = !empty && opt && opt.dataset.completed === "1";
     inst.wrap.classList.toggle("is-completed", completed);
-    if (inst.checkEl) {
-      inst.checkEl.hidden = !completed;
-      inst.checkEl.title = completed ? (opt.title || "") : "";
-    }
 
     inst.trigger.title = empty ? "" : (opt.title ? text + " — " + opt.title : text);
   },

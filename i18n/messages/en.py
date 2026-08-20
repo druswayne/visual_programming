@@ -398,7 +398,7 @@ MESSAGES = {
     "skills.rec.continue_topic": "Continue the «{topic}» topic.",
     "skills.rec.fix_tasks": (
         "The «{topic}» topic still has «Fix the code» tasks "
-        "({fix_completed}/{fix_total}). They come right after regular tasks."
+        "({fix_completed}/{fix_total}). They come right before similar regular tasks."
     ),
     "skills.rec.continue_progress": "Continue «{topic}»: {completed}/{total} tasks completed.",
     "runner.forbidden_pattern": "Forbidden construct: {pattern}",

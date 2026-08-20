@@ -97,6 +97,7 @@ CONVERT_MAP = {
     "str": "STR",
     "int": "INT",
     "float": "FLOAT",
+    "bool": "BOOL",
     "list": "LIST",
 }
 

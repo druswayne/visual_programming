@@ -58,6 +58,13 @@ def test_type_call():
     assert 'name="VALUE"' in xml
 
 
+def test_bool_convert():
+    result = python_to_blocks("print(bool(x))")
+    xml = result["xml"]
+    assert 'type="py_convert"' in xml
+    assert "BOOL" in xml
+
+
 def test_unsupported_syntax():
     result = python_to_blocks_safe("def foo():\n    pass")
     assert result["success"] is False

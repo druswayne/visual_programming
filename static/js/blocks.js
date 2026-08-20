@@ -156,6 +156,7 @@ function getPyblocksCustomBlocks() {
           pbOpt("convert.str", "строку", "STR"),
           pbOpt("convert.int", "целое", "INT"),
           pbOpt("convert.float", "дробное", "FLOAT"),
+          pbOpt("convert.bool", "логическое", "BOOL"),
           pbOpt("convert.list", "список", "LIST"),
         ],
       },
@@ -163,7 +164,7 @@ function getPyblocksCustomBlocks() {
     inputsInline: true,
     output: null,
     style: "math_blocks",
-    tooltip: pbMsg("tooltip.convert", "Преобразование типа: str, int, float, list"),
+    tooltip: pbMsg("tooltip.convert", "Преобразование типа: str, int, float, bool, list"),
   },
   {
     type: "py_type_check",
@@ -671,6 +672,10 @@ function registerPyIfBlock() {
         this.appendStatementInput("ELSE").appendField(pbMsg("if.else", "иначе"));
       } else if (!this.elseCount_ && this.getInput("ELSE")) {
         this.removeInput("ELSE");
+      }
+      // append* ставит ввод в конец; «иначе» всегда должно быть последней веткой.
+      if (this.getInput("ELSE")) {
+        this.moveInputBefore("ELSE", null);
       }
     },
     customContextMenu: function (menuOptions) {

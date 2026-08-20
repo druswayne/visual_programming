@@ -356,6 +356,182 @@ STRINGS: dict[str, dict] = {
             {"stdin": "Python\n", "expected_output": "nohtyP"},
         ],
     },
+    "str-36": {
+        "title": "Word edges",
+        "condition": (
+            "Ask for a non-empty word. Print its first and last letters on two lines."
+        ),
+        "tests": [
+            {"stdin": "cat\n", "expected_output": "c\nt"},
+            {"stdin": "Python\n", "expected_output": "P\nn"},
+            {"stdin": "I\n", "expected_output": "I\nI"},
+        ],
+        "hint": "The first letter is s[0], the last is s[-1] or s[len(s) - 1].",
+    },
+    "str-37": {
+        "title": "No spaces",
+        "condition": (
+            "Ask for a phrase and print it with all spaces removed."
+        ),
+        "tests": [
+            {"stdin": "I learn python\n", "expected_output": "Ilearnpython"},
+            {"stdin": "one\n", "expected_output": "one"},
+        ],
+        "hint": "Replace a space with an empty string using replace.",
+    },
+    "str-38": {
+        "title": "Same edges",
+        "condition": (
+            "Ask for a non-empty word. If the first and last letters match — "
+            "print yes, otherwise — no."
+        ),
+        "tests": [
+            {"stdin": "anna\n", "expected_output": "yes"},
+            {"stdin": "cat\n", "expected_output": "no"},
+            {"stdin": "A\n", "expected_output": "yes"},
+        ],
+    },
+    "str-39": {
+        "title": "Double the letters",
+        "condition": (
+            "Ask for a word. Build a new string where each letter is repeated twice "
+            "and print it (cat → ccaatt)."
+        ),
+        "tests": [
+            {"stdin": "cat\n", "expected_output": "ccaatt"},
+            {"stdin": "ab\n", "expected_output": "aabb"},
+        ],
+        "hint": "In a for loop append the character to the result twice.",
+    },
+    "str-40": {
+        "title": "Without vowels",
+        "condition": (
+            "Ask for a lowercase word. Remove all vowels from the set aeiou "
+            "and print the remaining letters joined together. If there were no vowels — print the word as is."
+        ),
+        "tests": [
+            {"stdin": "banana\n", "expected_output": "bnn"},
+            {"stdin": "rhythm\n", "expected_output": "rhythm"},
+            {"stdin": "test\n", "expected_output": "tst"},
+        ],
+        "hint": "In a loop add to the result only letters that are not in the vowel set.",
+    },
+    "str-41": {
+        "title": "How many consonants",
+        "condition": (
+            "Ask for a lowercase word. Count the letters that are not in the vowel set "
+            "aeiou and print that number."
+        ),
+        "tests": [
+            {"stdin": "mama\n", "expected_output": "2"},
+            {"stdin": "cat\n", "expected_output": "2"},
+            {"stdin": "au\n", "expected_output": "0"},
+        ],
+    },
+    "str-42": {
+        "title": "Swap the edges",
+        "condition": (
+            "Ask for a non-empty word. Swap the first and last letters and print the result. "
+            "If there is only one letter — print it as is."
+        ),
+        "tests": [
+            {"stdin": "cat\n", "expected_output": "tac"},
+            {"stdin": "ab\n", "expected_output": "ba"},
+            {"stdin": "I\n", "expected_output": "I"},
+        ],
+        "hint": "Build s[-1] + the middle + s[0]; for length 1 the middle is empty.",
+    },
+    "str-43": {
+        "title": "The longer word",
+        "condition": (
+            "Ask for two words. Print the one that has more letters. "
+            "If the lengths are equal — print the first."
+        ),
+        "tests": [
+            {"stdin": "cat\nelephant\n", "expected_output": "elephant"},
+            {"stdin": "yes\nno\n", "expected_output": "yes"},
+            {"stdin": "sun\ndog\n", "expected_output": "sun"},
+        ],
+    },
+    "str-44": {
+        "title": "Three-word abbreviation",
+        "condition": (
+            "Ask for three words separated by spaces on one line. Print the abbreviation: "
+            "the first letters joined together, with no spaces."
+        ),
+        "tests": [
+            {"stdin": "red orange tart\n", "expected_output": "rot"},
+            {"stdin": "Big Green House\n", "expected_output": "BGH"},
+        ],
+        "hint": "Split the string by space and take [0] of each part.",
+    },
+    "str-45": {
+        "title": "Vowels to stars",
+        "condition": (
+            "Ask for a lowercase word. Replace each vowel from the set "
+            "aeiou with the * character and print the result."
+        ),
+        "tests": [
+            {"stdin": "mama\n", "expected_output": "m*m*"},
+            {"stdin": "rhythm\n", "expected_output": "rhythm"},
+            {"stdin": "elm\n", "expected_output": "*lm"},
+        ],
+    },
+    "str-46": {
+        "title": "Letters in a column",
+        "condition": "Ask for a word and print each letter on a separate line.",
+        "tests": [
+            {"stdin": "cat\n", "expected_output": "c\na\nt"},
+            {"stdin": "I\n", "expected_output": "I"},
+        ],
+    },
+    "str-47": {
+        "title": "Palindrome ignoring case",
+        "condition": (
+            "Ask for a word. Convert it to lowercase and check whether it is a palindrome. "
+            "Print palindrome or not palindrome."
+        ),
+        "tests": [
+            {"stdin": "Topot\n", "expected_output": "palindrome"},
+            {"stdin": "Cat\n", "expected_output": "not palindrome"},
+            {"stdin": "A\n", "expected_output": "palindrome"},
+        ],
+    },
+    "str-48": {
+        "title": "Words longer than three",
+        "condition": (
+            "Ask for a phrase of several words. Count how many words are longer than 3 letters and print the number."
+        ),
+        "tests": [
+            {"stdin": "I love python\n", "expected_output": "2"},
+            {"stdin": "yes no\n", "expected_output": "0"},
+            {"stdin": "I am coding\n", "expected_output": "1"},
+        ],
+        "hint": "Split by space and in a loop check the length of each word.",
+    },
+    "str-49": {
+        "title": "The last word",
+        "condition": (
+            "Ask for a phrase of several words separated by spaces and print only the last word."
+        ),
+        "tests": [
+            {"stdin": "red house by river\n", "expected_output": "river"},
+            {"stdin": "one\n", "expected_output": "one"},
+        ],
+    },
+    "str-50": {
+        "title": "The middle of a word",
+        "condition": (
+            "Ask for a non-empty word. If the length is odd — print the middle letter. "
+            "If even — the two middle letters joined together."
+        ),
+        "tests": [
+            {"stdin": "cat\n", "expected_output": "a"},
+            {"stdin": "cats\n", "expected_output": "at"},
+            {"stdin": "I\n", "expected_output": "I"},
+        ],
+        "hint": "For an odd length the middle index is len // 2.",
+    },
 }
 
 # Strings fix tasks
@@ -771,6 +947,135 @@ LISTS: dict[str, dict] = {
             "(0, 2, 4…) — each on a new line, using a for loop and range with step 2."
         ),
         "tests": [{"expected_output": "10\n30\n50"}],
+    },
+    "list-36": {
+        "title": "Sum of even elements",
+        "condition": (
+            "Given the list [1, 2, 3, 4, 5, 6]. In a for loop add only the even elements "
+            "and print the sum."
+        ),
+        "tests": [{"expected_output": "12"}],
+        "hint": "Check evenness with the remainder of division by 2.",
+    },
+    "list-37": {
+        "title": "Second largest",
+        "condition": (
+            "Given the list [15, 3, 42, 7]. Find the second-largest element and print it. "
+            "You may sort the list."
+        ),
+        "tests": [{"expected_output": "15"}],
+        "hint": "After sorting in ascending order the second maximum is in the second-to-last place.",
+    },
+    "list-38": {
+        "title": "Shift left",
+        "condition": (
+            "Given the list [10, 20, 30, 40]. Shift it left by one step: "
+            "the first element moves to the end. Print the resulting list."
+        ),
+        "tests": [{"expected_output": "[20, 30, 40, 10]"}],
+        "hint": "Remove the first element with pop(0) and append it at the end.",
+    },
+    "list-39": {
+        "title": "Product of elements",
+        "condition": (
+            "Given the list [2, 3, 4]. Multiply all elements in a for loop and print the product."
+        ),
+        "tests": [{"expected_output": "24"}],
+        "hint": "Start the product at 1, not 0.",
+    },
+    "list-40": {
+        "title": "Above average",
+        "condition": (
+            "Given the grade list [4, 5, 3, 5, 4]. Compute the arithmetic mean "
+            "and print how many elements are strictly greater than that mean."
+        ),
+        "tests": [{"expected_output": "2"}],
+        "hint": "First find the sum and the mean, then in a second loop count matching elements.",
+    },
+    "list-41": {
+        "title": "Common elements",
+        "condition": (
+            "Given lists [1, 2, 3, 4] and [3, 4, 5, 3]. Print the elements of the first list "
+            "that appear in the second, each on a new line (no duplicates from the first: 3, then 4)."
+        ),
+        "tests": [{"expected_output": "3\n4"}],
+        "hint": "For each element of the first list check in and print immediately.",
+    },
+    "list-42": {
+        "title": "Prefix sums",
+        "condition": (
+            "Given the list [1, 2, 3, 4]. Build the list of prefix sums "
+            "[1, 1+2, 1+2+3, 1+2+3+4] and print it."
+        ),
+        "tests": [{"expected_output": "[1, 3, 6, 10]"}],
+        "hint": "Keep a running sum variable and on each step append it to a new list.",
+    },
+    "list-43": {
+        "title": "Shift right",
+        "condition": (
+            "Given the list [10, 20, 30, 40]. Shift it one step to the right: "
+            "the last element moves to the beginning. Print the list."
+        ),
+        "tests": [{"expected_output": "[40, 10, 20, 30]"}],
+        "hint": "Pop the last element with pop() and insert it at the beginning with insert(0, …).",
+    },
+    "list-44": {
+        "title": "Negatives to zeros",
+        "condition": (
+            "Given the list [2, -3, 5, -1, 0]. Replace all negative elements with 0 "
+            "and print the resulting list."
+        ),
+        "tests": [{"expected_output": "[2, 0, 5, 0, 0]"}],
+        "hint": "Build a new list: append 0 for negatives and the original value otherwise.",
+    },
+    "list-45": {
+        "title": "Second minimum",
+        "condition": (
+            "Given the list [15, 3, 42, 7]. Find the second smallest element "
+            "(you may sort the list). Print it."
+        ),
+        "tests": [{"expected_output": "7"}],
+    },
+    "list-46": {
+        "title": "Index of the maximum",
+        "condition": (
+            "Given the list [3, 9, 4, 9, 1]. Print the index of the first occurrence of the maximum (0-based)."
+        ),
+        "tests": [{"expected_output": "1"}],
+        "hint": "Remember both the current maximum and its index.",
+    },
+    "list-47": {
+        "title": "Odds only",
+        "condition": (
+            "From the list [1, 2, 3, 4, 5, 6] build a new list of odd elements only "
+            "and print it."
+        ),
+        "tests": [{"expected_output": "[1, 3, 5]"}],
+    },
+    "list-48": {
+        "title": "Neighbor products",
+        "condition": (
+            "Given the list [2, 3, 4, 5]. Print the products of adjacent pairs "
+            "(2×3, 3×4, 4×5) — each on a new line."
+        ),
+        "tests": [{"expected_output": "6\n12\n20"}],
+    },
+    "list-49": {
+        "title": "Gap from the maximum",
+        "condition": (
+            "Given the list [1, 5, 3]. Find the maximum and print for each element "
+            "the difference maximum − element (each number on a new line)."
+        ),
+        "tests": [{"expected_output": "4\n0\n2"}],
+    },
+    "list-50": {
+        "title": "Evens to the front",
+        "condition": (
+            "Given the list [1, 2, 3, 4, 5]. Build a new list: first all even numbers in original order, "
+            "then all odd numbers. Print it."
+        ),
+        "tests": [{"expected_output": "[2, 4, 1, 3, 5]"}],
+        "hint": "You can keep two lists and then extend.",
     },
 }
 

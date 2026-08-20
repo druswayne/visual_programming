@@ -420,7 +420,7 @@ MESSAGES = {
     "skills.rec.continue_topic": "Продолжайте тему «{topic}».",
     "skills.rec.fix_tasks": (
         "В теме «{topic}» остались задачи «Исправь код» "
-        "({fix_completed}/{fix_total}). Они идут сразу после обычных заданий."
+        "({fix_completed}/{fix_total}). Они идут сразу перед похожими обычными заданиями."
     ),
     "skills.rec.continue_progress": "Продолжайте тему «{topic}»: решено {completed}/{total} задач.",
     # Runner / sandbox

@@ -212,7 +212,7 @@ function registerCustomGenerators() {
   gen.forBlock["py_convert"] = function (block, generator) {
     const value = generator.valueToCode(block, "VALUE", Order.NONE) || "0";
     const target = block.getFieldValue("TO");
-    const fnMap = { STR: "str", INT: "int", FLOAT: "float", LIST: "list" };
+    const fnMap = { STR: "str", INT: "int", FLOAT: "float", BOOL: "bool", LIST: "list" };
     return [fnMap[target] + "(" + value + ")", Order.FUNCTION_CALL];
   };
 

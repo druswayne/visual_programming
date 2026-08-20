@@ -323,6 +323,205 @@ IO: dict[str, dict] = {
         ),
         "tests": [{"stdin": "milk\n42\n", "expected_output": "Batch 42: milk — OK"}],
     },
+    "io-36": {
+        "title": "Student card",
+        "condition": (
+            "Build a student card from four fields. Ask for name, grade, city and hobby "
+            "(all as text) and print four lines: "
+            "Name: …, Class: …, City: …, Hobby: …"
+        ),
+        "tests": [
+            {
+                "stdin": "Mary\n5\nLondon\ndrawing\n",
+                "expected_output": "Name: Mary\nClass: 5\nCity: London\nHobby: drawing",
+            },
+            {
+                "stdin": "Pete\n7\nYork\nfootball\n",
+                "expected_output": "Name: Pete\nClass: 7\nCity: York\nHobby: football",
+            },
+        ],
+        "hint": "First store all four answers in variables, then format the output.",
+    },
+    "io-37": {
+        "title": "Short letter",
+        "condition": (
+            "Write a short letter. Ask for a name, a city and a wish. "
+            "Print three lines: Hello, NAME! — City: CITY — Wish: TEXT"
+        ),
+        "tests": [
+            {
+                "stdin": "Pete\nLondon\nhealth\n",
+                "expected_output": "Hello, Pete!\nCity: London\nWish: health",
+            },
+            {
+                "stdin": "Amy\nYork\nsuccess\n",
+                "expected_output": "Hello, Amy!\nCity: York\nWish: success",
+            },
+        ],
+    },
+    "io-38": {
+        "title": "Three items and a total",
+        "condition": (
+            "A cashier prints a mini receipt of three items. Ask for three names "
+            "and print a numbered list (1. …, 2. …, 3. …), "
+            "then the line Total items: 3"
+        ),
+        "tests": [
+            {
+                "stdin": "milk\nbread\ncheese\n",
+                "expected_output": "1. milk\n2. bread\n3. cheese\nTotal items: 3",
+            },
+        ],
+    },
+    "io-39": {
+        "title": "Repeat a business card",
+        "condition": (
+            "Build a business card: ask for a name and a job title. "
+            "Print the line NAME — ROLE twice (each on a new line)."
+        ),
+        "tests": [
+            {"stdin": "Anna\ndoctor\n", "expected_output": "Anna — doctor\nAnna — doctor"},
+            {"stdin": "Igor\nteacher\n", "expected_output": "Igor — teacher\nIgor — teacher"},
+        ],
+    },
+    "io-40": {
+        "title": "Code from parts",
+        "condition": (
+            "A passcode is assembled from three parts with hyphens. "
+            "Ask for three fragments (as text) and print them as one line: A-B-C"
+        ),
+        "tests": [
+            {"stdin": "12\nAB\n9\n", "expected_output": "12-AB-9"},
+            {"stdin": "X\nY\nZ\n", "expected_output": "X-Y-Z"},
+        ],
+        "hint": "Store the three inputs in variables and join them with hyphens.",
+    },
+    "io-41": {
+        "title": "Full form",
+        "condition": (
+            "Build a form with five fields. Ask for surname, first name, class, city and school "
+            "and print five lines: Surname: …, Name: …, Class: …, City: …, School: …"
+        ),
+        "tests": [
+            {
+                "stdin": "Smith\nPete\n6\nLondon\nLyceum\n",
+                "expected_output": "Surname: Smith\nName: Pete\nClass: 6\nCity: London\nSchool: Lyceum",
+            },
+        ],
+        "hint": "First store all five answers, then format each line.",
+    },
+    "io-42": {
+        "title": "Four lines of dialogue",
+        "condition": (
+            "Record a dialogue of four lines. Ask for four phrases and print them "
+            "with a dash at the start of each line: — phrase"
+        ),
+        "tests": [
+            {
+                "stdin": "Hello\nHow are you?\nFine\nLet's go\n",
+                "expected_output": "— Hello\n— How are you?\n— Fine\n— Let's go",
+            },
+        ],
+    },
+    "io-43": {
+        "title": "Two addressees",
+        "condition": (
+            "Ask for two names. Print two lines: "
+            "Hello, NAME1 and NAME2! and See you, NAME2 and NAME1!"
+        ),
+        "tests": [
+            {
+                "stdin": "Ann\nPete\n",
+                "expected_output": "Hello, Ann and Pete!\nSee you, Pete and Ann!",
+            },
+            {
+                "stdin": "Amy\nDan\n",
+                "expected_output": "Hello, Amy and Dan!\nSee you, Dan and Amy!",
+            },
+        ],
+        "hint": "In the second line the names go in reverse order.",
+    },
+    "io-44": {
+        "title": "File path",
+        "condition": (
+            "Build a path: ask for a folder, a file name and an extension. "
+            "Print one line: folder/name.extension"
+        ),
+        "tests": [
+            {"stdin": "docs\nreport\ntxt\n", "expected_output": "docs/report.txt"},
+            {"stdin": "img\ncat\npng\n", "expected_output": "img/cat.png"},
+        ],
+    },
+    "io-45": {
+        "title": "Email address",
+        "condition": "Build an email: ask for a login and a domain. Print login@domain",
+        "tests": [
+            {"stdin": "ivan\nschool.ru\n", "expected_output": "ivan@school.ru"},
+            {"stdin": "anna\nmail.com\n", "expected_output": "anna@mail.com"},
+        ],
+    },
+    "io-46": {
+        "title": "Quoted phrase",
+        "condition": (
+            "Format a quote. Ask for a phrase and print it in guillemets: «phrase»"
+        ),
+        "tests": [
+            {"stdin": "Learn\n", "expected_output": "«Learn»"},
+            {"stdin": "Python\n", "expected_output": "«Python»"},
+        ],
+    },
+    "io-47": {
+        "title": "Gradebook line",
+        "condition": (
+            "A teacher fills the gradebook. Ask for a subject, a grade (as text) and a student's surname. "
+            "Print: Subject: … | Grade: … | Student: …"
+        ),
+        "tests": [
+            {
+                "stdin": "math\n5\nSmith\n",
+                "expected_output": "Subject: math | Grade: 5 | Student: Smith",
+            },
+        ],
+    },
+    "io-48": {
+        "title": "Receipt of four items",
+        "condition": (
+            "Ask for four product names. Print a numbered list "
+            "1. … … 4. … and then the line Total items: 4"
+        ),
+        "tests": [
+            {
+                "stdin": "bread\nmilk\ncheese\neggs\n",
+                "expected_output": "1. bread\n2. milk\n3. cheese\n4. eggs\nTotal items: 4",
+            },
+        ],
+    },
+    "io-49": {
+        "title": "Surname and full name",
+        "condition": (
+            "Ask for surname, first name and patronymic. Print two lines: "
+            "the full Surname First Patronymic and the surname alone."
+        ),
+        "tests": [
+            {
+                "stdin": "Petrov\nIvan\nSergeevich\n",
+                "expected_output": "Petrov Ivan Sergeevich\nPetrov",
+            },
+        ],
+    },
+    "io-50": {
+        "title": "Day schedule",
+        "condition": (
+            "Ask for a weekday and three lessons. Print: "
+            "Day: …, then three lines 1) …, 2) …, 3) …"
+        ),
+        "tests": [
+            {
+                "stdin": "Monday\nmath\nhistory\nPE\n",
+                "expected_output": "Day: Monday\n1) math\n2) history\n3) PE",
+            },
+        ],
+    },
 }
 
 IO_FIX: dict[str, dict] = {

@@ -353,6 +353,188 @@ WHILE: dict[str, dict] = {
             {"stdin": "1\n", "expected_output": "1"},
         ],
     },
+    "while-36": {
+        "title": "Digit sum of a number",
+        "condition": (
+            "Ask for an integer n > 0. In a while loop add up all its digits and print the sum."
+        ),
+        "tests": [
+            {"stdin": "48291\n", "expected_output": "24"},
+            {"stdin": "100\n", "expected_output": "1"},
+            {"stdin": "9\n", "expected_output": "9"},
+        ],
+        "hint": "On each step take n % 10 and divide n by 10 using integer division.",
+    },
+    "while-37": {
+        "title": "Powers of two up to n",
+        "condition": (
+            "Ask for an integer n ≥ 1. Starting from 1, print powers of two "
+            "(1, 2, 4, 8, …) while the next number is not greater than n. Each on a new line."
+        ),
+        "tests": [
+            {"stdin": "20\n", "expected_output": "1\n2\n4\n8\n16"},
+            {"stdin": "1\n", "expected_output": "1"},
+            {"stdin": "8\n", "expected_output": "1\n2\n4\n8"},
+        ],
+    },
+    "while-38": {
+        "title": "Prime or composite",
+        "condition": (
+            "Ask for an integer n > 0. In a while loop count the number of divisors. "
+            "If there are exactly 2 divisors — print prime, otherwise — composite."
+        ),
+        "tests": [
+            {"stdin": "7\n", "expected_output": "prime"},
+            {"stdin": "12\n", "expected_output": "composite"},
+            {"stdin": "1\n", "expected_output": "composite"},
+        ],
+        "hint": "A prime number has only 1 and itself as divisors.",
+    },
+    "while-39": {
+        "title": "Collatz steps",
+        "condition": (
+            "Ask for an integer n > 0. While n is not 1: if n is even — divide it by 2, "
+            "otherwise replace it with 3×n + 1. Count how many steps it took and print that number. "
+            "The value 1 itself is not a step."
+        ),
+        "tests": [
+            {"stdin": "6\n", "expected_output": "8"},
+            {"stdin": "1\n", "expected_output": "0"},
+            {"stdin": "3\n", "expected_output": "7"},
+        ],
+        "hint": "Increase the counter after each change of n.",
+    },
+    "while-40": {
+        "title": "Even digits",
+        "condition": (
+            "Ask for an integer n > 0. In a while loop count how many of its digits are even "
+            "and print that count. The digit 0 counts as even."
+        ),
+        "tests": [
+            {"stdin": "246\n", "expected_output": "3"},
+            {"stdin": "135\n", "expected_output": "0"},
+            {"stdin": "1024\n", "expected_output": "3"},
+        ],
+    },
+    "while-41": {
+        "title": "Palindrome number",
+        "condition": (
+            "Ask for an integer n > 0. Reverse its digits in a while loop. "
+            "If you get the same number — print yes, otherwise — no."
+        ),
+        "tests": [
+            {"stdin": "121\n", "expected_output": "yes"},
+            {"stdin": "123\n", "expected_output": "no"},
+            {"stdin": "10\n", "expected_output": "no"},
+        ],
+        "hint": "Keep the original value and compare the reversed number with it.",
+    },
+    "while-42": {
+        "title": "Odd digits",
+        "condition": (
+            "Ask for an integer n > 0. Count how many of its digits are odd and print that number."
+        ),
+        "tests": [
+            {"stdin": "135\n", "expected_output": "3"},
+            {"stdin": "246\n", "expected_output": "0"},
+            {"stdin": "1024\n", "expected_output": "1"},
+        ],
+    },
+    "while-43": {
+        "title": "Least common multiple",
+        "condition": (
+            "Ask for two integers a and b > 0. Find the GCD with the Euclidean algorithm, "
+            "then print the LCM = a × b / GCD."
+        ),
+        "tests": [
+            {"stdin": "12\n18\n", "expected_output": "36"},
+            {"stdin": "7\n5\n", "expected_output": "35"},
+            {"stdin": "6\n9\n", "expected_output": "18"},
+        ],
+        "hint": "It is convenient to compute LCM via GCD so you do not iterate over large numbers.",
+    },
+    "while-44": {
+        "title": "Digital root",
+        "condition": (
+            "Ask for an integer n > 0. While the number is greater than 9, replace it with the sum of its digits. "
+            "Print the resulting single digit."
+        ),
+        "tests": [
+            {"stdin": "38\n", "expected_output": "2"},
+            {"stdin": "999\n", "expected_output": "9"},
+            {"stdin": "10\n", "expected_output": "1"},
+        ],
+        "hint": "Inside the outer while loop, sum the digits again with an inner loop.",
+    },
+    "while-45": {
+        "title": "Maximum digit",
+        "condition": "Ask for an integer n > 0 and print its largest digit.",
+        "tests": [
+            {"stdin": "582\n", "expected_output": "8"},
+            {"stdin": "100\n", "expected_output": "1"},
+            {"stdin": "7\n", "expected_output": "7"},
+        ],
+    },
+    "while-46": {
+        "title": "Power of two?",
+        "condition": (
+            "Ask for an integer n > 0. If n is a power of two (1, 2, 4, 8, …) — yes, otherwise — no. "
+            "Divide n by 2 while it is even, then check whether 1 remains."
+        ),
+        "tests": [
+            {"stdin": "8\n", "expected_output": "yes"},
+            {"stdin": "12\n", "expected_output": "no"},
+            {"stdin": "1\n", "expected_output": "yes"},
+        ],
+    },
+    "while-47": {
+        "title": "Fibonacci up to n",
+        "condition": (
+            "Ask for an integer n ≥ 1. Print Fibonacci numbers not greater than n, "
+            "starting from 1, 1 — each on a new line."
+        ),
+        "tests": [
+            {"stdin": "10\n", "expected_output": "1\n1\n2\n3\n5\n8"},
+            {"stdin": "1\n", "expected_output": "1\n1"},
+            {"stdin": "2\n", "expected_output": "1\n1\n2"},
+        ],
+    },
+    "while-48": {
+        "title": "How many times divisible by two",
+        "condition": (
+            "Ask for an integer n > 0. While n is even, divide it by 2 and count the steps. "
+            "Print the number of divisions."
+        ),
+        "tests": [
+            {"stdin": "80\n", "expected_output": "4"},
+            {"stdin": "7\n", "expected_output": "0"},
+            {"stdin": "16\n", "expected_output": "4"},
+        ],
+    },
+    "while-49": {
+        "title": "Product of digits",
+        "condition": "Ask for an integer n > 0 and print the product of its digits.",
+        "tests": [
+            {"stdin": "23\n", "expected_output": "6"},
+            {"stdin": "105\n", "expected_output": "0"},
+            {"stdin": "22\n", "expected_output": "4"},
+        ],
+        "hint": "Start the product at 1. A zero among the digits will make the answer zero.",
+    },
+    "while-50": {
+        "title": "Sum until greater than n",
+        "condition": (
+            "Ask for an integer n ≥ 1. Add 1 + 2 + 3 + … in a while loop "
+            "until the sum becomes greater than n. Print how many terms were added "
+            "by that moment (the last term after which the sum exceeded n also counts)."
+        ),
+        "tests": [
+            {"stdin": "10\n", "expected_output": "5"},
+            {"stdin": "1\n", "expected_output": "2"},
+            {"stdin": "6\n", "expected_output": "4"},
+        ],
+        "hint": "For n = 10: 1+2+3+4=10 is not yet greater, +5 gives 15 — 5 terms.",
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -799,6 +981,188 @@ FOR: dict[str, dict] = {
         "tests": [
             {"stdin": "30\n", "expected_output": "6\n12\n18\n24\n30"},
             {"stdin": "12\n", "expected_output": "6\n12"},
+        ],
+    },
+    "for-36": {
+        "title": "Factorial with for",
+        "condition": (
+            "Ask for an integer n ≥ 0. Compute n! in a for loop and print the result. "
+            "Treat 0! as 1."
+        ),
+        "tests": [
+            {"stdin": "5\n", "expected_output": "120"},
+            {"stdin": "0\n", "expected_output": "1"},
+            {"stdin": "6\n", "expected_output": "720"},
+        ],
+        "hint": "Start the product at 1 and multiply by each number from 1 to n.",
+    },
+    "for-37": {
+        "title": "Sum of multiples of 3 or 5",
+        "condition": (
+            "Ask for an integer n. In a for loop add all numbers from 1 to n inclusive "
+            "that divide by 3 or by 5, and print the sum."
+        ),
+        "tests": [
+            {"stdin": "10\n", "expected_output": "33"},
+            {"stdin": "9\n", "expected_output": "23"},
+            {"stdin": "2\n", "expected_output": "0"},
+        ],
+        "hint": "Number 15 divides by both 3 and 5 — still add it only once.",
+    },
+    "for-38": {
+        "title": "Prime with for",
+        "condition": (
+            "Ask for an integer n > 0. In a for loop count the divisors from 1 to n. "
+            "If there are exactly 2 divisors — print prime, otherwise — composite."
+        ),
+        "tests": [
+            {"stdin": "7\n", "expected_output": "prime"},
+            {"stdin": "9\n", "expected_output": "composite"},
+            {"stdin": "2\n", "expected_output": "prime"},
+        ],
+    },
+    "for-39": {
+        "title": "Number ladder",
+        "condition": (
+            "Ask for an integer n ≥ 1. On line i (i from 1 to n) print the numbers "
+            "from 1 to i joined with no spaces. For example, for n = 4: 1, then 12, then 123, then 1234."
+        ),
+        "tests": [
+            {"stdin": "4\n", "expected_output": "1\n12\n123\n1234"},
+            {"stdin": "1\n", "expected_output": "1"},
+        ],
+        "hint": "Accumulate a string: on each step glue the next digit and print the current result.",
+    },
+    "for-40": {
+        "title": "Alternating sum",
+        "condition": (
+            "Ask for an integer n ≥ 1. Compute 1 − 2 + 3 − 4 + … ± n in a for loop and print the result. "
+            "Add odd terms and subtract even terms."
+        ),
+        "tests": [
+            {"stdin": "5\n", "expected_output": "3"},
+            {"stdin": "4\n", "expected_output": "-2"},
+            {"stdin": "1\n", "expected_output": "1"},
+        ],
+    },
+    "for-41": {
+        "title": "Perfect number",
+        "condition": (
+            "Ask for an integer n > 1. If the sum of all divisors of n except n itself equals n — "
+            "print perfect, otherwise — no. Examples: 6 = 1+2+3, 28 = 1+2+4+7+14."
+        ),
+        "tests": [
+            {"stdin": "6\n", "expected_output": "perfect"},
+            {"stdin": "28\n", "expected_output": "perfect"},
+            {"stdin": "12\n", "expected_output": "no"},
+        ],
+        "hint": "In a for loop add the divisors from 1 to n − 1.",
+    },
+    "for-42": {
+        "title": "Primes up to n",
+        "condition": (
+            "Ask for an integer n ≥ 2. Print all prime numbers from 2 to n inclusive, "
+            "each on a new line. A prime number has exactly two divisors."
+        ),
+        "tests": [
+            {"stdin": "10\n", "expected_output": "2\n3\n5\n7"},
+            {"stdin": "5\n", "expected_output": "2\n3\n5"},
+        ],
+        "hint": "For each x from 2 to n count the divisors with an inner loop.",
+    },
+    "for-43": {
+        "title": "Rectangle of stars",
+        "condition": (
+            "Ask for the number of rows n and the number of columns m. Print a rectangle of * characters "
+            "(n rows, each with exactly m asterisks and no spaces)."
+        ),
+        "tests": [
+            {"stdin": "2\n3\n", "expected_output": "***\n***"},
+            {"stdin": "3\n1\n", "expected_output": "*\n*\n*"},
+        ],
+        "hint": "A row of m stars can be built with '*' * m or with a loop.",
+    },
+    "for-44": {
+        "title": "GCD by brute force",
+        "condition": (
+            "Ask for two integers a and b > 0. Find the GCD: iterate d from 1 up to the smaller of them "
+            "and print the last d that divides both numbers."
+        ),
+        "tests": [
+            {"stdin": "24\n18\n", "expected_output": "6"},
+            {"stdin": "7\n3\n", "expected_output": "1"},
+            {"stdin": "10\n10\n", "expected_output": "10"},
+        ],
+    },
+    "for-45": {
+        "title": "How many perfect squares",
+        "condition": (
+            "Ask for an integer n ≥ 1. How many positive perfect squares are not greater than n? "
+            "Print that count (for 10 these are 1, 4 and 9 — the answer is 3)."
+        ),
+        "tests": [
+            {"stdin": "10\n", "expected_output": "3"},
+            {"stdin": "1\n", "expected_output": "1"},
+            {"stdin": "16\n", "expected_output": "4"},
+        ],
+        "hint": "Iterate i while i × i ≤ n and count such i.",
+    },
+    "for-46": {
+        "title": "Multiples of 4 but not 6",
+        "condition": (
+            "Ask for an integer n. Print all numbers from 1 to n inclusive "
+            "that are divisible by 4 and not divisible by 6 — each on a new line."
+        ),
+        "tests": [
+            {"stdin": "20\n", "expected_output": "4\n8\n16\n20"},
+            {"stdin": "8\n", "expected_output": "4\n8"},
+        ],
+    },
+    "for-47": {
+        "title": "Factorial table",
+        "condition": (
+            "Ask for an integer n ≥ 1. Print n lines: 1!, 2!, …, n! — one number per line."
+        ),
+        "tests": [
+            {"stdin": "4\n", "expected_output": "1\n2\n6\n24"},
+            {"stdin": "1\n", "expected_output": "1"},
+        ],
+        "hint": "You can accumulate a product in a variable and print it on each step.",
+    },
+    "for-48": {
+        "title": "Nested series sum",
+        "condition": (
+            "Ask for an integer n ≥ 1. Compute the sum: for each i from 1 to n add the sum of numbers from 1 to i. "
+            "That is (1) + (1+2) + (1+2+3) + … and print the result."
+        ),
+        "tests": [
+            {"stdin": "3\n", "expected_output": "10"},
+            {"stdin": "1\n", "expected_output": "1"},
+            {"stdin": "4\n", "expected_output": "20"},
+        ],
+        "hint": "You need an outer loop over i and an inner loop over j from 1 to i.",
+    },
+    "for-49": {
+        "title": "Count of primes",
+        "condition": (
+            "Ask for an integer n ≥ 1. Print how many prime numbers there are from 2 to n inclusive. "
+            "If n < 2, the answer is 0."
+        ),
+        "tests": [
+            {"stdin": "10\n", "expected_output": "4"},
+            {"stdin": "1\n", "expected_output": "0"},
+            {"stdin": "2\n", "expected_output": "1"},
+        ],
+    },
+    "for-50": {
+        "title": "Number pyramid",
+        "condition": (
+            "Ask for an integer n ≥ 1. On row i (from top to bottom, i from n down to 1) print i asterisks. "
+            "For n = 3 you get 3 rows: ***, then **, then *."
+        ),
+        "tests": [
+            {"stdin": "3\n", "expected_output": "***\n**\n*"},
+            {"stdin": "1\n", "expected_output": "*"},
         ],
     },
 }

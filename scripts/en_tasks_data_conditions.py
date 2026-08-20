@@ -455,6 +455,202 @@ CONDITIONS: dict[str, dict] = {
             {"stdin": "2\n5\n", "expected_output": "jump"},
         ],
     },
+    "cond-36": {
+        "title": "Coordinate quarter",
+        "condition": (
+            "Ask for point coordinates x and y (integers). Print the quarter number: "
+            "1 (x>0 and y>0), 2 (x<0 and y>0), 3 (x<0 and y<0), 4 (x>0 and y<0). "
+            "If the point lies on an axis (x = 0 or y = 0) — print axis."
+        ),
+        "tests": [
+            {"stdin": "3\n4\n", "expected_output": "1"},
+            {"stdin": "-2\n5\n", "expected_output": "2"},
+            {"stdin": "-1\n-1\n", "expected_output": "3"},
+            {"stdin": "4\n-3\n", "expected_output": "4"},
+            {"stdin": "0\n5\n", "expected_output": "axis"},
+        ],
+        "hint": "Check the axes first, then the signs of x and y.",
+    },
+    "cond-37": {
+        "title": "Ticket price",
+        "condition": (
+            "Ask for age (integer) and print the ticket price: "
+            "under 6 — 0, under 18 — 500, under 60 — 1000, otherwise — 700."
+        ),
+        "tests": [
+            {"stdin": "3\n", "expected_output": "0"},
+            {"stdin": "12\n", "expected_output": "500"},
+            {"stdin": "30\n", "expected_output": "1000"},
+            {"stdin": "60\n", "expected_output": "700"},
+        ],
+        "hint": "Check ages from smaller to larger.",
+    },
+    "cond-38": {
+        "title": "Leap year fully",
+        "condition": (
+            "Ask for a year (integer). A year is a leap year if it divides by 400, "
+            "or divides by 4 but not by 100. "
+            "Print leap or common."
+        ),
+        "tests": [
+            {"stdin": "2000\n", "expected_output": "leap"},
+            {"stdin": "1900\n", "expected_output": "common"},
+            {"stdin": "2024\n", "expected_output": "leap"},
+            {"stdin": "2023\n", "expected_output": "common"},
+        ],
+        "hint": "Check division by 400 first, then by 100, then by 4.",
+    },
+    "cond-39": {
+        "title": "In ascending order",
+        "condition": (
+            "Ask for two integers. Print them on two lines in non-decreasing order: "
+            "the smaller (or equal) first, then the larger."
+        ),
+        "tests": [
+            {"stdin": "5\n2\n", "expected_output": "2\n5"},
+            {"stdin": "3\n3\n", "expected_output": "3\n3"},
+            {"stdin": "-1\n4\n", "expected_output": "-1\n4"},
+        ],
+    },
+    "cond-40": {
+        "title": "Lucky ticket",
+        "condition": (
+            "Ask for a six-digit ticket number as an integer. "
+            "If the sum of the first three digits equals the sum of the last three — "
+            "print lucky, otherwise — ordinary."
+        ),
+        "tests": [
+            {"stdin": "123321\n", "expected_output": "lucky"},
+            {"stdin": "123456\n", "expected_output": "ordinary"},
+            {"stdin": "111111\n", "expected_output": "lucky"},
+        ],
+        "hint": "Split the number into digits with // and %, as in the Numbers topic.",
+    },
+    "cond-41": {
+        "title": "Rock, paper, scissors",
+        "condition": (
+            "Ask for two strings: the first player's move and the second's "
+            "(rock, scissors or paper). Print first, second or draw. "
+            "Rock beats scissors, scissors beat paper, paper beats rock."
+        ),
+        "tests": [
+            {"stdin": "rock\nscissors\n", "expected_output": "first"},
+            {"stdin": "scissors\nrock\n", "expected_output": "second"},
+            {"stdin": "paper\npaper\n", "expected_output": "draw"},
+            {"stdin": "rock\npaper\n", "expected_output": "second"},
+        ],
+        "hint": "Check a draw first, then the three winning pairs for player one.",
+    },
+    "cond-42": {
+        "title": "Point in a rectangle",
+        "condition": (
+            "Ask for a point x, y and rectangle bounds x1, y1, x2, y2 "
+            "(all integers, x1 ≤ x2, y1 ≤ y2). If the point is inside or on the border — yes, otherwise — no."
+        ),
+        "tests": [
+            {"stdin": "3\n4\n1\n1\n5\n5\n", "expected_output": "yes"},
+            {"stdin": "0\n0\n1\n1\n5\n5\n", "expected_output": "no"},
+            {"stdin": "1\n5\n1\n1\n5\n5\n", "expected_output": "yes"},
+        ],
+    },
+    "cond-43": {
+        "title": "Three numbers ascending",
+        "condition": (
+            "Ask for three integers and print them on three lines in non-decreasing order."
+        ),
+        "tests": [
+            {"stdin": "5\n1\n3\n", "expected_output": "1\n3\n5"},
+            {"stdin": "2\n2\n2\n", "expected_output": "2\n2\n2"},
+            {"stdin": "-1\n4\n0\n", "expected_output": "-1\n0\n4"},
+        ],
+        "hint": "You can find min, max and the middle as the sum minus min minus max.",
+    },
+    "cond-44": {
+        "title": "Course admission",
+        "condition": (
+            "Ask for age and a score (integers). Admission requires age at least 14 "
+            "and score at least 70. Print yes or no."
+        ),
+        "tests": [
+            {"stdin": "15\n80\n", "expected_output": "yes"},
+            {"stdin": "13\n90\n", "expected_output": "no"},
+            {"stdin": "16\n60\n", "expected_output": "no"},
+        ],
+    },
+    "cond-45": {
+        "title": "Valid time",
+        "condition": (
+            "Ask for hours and minutes (integers). If hours are 0–23 and minutes are 0–59 — "
+            "print ok, otherwise — error."
+        ),
+        "tests": [
+            {"stdin": "23\n59\n", "expected_output": "ok"},
+            {"stdin": "24\n0\n", "expected_output": "error"},
+            {"stdin": "12\n60\n", "expected_output": "error"},
+            {"stdin": "0\n0\n", "expected_output": "ok"},
+        ],
+    },
+    "cond-46": {
+        "title": "Who won",
+        "condition": "Ask for two players' scores (integers). Print first, second or draw.",
+        "tests": [
+            {"stdin": "10\n7\n", "expected_output": "first"},
+            {"stdin": "3\n3\n", "expected_output": "draw"},
+            {"stdin": "1\n8\n", "expected_output": "second"},
+        ],
+    },
+    "cond-47": {
+        "title": "Sign of the discriminant",
+        "condition": (
+            "Ask for integers a, b, c. Compute D = b² − 4×a×c and print "
+            "positive, zero or negative — according to the sign of D."
+        ),
+        "tests": [
+            {"stdin": "1\n2\n1\n", "expected_output": "zero"},
+            {"stdin": "1\n0\n-1\n", "expected_output": "positive"},
+            {"stdin": "1\n1\n1\n", "expected_output": "negative"},
+        ],
+    },
+    "cond-48": {
+        "title": "Enough money",
+        "condition": (
+            "Ask for the amount of money, the item price and the quantity (integers). "
+            "If the money covers the whole purchase — enough, otherwise — not enough."
+        ),
+        "tests": [
+            {"stdin": "100\n30\n3\n", "expected_output": "enough"},
+            {"stdin": "50\n20\n3\n", "expected_output": "not enough"},
+            {"stdin": "90\n30\n3\n", "expected_output": "enough"},
+        ],
+    },
+    "cond-49": {
+        "title": "Number type in detail",
+        "condition": (
+            "Ask for an integer n. Print: positive even, positive odd, "
+            "negative or zero."
+        ),
+        "tests": [
+            {"stdin": "4\n", "expected_output": "positive even"},
+            {"stdin": "3\n", "expected_output": "positive odd"},
+            {"stdin": "-1\n", "expected_output": "negative"},
+            {"stdin": "0\n", "expected_output": "zero"},
+        ],
+        "hint": "Handle zero and negatives first, then check evenness.",
+    },
+    "cond-50": {
+        "title": "Between two numbers",
+        "condition": (
+            "Ask for three integers x, a, b. If x lies between a and b inclusive "
+            "(the order of a and b is unknown) — print inside, otherwise — outside."
+        ),
+        "tests": [
+            {"stdin": "5\n1\n10\n", "expected_output": "inside"},
+            {"stdin": "5\n10\n1\n", "expected_output": "inside"},
+            {"stdin": "0\n1\n10\n", "expected_output": "outside"},
+            {"stdin": "10\n10\n1\n", "expected_output": "inside"},
+        ],
+        "hint": "Compare x with both the smaller and the larger of a and b.",
+    },
 }
 
 CONDITIONS_FIX: dict[str, dict] = {
