@@ -241,6 +241,10 @@ function setOutput(text, isError) {
 }
 
 async function runCode() {
+  if (typeof GameUI !== "undefined" && GameUI.active) {
+    await GameUI.run();
+    return;
+  }
   StepDebugger.stop();
   const code = getActivePythonCode();
   if (!code.trim()) {

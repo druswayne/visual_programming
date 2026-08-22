@@ -24,7 +24,9 @@
   class CompactConstantProvider extends BaseConstantProvider {
     constructor() {
       super();
-      this.FIELD_TEXT_FONTSIZE = scale(10);
+      this.FIELD_TEXT_FONTSIZE = 11;
+      this.FIELD_TEXT_FONTFAMILY = '"Segoe UI", system-ui, sans-serif';
+      this.FIELD_TEXT_FONTWEIGHT = "600";
       this.FIELD_BORDER_RECT_X_PADDING = scale(5);
       this.FIELD_BORDER_RECT_Y_PADDING = scale(2);
       this.FIELD_BORDER_RECT_HEIGHT = scale(18);

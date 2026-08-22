@@ -16,11 +16,14 @@ const ScratchToolbox = {
     lists: { color: "#6B5278", icon: "[]" },
     functions: { color: "#7A5260", icon: "f" },
     types: { color: "#3A6B6B", icon: "τ" },
+    robot: { color: "#3A6A78", icon: "◆" },
+    robot_sensors: { color: "#4A6870", icon: "?" },
   },
 
   init(workspace) {
     this.workspace = workspace;
     this.toolbox = workspace.getToolbox();
+    this.toolboxDef = PYBLOCKS_TOOLBOX;
     if (!this.toolbox) return;
 
     this.shell = document.getElementById("blocklyShell");
@@ -288,9 +291,27 @@ const ScratchToolbox = {
     return "hsl(" + hue + ", 65%, 52%)";
   },
 
+  getToolboxContents() {
+    if (this.toolboxDef && this.toolboxDef.contents) {
+      return this.toolboxDef.contents;
+    }
+    return (typeof PYBLOCKS_TOOLBOX !== "undefined" && PYBLOCKS_TOOLBOX.contents) || [];
+  },
+
+  rebuild(toolboxDef) {
+    if (!this.workspace || typeof Blockly === "undefined") return;
+    this.toolboxDef = toolboxDef || PYBLOCKS_TOOLBOX;
+    this.workspace.updateToolbox(this.toolboxDef);
+    this.toolbox = this.workspace.getToolbox();
+    this.buildCategoryRail();
+    this.setupPersistentFlyout();
+    this.selectCategory(0);
+    this.scheduleFlyoutSync();
+  },
+
   buildCategoryRail() {
     this.categoriesEl.innerHTML = "";
-    (PYBLOCKS_TOOLBOX.contents || []).forEach((cat, index) => {
+    this.getToolboxContents().forEach((cat, index) => {
       const style = this.getStyle(cat);
       const btn = document.createElement("button");
       btn.type = "button";
@@ -307,7 +328,7 @@ const ScratchToolbox = {
   },
 
   selectCategory(index) {
-    const categories = PYBLOCKS_TOOLBOX.contents || [];
+    const categories = this.getToolboxContents();
     if (index < 0 || index >= categories.length) return;
 
     this.activeIndex = index;

@@ -773,7 +773,7 @@ TASKS_EN: dict[str, dict] = {
         'condition': (
             'Ask for a letter, then a word. Count in a for loop how many times that letter appears in the word, and print the number.'
         ),
-        'tests': [{'stdin': 'a\nbanana\n', 'expected_output': '2'}, {'stdin': 'o\ncat\n', 'expected_output': '1'}],
+        'tests': [{'stdin': 'a\nbanana\n', 'expected_output': '3'}, {'stdin': 't\ncat\n', 'expected_output': '1'}],
     },
     "for-35": {
         'title': 'Numbers divisible by six',
@@ -987,10 +987,10 @@ TASKS_EN: dict[str, dict] = {
     "for-fix-09": {
         'title': 'Fix: letter count',
         'condition': (
-            'Counting the letter «a» in the word «banana» gives 1 — each character is compared to the whole string. A program is already assembled in the workspace, but it behaves incorrectly when checked. Find the mistake in the blocks and fix it.'
+            'Counting the letter «a» in the word «banana» gives 0 — each character is compared to the whole string. A program is already assembled in the workspace, but it behaves incorrectly when checked. Find the mistake in the blocks and fix it.'
         ),
         'hint': 'Compare each character with the sought letter ch.',
-        'tests': [{'stdin': 'a\nbanana\n', 'expected_output': '2'}, {'stdin': 'o\ncat\n', 'expected_output': '1'}],
+        'tests': [{'stdin': 'a\nbanana\n', 'expected_output': '3'}, {'stdin': 't\ncat\n', 'expected_output': '1'}],
     },
     "for-fix-10": {
         'title': 'Fix: numbers divisible by six',
@@ -1025,7 +1025,7 @@ TASKS_EN: dict[str, dict] = {
     "io-04": {
         'title': 'Favorite subject',
         'condition': (
-            'A student answers the question «Which subject do you like most?». Save the answer computer science in variable subject and show it on screen.'
+            'A student named their favorite subject. Store computer science in variable subject (this is a ready-made answer, do not use an input block) and print it.'
         ),
         'tests': [{'expected_output': 'computer science'}],
     },

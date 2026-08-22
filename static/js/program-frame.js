@@ -139,6 +139,41 @@ const ProgramFrame = {
     if (end) this.decorateBlock(end);
   },
 
+  remesureBlock(block) {
+    if (!block || block.disposed || block.isInFlyout) return;
+    if (typeof block.isDisposed === "function" && block.isDisposed()) return;
+    if (typeof block.markDirty === "function") {
+      block.markDirty();
+    }
+    if (typeof block.queueRender === "function") {
+      block.queueRender();
+    } else if (typeof block.render === "function") {
+      block.render();
+    }
+  },
+
+  remesureSubtree(block) {
+    if (!block) return;
+    this.remesureBlock(block);
+    if (block.inputList) {
+      block.inputList.forEach(function (input) {
+        const child = input.connection && input.connection.targetBlock();
+        if (child) ProgramFrame.remesureSubtree(child);
+      });
+    }
+    const next = block.getNextBlock();
+    if (next) this.remesureSubtree(next);
+  },
+
+  remesureStack(block) {
+    if (!block) return;
+    let root = block;
+    while (root.getPreviousBlock()) {
+      root = root.getPreviousBlock();
+    }
+    this.remesureSubtree(root);
+  },
+
   getChainTail(block) {
     let tail = block;
     while (tail.getNextBlock()) {
@@ -197,6 +232,31 @@ const ProgramFrame = {
       });
     };
 
+    let pendingRemesure = false;
+    let remesureIds = new Set();
+    const scheduleRemesure = function (blockId) {
+      if (blockId) remesureIds.add(blockId);
+      if (pendingRemesure) return;
+      pendingRemesure = true;
+      requestAnimationFrame(function () {
+        pendingRemesure = false;
+        if (typeof workspace.isDragging === "function" && workspace.isDragging()) {
+          const ids = remesureIds;
+          remesureIds = new Set();
+          ids.forEach(function (id) {
+            scheduleRemesure(id);
+          });
+          return;
+        }
+        const ids = remesureIds;
+        remesureIds = new Set();
+        ids.forEach(function (id) {
+          const block = workspace.getBlockById(id);
+          if (block) ProgramFrame.remesureStack(block);
+        });
+      });
+    };
+
     let pendingConsolidate = false;
     const scheduleConsolidate = function () {
       if (pendingConsolidate) return;
@@ -242,6 +302,13 @@ const ProgramFrame = {
         scheduleConsolidate();
       } else if (event.type === Blockly.Events.BLOCK_CREATE && block && block.type === "py_end") {
         scheduleConsolidate();
+      }
+
+      if (
+        (event.type === Blockly.Events.BLOCK_MOVE || event.type === Blockly.Events.BLOCK_CREATE) &&
+        event.blockId
+      ) {
+        scheduleRemesure(event.blockId);
       }
 
       scheduleUpdate();
@@ -342,6 +409,15 @@ const ProgramFrame = {
     requestAnimationFrame(function () {
       ProgramFrame.decorateFrameBlocks(workspace);
       ProgramFrame.updateDetachedStyles(workspace);
+      const startBlock = ProgramFrame.findStart(workspace);
+      if (startBlock) ProgramFrame.remesureStack(startBlock);
     });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () {
+        workspace.getTopBlocks(false).forEach(function (block) {
+          ProgramFrame.remesureStack(block);
+        });
+      });
+    }
   },
 };

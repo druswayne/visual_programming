@@ -26,3 +26,16 @@ def test_check_solution_multiple_inputs():
     tests = [{"stdin": "Оля\nсиний\n", "expected_output": "Оля\nсиний"}]
     result = check_solution(code, tests)
     assert result["success"] is True
+
+
+def test_input_without_stdin_fails_fast():
+    import time
+
+    from runner.sandbox import run_python_code
+
+    started = time.perf_counter()
+    result = run_python_code("print(input())")
+    elapsed = time.perf_counter() - started
+    assert elapsed < 2.0
+    assert result["success"] is False
+    assert result.get("error")

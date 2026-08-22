@@ -71,8 +71,16 @@ const TopicsUI = {
     this.setupWorkspaceLayoutObserver();
 
     const hasDemo = new URLSearchParams(window.location.search).has("demo");
+    const params = new URLSearchParams(window.location.search);
+    const wantsGame = params.get("mode") === "game" || params.has("track") || params.has("mission");
+
+    if (typeof GameUI !== "undefined") GameUI.init();
 
     if (!this.authenticated) {
+      if (wantsGame) {
+        window.location.replace("/auth/login?next=" + encodeURIComponent("/learn?" + params.toString()));
+        return;
+      }
       this.mode = "sandbox";
       this.applyMode();
       if (hasDemo) {
@@ -83,7 +91,7 @@ const TopicsUI = {
 
     this.loadTopics().then(function () {
       TopicsUI.applyUrlParams();
-      if (hasDemo) {
+      if (hasDemo && TopicsUI.mode === "sandbox") {
         TopicsUI.applySandboxDemo();
       }
     });
@@ -204,8 +212,20 @@ const TopicsUI = {
 
   async applyUrlParams() {
     const params = new URLSearchParams(window.location.search);
+    const mode = params.get("mode");
     const topic = params.get("topic");
     const task = params.get("task");
+
+    if (mode === "game" || params.has("track") || params.has("mission")) {
+      this.mode = "game";
+      if (this.modeSelect) this.modeSelect.value = "game";
+      this.applyMode();
+      if (typeof GameUI !== "undefined") {
+        await GameUI.applyUrlParams(params);
+      }
+      return;
+    }
+
     if (!topic) return;
 
     if (this.modeSelect) {
@@ -340,9 +360,9 @@ const TopicsUI = {
     this.updateMySolutionButton();
 
     if (typeof SandboxSavesUI !== "undefined") {
-      const showSandboxSaves = this.authenticated && !isTopic;
+      const showSandboxSaves = this.authenticated && this.mode === "sandbox";
       SandboxSavesUI.setVisible(showSandboxSaves);
-      if (isTopic) {
+      if (this.mode !== "sandbox") {
         SandboxSavesUI.clearCurrent();
       }
     }
@@ -661,20 +681,26 @@ const TopicsUI = {
   },
 
   onModeChange() {
-    if (!this.authenticated) {
+    const next = this.modeSelect ? this.modeSelect.value : "sandbox";
+    if (!this.authenticated && (next === "topic" || next === "game")) {
       this.mode = "sandbox";
       this.applyMode();
       return;
     }
-    this.mode = this.modeSelect.value;
+    this.mode = next;
     this.applyMode();
   },
 
   applyMode() {
     const isTopic = this.mode === "topic";
+    const isGame = this.mode === "game";
 
     if (this.modeSelect && this.modeSelect.value !== this.mode) {
       this.modeSelect.value = this.mode;
+    }
+
+    if (typeof GameUI !== "undefined") {
+      GameUI.setActive(isGame);
     }
 
     this.updateTaskChrome();

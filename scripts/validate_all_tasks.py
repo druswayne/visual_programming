@@ -12,21 +12,25 @@ from scripts.task_references import REFERENCE_SOLUTIONS
 
 
 def main():
+    from app import create_app
+
     errors = []
     missing = []
     total = 0
+    app = create_app()
 
-    for topic in get_topics():
-        for task in TASKS_BY_TOPIC[topic["id"]]:
-            total += 1
-            tid = task["id"]
-            code = REFERENCE_SOLUTIONS.get(tid)
-            if not code:
-                missing.append(tid)
-                continue
-            result = check_solution(code, task["tests"])
-            if not result["success"]:
-                errors.append({"id": tid, "title": task["title"], "result": result})
+    with app.app_context(), app.test_request_context("/"):
+        for topic in get_topics():
+            for task in TASKS_BY_TOPIC[topic["id"]]:
+                total += 1
+                tid = task["id"]
+                code = REFERENCE_SOLUTIONS.get(tid)
+                if not code:
+                    missing.append(tid)
+                    continue
+                result = check_solution(code, task["tests"])
+                if not result["success"]:
+                    errors.append({"id": tid, "title": task["title"], "result": result})
 
     print(f"Всего задач: {total}")
     print(f"Эталонов: {len(REFERENCE_SOLUTIONS)}")

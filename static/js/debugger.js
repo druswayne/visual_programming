@@ -220,6 +220,7 @@ const StepDebugger = {
 
   async start() {
     if (!this.workspace || this.loading) return;
+    if (typeof GameUI !== "undefined" && GameUI.active) return;
 
     if (typeof CodeEditor !== "undefined" && CodeEditor.isEditMode()) {
       setStatus("error", t("status.error"));

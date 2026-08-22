@@ -7,8 +7,10 @@ from math import ceil
 
 from sqlalchemy import case, func
 
+from data.game.registry import MISSIONS_BY_TRACK
 from data.registry import TASKS_BY_TOPIC
 from extensions import db
+from game.unlock import TRACK_TOPIC_IDS
 from models import SkillXpAward, TaskProgress, User
 
 TOP_LIMIT = 50
@@ -33,6 +35,9 @@ TITLES = (
 )
 
 _TOPIC_TOTALS = {tid: len(tasks) for tid, tasks in TASKS_BY_TOPIC.items()}
+_TOPIC_TOTALS.update(
+    {TRACK_TOPIC_IDS[track_id]: len(items) for track_id, items in MISSIONS_BY_TRACK.items()}
+)
 
 
 def is_hidden_from_leaderboard(user: User) -> bool:

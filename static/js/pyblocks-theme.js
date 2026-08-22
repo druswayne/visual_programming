@@ -18,13 +18,15 @@
     io: ["#4A6878", "#3A5260", "#283840"],
     start: ["#3D6B52", "#2E5540", "#1E3828"],
     end: ["#7A5238", "#604030", "#483020"],
+    robot: ["#3A6A78", "#2E5560", "#203C44"],
+    sensor: ["#4A6870", "#3A545C", "#283840"],
   };
 
   window.pyblocksTheme = Blockly.Theme.defineTheme("pyblocks", {
     base: Blockly.Themes.Classic,
     fontStyle: {
       family: '"Segoe UI", system-ui, sans-serif',
-      weight: "500",
+      weight: "600",
       size: 11,
     },
     blockStyles: {
@@ -78,6 +80,16 @@
         colourPrimary: C.io[0],
         colourSecondary: C.io[1],
         colourTertiary: C.io[2],
+      },
+      robot_blocks: {
+        colourPrimary: C.robot[0],
+        colourSecondary: C.robot[1],
+        colourTertiary: C.robot[2],
+      },
+      robot_sensor_blocks: {
+        colourPrimary: C.sensor[0],
+        colourSecondary: C.sensor[1],
+        colourTertiary: C.sensor[2],
       },
     },
     categoryStyles: {

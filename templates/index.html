@@ -54,15 +54,21 @@
               aria-expanded="false"
               aria-controls="blocksPanel"
             >{{ _('editor.blocks') }}</button>
+            <div class="mode-switch" id="modeSwitch" role="group" aria-label="{{ _('editor.mode_group') }}">
+              <button type="button" class="mode-switch__btn is-active" data-mode="sandbox">{{ _('editor.mode_sandbox') }}</button>
+              {% if current_user.is_authenticated %}
+              <button type="button" class="mode-switch__btn" data-mode="topic">{{ _('editor.mode_tasks') }}</button>
+              <button type="button" class="mode-switch__btn" data-mode="game">{{ _('editor.mode_game') }}</button>
+              {% endif %}
+            </div>
+            <select id="modeSelect" class="visually-hidden" aria-hidden="true" tabindex="-1">
+              <option value="sandbox">{{ _('editor.mode_sandbox') }}</option>
+              {% if current_user.is_authenticated %}
+              <option value="topic">{{ _('editor.mode_tasks') }}</option>
+              <option value="game">{{ _('editor.mode_game') }}</option>
+              {% endif %}
+            </select>
             {% if current_user.is_authenticated %}
-              <div class="mode-switch" id="modeSwitch" role="group" aria-label="{{ _('editor.mode_group') }}">
-                <button type="button" class="mode-switch__btn is-active" data-mode="sandbox">{{ _('editor.mode_sandbox') }}</button>
-                <button type="button" class="mode-switch__btn" data-mode="topic">{{ _('editor.mode_tasks') }}</button>
-              </div>
-              <select id="modeSelect" class="visually-hidden" aria-hidden="true" tabindex="-1">
-                <option value="sandbox">{{ _('editor.mode_sandbox') }}</option>
-                <option value="topic">{{ _('editor.mode_tasks') }}</option>
-              </select>
               <div class="sandbox-saves-bar" id="sandboxSavesBar" hidden>
                 <span class="sandbox-saves-bar__title" id="sandboxSaveTitle" hidden></span>
                 <button
@@ -79,7 +85,6 @@
                 >{{ _('editor.sandbox_open') }}</button>
               </div>
             {% else %}
-              <span class="mode-badge__label">{{ _('editor.mode_sandbox') }}</span>
               <a href="{{ url_for('auth.login', next=url_for('learn')) }}" class="btn btn--ghost btn--small btn--nav-login">{{ _('editor.login_for_tasks') }}</a>
             {% endif %}
 
@@ -97,6 +102,21 @@
                 </select>
               </label>
               <button id="btnTopicMore" class="picker-group__more btn btn--small btn--topic-more" type="button" hidden>{{ _('editor.more') }}</button>
+            </div>
+
+            <div class="picker-group" id="gamePickersRow" hidden>
+              <label class="picker-group__item picker-group__item--topic" for="gameTrackSelect">
+                <span class="picker-group__label">{{ _('game.track') }}</span>
+                <select id="gameTrackSelect" aria-label="{{ _('game.select_track') }}">
+                  <option value="">{{ _('game.select_track') }}</option>
+                </select>
+              </label>
+              <label class="picker-group__item picker-group__item--task" for="gameMissionSelect">
+                <span class="picker-group__label">{{ _('game.mission') }}</span>
+                <select id="gameMissionSelect" aria-label="{{ _('game.select_mission') }}" disabled>
+                  <option value="">{{ _('game.select_mission') }}</option>
+                </select>
+              </label>
             </div>
           </div>
         </div>
@@ -138,6 +158,24 @@
                 <p id="taskHint" class="task-hint" hidden></p>
               </div>
             </section>
+            <section class="task-strip" id="gamePanel" hidden>
+              <div class="task-strip__header">
+                <div class="task-strip__titles">
+                  <h2 id="gameTitle" class="task-strip__title">{{ _('game.mission') }}</h2>
+                  <span id="gameMeta" class="task-meta"></span>
+                </div>
+                <div class="task-nav">
+                  <button id="btnGamePrev" class="btn btn--small" type="button" hidden title="{{ _('game.prev_mission') }}">←</button>
+                  <button id="btnGameNext" class="btn btn--small" type="button" hidden title="{{ _('game.next_mission') }}">→</button>
+                  <button id="btnGameSolution" class="btn btn--small btn--ghost btn--my-solution" type="button" hidden title="{{ _('editor.my_solution') }}">{{ _('editor.my_solution') }}</button>
+                  <button id="btnGameCheck" class="btn btn--small btn--check" type="button" hidden>{{ _('editor.check') }}</button>
+                </div>
+              </div>
+              <div class="task-strip__body">
+                <p id="gameCondition" class="task-condition"></p>
+                <p id="gameHint" class="task-hint" hidden></p>
+              </div>
+            </section>
           </div>
         </div>
       </div>
@@ -150,6 +188,37 @@
         <button id="btnDebugStart" class="btn btn--ghost btn--icon" type="button" title="{{ _('editor.debug') }}" aria-label="{{ _('editor.debug') }}">⏭</button>
         <button id="btnClear" class="btn btn--ghost btn--icon" type="button" title="{{ _('editor.clear') }}" aria-label="{{ _('editor.clear') }}">🗑</button>
       </div>
+
+      <section class="panel panel--game" id="gameStage" hidden>
+        <div class="panel__header">
+          <h2>{{ _('game.field') }}</h2>
+          <div class="game-stage__tools">
+            <label class="game-stage__speed" title="{{ _('editor.speed') }}">
+              <span>{{ _('editor.speed') }}</span>
+              <select id="gameSpeed">
+                <option value="600">{{ _('editor.speed_slow') }}</option>
+                <option value="320" selected>{{ _('editor.speed_normal') }}</option>
+                <option value="120">{{ _('editor.speed_fast') }}</option>
+              </select>
+            </label>
+            <button id="btnGameReset" class="btn btn--small btn--ghost" type="button">{{ _('game.reset_field') }}</button>
+          </div>
+        </div>
+        <div class="game-world-wrap" id="gameWorldWrap">
+          <div class="game-world" id="gameWorld" aria-label="{{ _('game.field') }}"></div>
+        </div>
+        <p class="game-stage__message" id="gameMessage">{{ _('game.pick_mission') }}</p>
+        <div class="game-celebrate" id="gameCelebrate" hidden>
+          <div class="game-celebrate__flash" aria-hidden="true"></div>
+          <div class="game-celebrate__rays" aria-hidden="true"></div>
+          <div class="game-celebrate__burst" aria-hidden="true"></div>
+          <div class="game-celebrate__card">
+            <span class="game-celebrate__badge" aria-hidden="true">✓</span>
+            <p class="game-celebrate__title" id="gameCelebrateTitle"></p>
+            <p class="game-celebrate__sub" id="gameCelebrateSub"></p>
+          </div>
+        </div>
+      </section>
 
       <section class="panel panel--code" id="codePanel">
         <div class="panel__header">
@@ -429,11 +498,13 @@
   <script src="{{ url_for('static', filename='js/compact-renderer.js') }}"></script>
   <script src="{{ url_for('static', filename='js/method-blocks.js') }}"></script>
   <script src="{{ url_for('static', filename='js/toolbox.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/game-toolbox.js') }}"></script>
   <script src="{{ url_for('static', filename='js/scratch-toolbox.js') }}"></script>
   <script src="{{ url_for('static', filename='js/blocks.js') }}"></script>
   <script src="{{ url_for('static', filename='js/program-frame.js') }}"></script>
   <script src="{{ url_for('static', filename='js/guide-preview.js') }}"></script>
   <script src="{{ url_for('static', filename='js/generator.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/game-blocks.js') }}"></script>
   <script src="{{ url_for('static', filename='js/block-code-sync.js') }}"></script>
   <script src="{{ url_for('static', filename='js/blocks-builder.js') }}"></script>
   <script src="{{ url_for('static', filename='js/python-highlighter.js') }}"></script>
@@ -444,6 +515,8 @@
   <script src="{{ url_for('static', filename='js/debugger.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom-select.js') }}"></script>
   <script src="{{ url_for('static', filename='js/topics-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/game-world-view.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/game-ui.js') }}"></script>
   <script src="{{ url_for('static', filename='js/sandbox-saves.js') }}"></script>
   <script src="{{ url_for('static', filename='js/pyblocks-theme.js') }}"></script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>

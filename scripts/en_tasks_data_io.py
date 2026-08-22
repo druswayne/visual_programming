@@ -35,8 +35,9 @@ IO: dict[str, dict] = {
     "io-04": {
         "title": "Favorite subject",
         "condition": (
-            "A student answers the question «Which subject do you like most?». "
-            "Save the answer computer science in variable subject and show it on screen."
+            "A student named their favorite subject. Store computer science "
+            "in variable subject (this is a ready-made answer, do not use an input block) "
+            "and print it."
         ),
         "tests": [{"expected_output": "computer science"}],
     },

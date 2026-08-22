@@ -79,6 +79,17 @@ def _is_fix_task(topic_id: str, task_id: str) -> bool:
 
 def calc_xp_for_completed_task(topic_id: str, task_id: str, attempts_count: int) -> TaskXpResult:
     """XP начисляется в ветку темы, где решена задача."""
+    if topic_id.startswith("game_"):
+        base = 10
+        if attempts_count == 1:
+            base += 4
+        elif attempts_count <= 2:
+            base += 2
+        medals: dict[str, int] = {}
+        if attempts_count == 1:
+            medals["clean_solve"] = 1
+        return TaskXpResult(xp_by_branch={topic_id: base}, medals=medals)
+
     if topic_id not in BRANCH_IDS:
         topic_id = "io"
 

@@ -73,11 +73,14 @@ def check_solution(code: str, tests: list) -> dict:
             }
 
         item = {"index": index + 1, "passed": False}
+        uses_input = "input(" in code.replace(" ", "")
 
         if not result["success"]:
             item["message"] = result.get("error") or _("check.exec_error")
             if test.get("stdin"):
                 item["hint"] = _("check.input_hint")
+            elif uses_input:
+                item["hint"] = _("check.no_stdin_for_input")
             details.append(item)
             continue
 

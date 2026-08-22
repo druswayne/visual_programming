@@ -33,6 +33,7 @@ from i18n import (
 )
 from models import TaskProgress, User
 from limits import init_rate_limiter, rate_limit_execution
+from game_routes import game_bp
 from leaderboard_routes import leaderboard_bp
 from profile_routes import profile_bp
 from progress_service import get_user_task_progress, maybe_record_check
@@ -122,6 +123,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(leaderboard_bp)
+    app.register_blueprint(game_bp)
 
     with app.app_context():
         db.create_all()
@@ -403,9 +405,10 @@ def register_routes(app):
     @app.route("/api/progress/<topic_id>/<task_id>", methods=["GET"])
     @login_required
     def get_task_progress(topic_id, task_id):
-        locked = assert_topic_unlocked(current_user.id, topic_id)
-        if locked:
-            return jsonify({"error": locked["unlock_hint"], "locked": True, **locked}), 403
+        if not topic_id.startswith("game_"):
+            locked = assert_topic_unlocked(current_user.id, topic_id)
+            if locked:
+                return jsonify({"error": locked["unlock_hint"], "locked": True, **locked}), 403
 
         progress = get_user_task_progress(current_user, topic_id, task_id)
         if not progress:

@@ -231,6 +231,11 @@
         <p>{{ _('landing.feature_profile_desc') }}</p>
       </article>
       <article class="feature-card">
+        <div class="feature-card__icon">🤖</div>
+        <h3>{{ _('landing.feature_game_title') }}</h3>
+        <p>{{ _('landing.feature_game_desc') }}</p>
+      </article>
+      <article class="feature-card">
         <div class="feature-card__icon">🏆</div>
         <h3>{{ _('landing.feature_leaderboard_title') }}</h3>
         <p>{{ _('landing.feature_leaderboard_desc') }}</p>
@@ -253,6 +258,16 @@
     <div class="topics-preview__cta">
       <a href="{{ url_for('learn') }}" class="btn btn--cta">{{ _('landing.topics_try') }}</a>
     </div>
+  </section>
+
+  <section class="cta-block reveal">
+    <h2>{{ _('landing.game_title') }}</h2>
+    <p>{{ _('landing.game_lead') }}</p>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('learn', mode='game') }}" class="btn btn--cta btn--huge">{{ _('landing.game_cta') }}</a>
+    {% else %}
+    <a href="{{ url_for('auth.login', next=url_for('learn', mode='game')) }}" class="btn btn--cta btn--huge">{{ _('landing.game_cta') }}</a>
+    {% endif %}
   </section>
 
   <section class="cta-block reveal">

@@ -968,8 +968,8 @@ FOR: dict[str, dict] = {
             "how many times that letter appears in the word, and print the number."
         ),
         "tests": [
-            {"stdin": "a\nbanana\n", "expected_output": "2"},
-            {"stdin": "o\ncat\n", "expected_output": "1"},
+            {"stdin": "a\nbanana\n", "expected_output": "3"},
+            {"stdin": "t\ncat\n", "expected_output": "1"},
         ],
     },
     "for-35": {
@@ -1259,13 +1259,13 @@ FOR_FIX: dict[str, dict] = {
     "for-fix-09": {
         "title": "Fix: letter count",
         "condition": (
-            "Counting the letter «a» in the word «banana» gives 1 — "
+            "Counting the letter «a» in the word «banana» gives 0 — "
             "each character is compared to the whole string. " + _FIX_INTRO
         ),
         "hint": "Compare each character with the sought letter ch.",
         "tests": [
-            {"stdin": "a\nbanana\n", "expected_output": "2"},
-            {"stdin": "o\ncat\n", "expected_output": "1"},
+            {"stdin": "a\nbanana\n", "expected_output": "3"},
+            {"stdin": "t\ncat\n", "expected_output": "1"},
         ],
     },
     "for-fix-10": {

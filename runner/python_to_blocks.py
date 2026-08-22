@@ -491,6 +491,8 @@ class PythonToBlocksConverter:
                 }
 
         if isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
+            if node.func.value.id == "robot":
+                return self._robot_call(node)
             if node.func.value.id == "math" and node.func.attr in MATH_SINGLE_MAP:
                 if len(node.args) != 1:
                     raise self._err("runner.ptb.math_one_arg", node, name=node.func.attr)
@@ -517,6 +519,34 @@ class PythonToBlocksConverter:
         if isinstance(node.func, ast.Attribute):
             return self._method_call(node)
 
+        raise self._err("runner.ptb.call_not_supported", node)
+
+    ROBOT_STMT_METHODS = frozenset({"up", "down", "left", "right", "paint", "pick", "put"})
+    ROBOT_BOOL_METHODS = frozenset(
+        {
+            "wall_up",
+            "wall_down",
+            "wall_left",
+            "wall_right",
+            "box_up",
+            "box_down",
+            "box_left",
+            "box_right",
+            "painted",
+            "has_item",
+            "carrying",
+            "finish",
+        }
+    )
+
+    def _robot_call(self, node: ast.Call) -> dict[str, Any]:
+        method = node.func.attr
+        if node.args or node.keywords:
+            raise self._err("runner.ptb.call_not_supported", node)
+        if method in self.ROBOT_STMT_METHODS:
+            return {"block": {"type": f"py_robot_{method}"}, "statement": True}
+        if method in self.ROBOT_BOOL_METHODS:
+            return {"block": {"type": f"py_robot_{method}"}}
         raise self._err("runner.ptb.call_not_supported", node)
 
     def _method_call(self, node: ast.Call) -> dict[str, Any]:
